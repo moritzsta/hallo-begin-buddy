@@ -1,17 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp, user } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,35 +39,38 @@ const Auth = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher />
+      </div>
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Smart Document Storage</CardTitle>
+          <CardTitle>{t('auth.title')}</CardTitle>
           <CardDescription>
-            Melden Sie sich an oder erstellen Sie ein neues Konto
+            {t('auth.subtitle')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Anmelden</TabsTrigger>
-              <TabsTrigger value="signup">Registrieren</TabsTrigger>
+              <TabsTrigger value="signin">{t('auth.signin')}</TabsTrigger>
+              <TabsTrigger value="signup">{t('auth.signup')}</TabsTrigger>
             </TabsList>
             
             <TabsContent value="signin">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signin-email">E-Mail</Label>
+                  <Label htmlFor="signin-email">{t('auth.email')}</Label>
                   <Input
                     id="signin-email"
                     type="email"
-                    placeholder="ihre@email.de"
+                    placeholder={t('auth.emailPlaceholder')}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signin-password">Passwort</Label>
+                  <Label htmlFor="signin-password">{t('auth.password')}</Label>
                   <Input
                     id="signin-password"
                     type="password"
@@ -74,7 +80,7 @@ const Auth = () => {
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? 'Wird angemeldet...' : 'Anmelden'}
+                  {isLoading ? t('auth.signingIn') : t('auth.signin')}
                 </Button>
               </form>
             </TabsContent>
@@ -82,18 +88,18 @@ const Auth = () => {
             <TabsContent value="signup">
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">E-Mail</Label>
+                  <Label htmlFor="signup-email">{t('auth.email')}</Label>
                   <Input
                     id="signup-email"
                     type="email"
-                    placeholder="ihre@email.de"
+                    placeholder={t('auth.emailPlaceholder')}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Passwort</Label>
+                  <Label htmlFor="signup-password">{t('auth.password')}</Label>
                   <Input
                     id="signup-password"
                     type="password"
@@ -104,7 +110,7 @@ const Auth = () => {
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? 'Wird registriert...' : 'Konto erstellen'}
+                  {isLoading ? t('auth.signingUp') : t('auth.createAccount')}
                 </Button>
               </form>
             </TabsContent>

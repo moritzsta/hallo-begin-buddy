@@ -17,7 +17,8 @@
 | T04 | Auth & Profil-Management | ✅ Done |
 | T05 | Smart Upload UI | ✅ Done |
 | T06 | Document List Component | ✅ Done |
-| T07 | i18n Setup (German/English) | Backlog |
+| T07 | i18n Setup (German/English) | ✅ Done |
+| T08 | Dark Mode & Theme Switcher | Backlog |
 | T05 | Create `user_roles` Table | Backlog |
 | T06 | RLS Policies – Owner-Only Access | Backlog |
 | T07 | Storage Bucket & RLS | Backlog |
@@ -56,6 +57,31 @@
 ## Change Log
 
 *Neueste Einträge oben. Format: [UTC Timestamp] [Task-ID] Beschreibung – Dateien/Ordner – Diffs (Stichpunkte)*
+
+### 2025-10-09T17:30:00Z – T07 Completed
+- **[T07]** i18n Setup (German/English) implementiert
+- Dependencies installiert:
+  - `i18next` – Core i18n Library
+  - `react-i18next` – React Integration
+- Dateien erstellt:
+  - `src/i18n/config.ts` – i18n Konfiguration mit DE/EN Support
+  - `src/i18n/locales/de.json` – Deutsche Übersetzungen (App, Auth, Upload, Documents, Common)
+  - `src/i18n/locales/en.json` – Englische Übersetzungen (vollständig)
+  - `src/components/LanguageSwitcher.tsx` – Sprach-Dropdown (DE/EN mit Flags)
+- Features:
+  - Sprachumschalter speichert Auswahl im Profil (profiles.locale)
+  - AuthContext lädt Sprache beim Login aus Profil
+  - Fallback auf Deutsch wenn keine Sprache gesetzt
+  - Alle UI-Texte übersetzt (Auth, Upload, Documents, Toasts)
+  - Toast-Nachrichten verwenden i18n
+- Komponenten aktualisiert:
+  - `src/App.tsx` – i18n Config importiert
+  - `src/contexts/AuthContext.tsx` – useTranslation für Toasts, Sprache aus Profil laden
+  - `src/pages/Auth.tsx` – useTranslation für alle Texte, LanguageSwitcher im Header
+  - `src/pages/Index.tsx` – useTranslation, LanguageSwitcher im Header
+  - `src/components/upload/FileUpload.tsx` – useTranslation für UI & Toasts
+  - `src/components/documents/DocumentList.tsx` – useTranslation für Tabelle, Suche, Aktionen, Dialoge
+- Next Step: T08 – Dark Mode & Theme Switcher
 
 ### 2025-10-09T17:00:00Z – T06 Completed
 - **[T06]** Document List Component implementiert
@@ -242,16 +268,16 @@
 
 ## Next Step
 
-**Task ID:** T07 – i18n Setup (German/English)  
+**Task ID:** T08 – Dark Mode & Theme Switcher  
 **Akzeptanzkriterien:**
-- i18next Integration
-- Deutsche und englische Übersetzungen
-- Sprachumschalter in Header
-- Speicherung der Sprache im Profil
-- Alle UI-Texte übersetzbar
-- Fallback auf Deutsch
+- next-themes Integration für Theme-Management
+- Light / Dark / System Theme Support
+- Theme Switcher in Header
+- Speicherung des Themes im Profil
+- CSS Variables für Light/Dark angepasst
+- Alle Komponenten unterstützen Dark Mode
 
-**Aktion:** i18next konfigurieren, Übersetzungsdateien erstellen, Language Switcher implementieren, Context-Integration.
+**Aktion:** next-themes konfigurieren, Theme Switcher implementieren, Dark Mode CSS Variables, Profil-Integration.
 
 ---
 

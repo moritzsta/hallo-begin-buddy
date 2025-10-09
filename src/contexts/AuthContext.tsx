@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 
 interface Profile {
   id: string;
@@ -31,6 +32,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { i18n } = useTranslation();
 
   const fetchProfile = async (userId: string) => {
     const { data, error } = await supabase
@@ -43,6 +45,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.error('Error fetching profile:', error);
       return null;
     }
+    
+    // Set language from profile
+    if (data?.locale) {
+      i18n.changeLanguage(data.locale);
+    }
+    
     return data;
   };
 
@@ -98,14 +106,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     if (error) {
       toast({
-        title: 'Fehler bei der Registrierung',
+        title: i18n.t('auth.errorSignup'),
         description: error.message,
         variant: 'destructive',
       });
     } else {
       toast({
-        title: 'Erfolgreich registriert',
-        description: 'Sie können sich jetzt anmelden.',
+        title: i18n.t('auth.successSignup'),
+        description: i18n.t('auth.successSignupDesc'),
       });
     }
 
@@ -120,7 +128,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     if (error) {
       toast({
-        title: 'Fehler bei der Anmeldung',
+        title: i18n.t('auth.errorSignin'),
         description: error.message,
         variant: 'destructive',
       });
@@ -133,7 +141,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { error } = await supabase.auth.signOut();
     if (error) {
       toast({
-        title: 'Fehler beim Abmelden',
+        title: i18n.t('auth.errorSignout'),
         description: error.message,
         variant: 'destructive',
       });

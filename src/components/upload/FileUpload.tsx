@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { useTranslation } from 'react-i18next';
 import { Upload, X, FileIcon, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -27,13 +28,17 @@ export const FileUpload = ({ onUploadComplete }: { onUploadComplete?: () => void
   const [uploadFiles, setUploadFiles] = useState<UploadFile[]>([]);
   const { toast } = useToast();
   const { user, profile } = useAuth();
+  const { t } = useTranslation();
 
   const planTier = (profile?.plan_tier || 'free') as keyof typeof PLAN_LIMITS;
   const limits = PLAN_LIMITS[planTier];
 
   const validateFile = (file: File): string | null => {
     if (file.size > limits.maxSize) {
-      return `Datei zu groß (max. ${Math.round(limits.maxSize / 1024 / 1024)}MB für ${planTier}-Plan)`;
+      return t('upload.fileTooLarge', { 
+        size: Math.round(limits.maxSize / 1024 / 1024), 
+        tier: planTier 
+      });
     }
     return null;
   };
@@ -94,20 +99,20 @@ export const FileUpload = ({ onUploadComplete }: { onUploadComplete?: () => void
       );
 
       toast({
-        title: 'Upload erfolgreich',
-        description: `${file.name} wurde hochgeladen.`,
+        title: t('upload.uploadSuccess'),
+        description: t('upload.uploadSuccessDesc', { filename: file.name }),
       });
 
     } catch (error) {
       console.error('Upload error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unbekannter Fehler';
+      const errorMessage = error instanceof Error ? error.message : t('common.unknownError');
       
       setUploadFiles(prev => 
         prev.map(f => f.id === id ? { ...f, status: 'error' as const, error: errorMessage } : f)
       );
 
       toast({
-        title: 'Upload fehlgeschlagen',
+        title: t('upload.uploadError'),
         description: errorMessage,
         variant: 'destructive',
       });
@@ -159,20 +164,20 @@ export const FileUpload = ({ onUploadComplete }: { onUploadComplete?: () => void
         <input {...getInputProps()} />
         <Upload className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
         <p className="text-lg font-medium mb-2">
-          {isDragActive ? 'Dateien hier ablegen...' : 'Dateien hochladen'}
+          {isDragActive ? t('upload.dragDropActive') : t('upload.dragDrop')}
         </p>
         <p className="text-sm text-muted-foreground">
-          Klicken oder Dateien hierher ziehen (max. {Math.round(limits.maxSize / 1024 / 1024)}MB pro Datei)
+          {t('upload.clickOrDrag')} ({t('upload.maxSize', { size: Math.round(limits.maxSize / 1024 / 1024) })})
         </p>
       </Card>
 
       {uploadFiles.length > 0 && (
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium">Uploads ({uploadFiles.length})</h3>
+            <h3 className="text-sm font-medium">{t('upload.uploads')} ({uploadFiles.length})</h3>
             {uploadFiles.some(f => f.status === 'success') && (
               <Button onClick={clearCompleted} variant="ghost" size="sm">
-                Erledigte entfernen
+                {t('upload.clearCompleted')}
               </Button>
             )}
           </div>
@@ -197,17 +202,17 @@ export const FileUpload = ({ onUploadComplete }: { onUploadComplete?: () => void
                     {(uploadFile.file.size / 1024 / 1024).toFixed(2)} MB
                   </p>
 
-                  {uploadFile.status === 'uploading' && (
+                   {uploadFile.status === 'uploading' && (
                     <div className="space-y-1">
                       <Progress value={uploadFile.progress} className="h-1" />
                       <p className="text-xs text-muted-foreground">
-                        Hochladen... {uploadFile.progress}%
+                        {t('upload.uploading')} {uploadFile.progress}%
                       </p>
                     </div>
                   )}
 
                   {uploadFile.status === 'success' && (
-                    <p className="text-xs text-green-600">✓ Erfolgreich hochgeladen</p>
+                    <p className="text-xs text-green-600">✓ {t('upload.success')}</p>
                   )}
 
                   {uploadFile.status === 'error' && (
@@ -217,7 +222,7 @@ export const FileUpload = ({ onUploadComplete }: { onUploadComplete?: () => void
                   {uploadFile.status === 'pending' && (
                     <div className="flex items-center gap-1 text-xs text-muted-foreground">
                       <Loader2 className="h-3 w-3 animate-spin" />
-                      Warten...
+                      {t('upload.waiting')}
                     </div>
                   )}
                 </div>

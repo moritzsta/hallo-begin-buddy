@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -60,6 +61,7 @@ type SortOrder = 'asc' | 'desc';
 export const DocumentList = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -111,14 +113,14 @@ export const DocumentList = () => {
       window.open(data.signedUrl, '_blank');
 
       toast({
-        title: 'Download gestartet',
-        description: `${file.title} wird heruntergeladen.`,
+        title: t('documents.downloadStarted'),
+        description: t('documents.downloadStartedDesc', { filename: file.title }),
       });
     } catch (error) {
       console.error('Download error:', error);
       toast({
-        title: 'Download fehlgeschlagen',
-        description: error instanceof Error ? error.message : 'Unbekannter Fehler',
+        title: t('documents.downloadError'),
+        description: error instanceof Error ? error.message : t('common.unknownError'),
         variant: 'destructive',
       });
     }
@@ -148,15 +150,15 @@ export const DocumentList = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['files'] });
       toast({
-        title: 'Datei gelöscht',
-        description: 'Die Datei wurde erfolgreich gelöscht.',
+        title: t('documents.deleteSuccess'),
+        description: t('documents.deleteSuccessDesc'),
       });
       setDeleteId(null);
     },
     onError: (error) => {
       toast({
-        title: 'Löschen fehlgeschlagen',
-        description: error instanceof Error ? error.message : 'Unbekannter Fehler',
+        title: t('documents.deleteError'),
+        description: error instanceof Error ? error.message : t('common.unknownError'),
         variant: 'destructive',
       });
     },
@@ -175,16 +177,16 @@ export const DocumentList = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['files'] });
       toast({
-        title: 'Datei umbenannt',
-        description: 'Der Dateiname wurde erfolgreich geändert.',
+        title: t('documents.renameSuccess'),
+        description: t('documents.renameSuccessDesc'),
       });
       setEditingId(null);
       setEditTitle('');
     },
     onError: (error) => {
       toast({
-        title: 'Umbenennen fehlgeschlagen',
-        description: error instanceof Error ? error.message : 'Unbekannter Fehler',
+        title: t('documents.renameError'),
+        description: error instanceof Error ? error.message : t('common.unknownError'),
         variant: 'destructive',
       });
     },
@@ -224,7 +226,7 @@ export const DocumentList = () => {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Dokumente durchsuchen..."
+              placeholder={t('documents.search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9"
@@ -236,9 +238,9 @@ export const DocumentList = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="created_at">Datum</SelectItem>
-                <SelectItem value="title">Name</SelectItem>
-                <SelectItem value="size">Größe</SelectItem>
+                <SelectItem value="created_at">{t('documents.sortDate')}</SelectItem>
+                <SelectItem value="title">{t('documents.sortName')}</SelectItem>
+                <SelectItem value="size">{t('documents.sortSize')}</SelectItem>
               </SelectContent>
             </Select>
             <Button
@@ -256,7 +258,7 @@ export const DocumentList = () => {
         <Card className="p-12 text-center">
           <FileIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
           <p className="text-muted-foreground">
-            {searchQuery ? 'Keine Dokumente gefunden' : 'Noch keine Dokumente hochgeladen'}
+            {searchQuery ? t('documents.noResults') : t('documents.noDocuments')}
           </p>
         </Card>
       ) : (
@@ -264,12 +266,12 @@ export const DocumentList = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Typ</TableHead>
-                <TableHead>Größe</TableHead>
-                <TableHead>Tags</TableHead>
-                <TableHead>Datum</TableHead>
-                <TableHead className="text-right">Aktionen</TableHead>
+                <TableHead>{t('documents.name')}</TableHead>
+                <TableHead>{t('documents.type')}</TableHead>
+                <TableHead>{t('documents.size')}</TableHead>
+                <TableHead>{t('documents.tags')}</TableHead>
+                <TableHead>{t('documents.date')}</TableHead>
+                <TableHead className="text-right">{t('documents.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -289,7 +291,7 @@ export const DocumentList = () => {
                           autoFocus
                         />
                         <Button size="sm" onClick={saveEdit}>
-                          Speichern
+                          {t('documents.save')}
                         </Button>
                       </div>
                     ) : (
@@ -331,18 +333,18 @@ export const DocumentList = () => {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => downloadFile(file)}>
                           <Download className="h-4 w-4 mr-2" />
-                          Herunterladen
+                          {t('documents.download')}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => startEdit(file)}>
                           <Edit className="h-4 w-4 mr-2" />
-                          Umbenennen
+                          {t('documents.rename')}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => setDeleteId(file.id)}
                           className="text-destructive"
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
-                          Löschen
+                          {t('documents.delete')}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -354,22 +356,21 @@ export const DocumentList = () => {
         </Card>
       )}
 
-      {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Datei löschen?</AlertDialogTitle>
+            <AlertDialogTitle>{t('documents.deleteConfirm')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Diese Aktion kann nicht rückgängig gemacht werden. Die Datei wird dauerhaft gelöscht.
+              {t('documents.deleteConfirmDesc')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+            <AlertDialogCancel>{t('documents.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => deleteId && deleteMutation.mutate(deleteId)}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Löschen
+              {t('documents.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
