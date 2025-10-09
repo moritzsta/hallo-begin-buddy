@@ -88,7 +88,7 @@ export const DocumentDetailsTable = ({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className={cn(
-                      "font-medium truncate text-sm",
+                      "font-medium truncate",
                       isNewFile(file) && "font-semibold"
                     )}>
                       {file.title}
@@ -96,7 +96,7 @@ export const DocumentDetailsTable = ({
                     {isNewFile(file) && (
                       <Badge 
                         variant={isLifestyle ? "lifestyle" : "default"} 
-                        className="text-xs shrink-0 px-1.5 py-0"
+                        className="text-xs shrink-0 px-2 py-0.5"
                       >
                         {t('documents.new')}
                       </Badge>
@@ -108,7 +108,7 @@ export const DocumentDetailsTable = ({
                 <div className="shrink-0">
                   <Badge 
                     variant="outline" 
-                    className={cn("text-xs font-medium", getFileTypeColor(file.mime))}
+                    className={cn("text-sm font-medium", getFileTypeColor(file.mime))}
                   >
                     {getFileTypeLabel(file.mime)}
                   </Badge>
@@ -116,7 +116,7 @@ export const DocumentDetailsTable = ({
 
                 {/* File Size */}
                 <div className="shrink-0 w-16 text-right">
-                  <span className="text-xs text-muted-foreground font-mono">
+                  <span className="text-sm text-muted-foreground font-mono">
                     {formatFileSize(file.size)}
                   </span>
                 </div>
@@ -129,17 +129,17 @@ export const DocumentDetailsTable = ({
                         <Badge 
                           key={tag} 
                           variant={isLifestyle ? "lifestyle-secondary" : "secondary"}
-                          className="text-xs truncate max-w-[70px] px-1.5 py-0"
+                          className="text-sm truncate max-w-[70px] px-2 py-0.5"
                         >
                           {tag}
                         </Badge>
                       ))}
-                      {file.tags.length > 2 && (
+                      {file.tags.length > 3 && (
                         <Badge 
                           variant="outline" 
-                          className="text-xs px-1.5 py-0 bg-muted/50"
+                          className="text-sm px-2 py-0.5 bg-muted/50"
                         >
-                          +{file.tags.length - 2}
+                          +{file.tags.length - 3}
                         </Badge>
                       )}
                     </div>
@@ -150,7 +150,7 @@ export const DocumentDetailsTable = ({
 
                 {/* Date */}
                 <div className="shrink-0 w-24 text-right">
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-sm text-muted-foreground">
                     {new Date(file.created_at).toLocaleDateString(undefined, {
                       year: '2-digit',
                       month: 'short',
