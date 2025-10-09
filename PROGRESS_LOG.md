@@ -19,7 +19,8 @@
 | T06 | Document List Component | ✅ Done |
 | T07 | i18n Setup (German/English) | ✅ Done |
 | T08 | Dark Mode & Theme Switcher | ✅ Done |
-| T05 | Create `user_roles` Table | Backlog |
+| T09 | Folder Management (CRUD + Hierarchy) | ✅ Done |
+| T05 | Create `user_roles` Table | ✅ Done (already exists) |
 | T06 | RLS Policies – Owner-Only Access | Backlog |
 | T07 | Storage Bucket & RLS | Backlog |
 | T08 | Admin-Gate Verification Function | Backlog |
@@ -57,6 +58,36 @@
 ## Change Log
 
 *Neueste Einträge oben. Format: [UTC Timestamp] [Task-ID] Beschreibung – Dateien/Ordner – Diffs (Stichpunkte)*
+
+### 2025-10-09T18:30:00Z – T09 Completed
+- **[T09]** Folder Management (CRUD + Hierarchy) implementiert
+- Hooks erstellt:
+  - `src/hooks/useFolders.ts` – CRUD-Operationen für Ordner mit Tanstack Query
+- Features:
+  - Ordner erstellen, umbenennen, löschen
+  - Hierarchie-Validierung (max. Tiefe 3)
+  - Zirkuläre Referenzen verhindern
+  - Owner-Only Access via RLS
+  - Cascade Delete für Unterordner und Dateien (via DB FK)
+- Komponenten erstellt:
+  - `src/components/folders/FolderTree.tsx` – Baum-Ansicht mit Expand/Collapse
+  - `src/components/folders/CreateFolderDialog.tsx` – Dialog zum Erstellen von Ordnern
+  - `src/components/folders/RenameFolderDialog.tsx` – Dialog zum Umbenennen
+  - `src/components/folders/DeleteFolderDialog.tsx` – Bestätigungs-Dialog zum Löschen
+- UI:
+  - Context-Menü mit Ordner-Operationen (Erstellen, Umbenennen, Löschen)
+  - Unterordner können nur bis Tiefe 3 erstellt werden
+  - Ordner-Auswahl in Sidebar
+  - "Alle Dateien" Ansicht als Wurzel
+  - Icons: Folder/FolderOpen mit Expand/Collapse
+- Übersetzungen:
+  - `src/i18n/locales/de.json` – Ordner-Übersetzungen hinzugefügt
+  - `src/i18n/locales/en.json` – Ordner-Übersetzungen hinzugefügt
+- Validierung:
+  - Max. Hierarchie-Tiefe: 3 Ebenen
+  - Zirkuläre Referenzen-Check beim Verschieben
+  - Fehler-Handling mit Toast-Benachrichtigungen
+- Next Step: T10 – Datei-Verschieben in Ordner (DocumentList Integration)
 
 ### 2025-10-09T18:00:00Z – T08 Completed
 - **[T08]** Dark Mode & Theme Switcher implementiert
@@ -294,14 +325,14 @@
 
 ## Next Step
 
-**Task ID:** T05 (aus Backlog) – Create `user_roles` Table  
+**Task ID:** T10 – Folder Sidebar & File Integration  
 **Akzeptanzkriterien:**
-- Migration für `user_roles` Tabelle
-- RLS Owner-Only Policies
-- Security Definer Function für Admin-Checks
-- Auto-Trigger für Default-Role bei User-Signup
+- FolderTree in Index.tsx Sidebar integrieren
+- DocumentList filtert nach ausgewähltem Ordner
+- FileUpload speichert in ausgewähltem Ordner
+- Move-File-Dialog ermöglicht Verschieben zwischen Ordnern
 
-**Aktion:** Migration erstellen für Rollen-Management, RLS Policies, Admin-Gate Function.
+**Aktion:** Sidebar-Layout mit FolderTree erstellen, Index.tsx anpassen, DocumentList & FileUpload mit Ordner-Kontext verbinden.
 
 ---
 

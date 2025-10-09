@@ -88,5 +88,32 @@
     "light": "Light",
     "dark": "Dark",
     "system": "System"
+  },
+  "folders": {
+    "title": "Folders",
+    "allFiles": "All Files",
+    "name": "Name",
+    "namePlaceholder": "Enter folder name",
+    "create": "Create",
+    "createTitle": "Create Folder",
+    "createDesc": "Create a new folder to organize your documents.",
+    "createSubfolder": "Create Subfolder",
+    "createSuccess": "Folder created",
+    "createSuccessDesc": "The folder has been created successfully.",
+    "createError": "Error creating folder",
+    "rename": "Rename",
+    "renameTitle": "Rename Folder",
+    "renameDesc": "Enter a new name for the folder.",
+    "updateSuccess": "Folder updated",
+    "updateSuccessDesc": "The folder has been updated successfully.",
+    "updateError": "Error updating folder",
+    "delete": "Delete",
+    "deleteConfirm": "Delete folder?",
+    "deleteConfirmDesc": "Are you sure you want to delete the folder \"{{name}}\"? All subfolders and files will also be deleted.",
+    "deleteSuccess": "Folder deleted",
+    "deleteSuccessDesc": "The folder has been deleted successfully.",
+    "deleteError": "Error deleting folder",
+    "maxDepthError": "Maximum folder depth (3 levels) reached",
+    "circularError": "Circular reference not allowed"
   }
 }

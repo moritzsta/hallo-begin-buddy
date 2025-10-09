@@ -88,5 +88,32 @@
     "light": "Hell",
     "dark": "Dunkel",
     "system": "System"
+  },
+  "folders": {
+    "title": "Ordner",
+    "allFiles": "Alle Dateien",
+    "name": "Name",
+    "namePlaceholder": "Ordnername eingeben",
+    "create": "Erstellen",
+    "createTitle": "Ordner erstellen",
+    "createDesc": "Erstellen Sie einen neuen Ordner zur Organisation Ihrer Dokumente.",
+    "createSubfolder": "Unterordner erstellen",
+    "createSuccess": "Ordner erstellt",
+    "createSuccessDesc": "Der Ordner wurde erfolgreich erstellt.",
+    "createError": "Fehler beim Erstellen",
+    "rename": "Umbenennen",
+    "renameTitle": "Ordner umbenennen",
+    "renameDesc": "Geben Sie einen neuen Namen für den Ordner ein.",
+    "updateSuccess": "Ordner aktualisiert",
+    "updateSuccessDesc": "Der Ordner wurde erfolgreich aktualisiert.",
+    "updateError": "Fehler beim Aktualisieren",
+    "delete": "Löschen",
+    "deleteConfirm": "Ordner löschen?",
+    "deleteConfirmDesc": "Möchten Sie den Ordner \"{{name}}\" wirklich löschen? Alle Unterordner und Dateien werden ebenfalls gelöscht.",
+    "deleteSuccess": "Ordner gelöscht",
+    "deleteSuccessDesc": "Der Ordner wurde erfolgreich gelöscht.",
+    "deleteError": "Fehler beim Löschen",
+    "maxDepthError": "Maximale Ordnertiefe (3 Ebenen) erreicht",
+    "circularError": "Zirkuläre Referenz nicht erlaubt"
   }
 }
