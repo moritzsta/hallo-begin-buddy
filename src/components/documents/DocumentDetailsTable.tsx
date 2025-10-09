@@ -11,7 +11,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Download, Trash2, Edit, FolderInput, Tags as TagsIcon, MoreVertical, Eye } from 'lucide-react';
+import { Download, Trash2, Edit, FolderInput, Tags as TagsIcon, MoreVertical, Eye, Link } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { listItem, getAnimationProps } from '@/lib/animations';
 
@@ -36,6 +36,7 @@ interface DocumentDetailsTableProps {
   onMove: (fileId: string) => void;
   onEditTags: (file: FileRecord) => void;
   onPreview: (file: FileRecord) => void;
+  onShare: (file: FileRecord) => void;
   formatFileSize: (bytes: number) => string;
 }
 
@@ -48,6 +49,7 @@ export const DocumentDetailsTable = ({
   onMove,
   onEditTags,
   onPreview,
+  onShare,
   formatFileSize,
 }: DocumentDetailsTableProps) => {
   const { t } = useTranslation();
@@ -179,6 +181,13 @@ export const DocumentDetailsTable = ({
                       >
                         <Eye className="h-4 w-4 text-indigo-500" />
                         <span className="font-medium">{t('documents.preview')}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => onShare(file)} 
+                        className="gap-2 rounded-md transition-colors hover:bg-accent focus:bg-accent"
+                      >
+                        <Link className="h-4 w-4 text-purple-500" />
+                        <span className="font-medium">{t('documents.shareLink')}</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => onDownload(file)} 

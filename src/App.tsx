@@ -17,6 +17,7 @@ import UseCases from "./pages/public/UseCases";
 import Impressum from "./pages/public/legal/Impressum";
 import Privacy from "./pages/public/legal/Privacy";
 import Terms from "./pages/public/legal/Terms";
+import SharedDocument from "./pages/SharedDocument";
 import '@/i18n/config';
 
 const queryClient = new QueryClient();
@@ -42,6 +43,9 @@ const App = () => (
               <Route path="/legal/impressum" element={<Impressum />} />
               <Route path="/legal/privacy" element={<Privacy />} />
               <Route path="/legal/terms" element={<Terms />} />
+              
+              {/* Shared Document Route (Public) */}
+              <Route path="/share/:token" element={<SharedDocument />} />
               
               {/* App Routes */}
               <Route path="/auth" element={<Auth />} />

@@ -42,13 +42,14 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Card } from '@/components/ui/card';
-import { MoreVertical, Download, Trash2, Edit, FileIcon, Loader2, Search, Folder as FolderIcon, SlidersHorizontal, CheckCheck, Tags, LayoutGrid, List, Eye } from 'lucide-react';
+import { MoreVertical, Download, Trash2, Edit, FileIcon, Loader2, Search, Folder as FolderIcon, SlidersHorizontal, CheckCheck, Tags, LayoutGrid, List, Eye, Link } from 'lucide-react';
 import { MoveFileDialog } from './MoveFileDialog';
 import { DocumentPreview } from './DocumentPreview';
 import { FilterPanel, FileFilters } from './FilterPanel';
 import { EditTagsDialog } from './EditTagsDialog';
 import { DocumentDetailsTable } from './DocumentDetailsTable';
 import { DocumentViewer } from '../viewer/DocumentViewer';
+import { ShareLinkDialog } from './ShareLinkDialog';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -93,6 +94,8 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [previewFile, setPreviewFile] = useState<FileRecord | null>(null);
+  const [shareFileId, setShareFileId] = useState<string | null>(null);
+  const [shareFileName, setShareFileName] = useState<string>('');
   const [filters, setFilters] = useState<FileFilters>({
     mimeTypes: [],
     dateFrom: '',
@@ -365,6 +368,11 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
     setEditTagsCurrentTags(file.tags || []);
   };
 
+  const handleShare = (file: FileRecord) => {
+    setShareFileId(file.id);
+    setShareFileName(file.title);
+  };
+
   const saveEdit = () => {
     if (editingId && editTitle.trim()) {
       renameMutation.mutate({ id: editingId, title: editTitle.trim() });
@@ -508,6 +516,7 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
           onMove={setMoveFileId}
           onEditTags={startEditTags}
           onPreview={setPreviewFile}
+          onShare={handleShare}
           formatFileSize={formatFileSize}
         />
       ) : (
@@ -609,6 +618,13 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
                           <span className="font-medium">{t('documents.preview')}</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem 
+                          onClick={() => handleShare(file)}
+                          className="gap-2 rounded-md transition-colors hover:bg-accent focus:bg-accent"
+                        >
+                          <Link className="h-4 w-4 text-purple-500" />
+                          <span className="font-medium">{t('documents.shareLink')}</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
                           onClick={() => downloadFile(file)}
                           className="gap-2 rounded-md transition-colors hover:bg-accent focus:bg-accent"
                         >
@@ -703,6 +719,14 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
           onClose={() => setPreviewFile(null)}
         />
       )}
+
+      {/* Share Link Dialog */}
+      <ShareLinkDialog
+        open={shareFileId !== null}
+        onOpenChange={(open) => !open && setShareFileId(null)}
+        fileId={shareFileId || ''}
+        fileName={shareFileName}
+      />
     </div>
   );
 };
