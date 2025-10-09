@@ -170,7 +170,7 @@ serve(async (req) => {
     let analysisPrompt = '';
     
     if (isImage) {
-      // For images, download and send as base64
+      // For images, pass a short-lived signed URL directly (avoid large base64 payloads)
       const { data: signedData, error: signedError } = await supabase.storage
         .from('documents')
         .createSignedUrl(file.storage_path, 300);
@@ -179,16 +179,8 @@ serve(async (req) => {
         throw new Error('Failed to get signed URL for image');
       }
 
-      const fileResponse = await fetch(signedData.signedUrl);
-      if (!fileResponse.ok) {
-        throw new Error('Failed to download image');
-      }
-      
-      const fileBuffer = await fileResponse.arrayBuffer();
-      const base64Content = btoa(String.fromCharCode(...new Uint8Array(fileBuffer)));
-      
       analysisPrompt = 'Analyze this image/document and extract: document type (e.g., invoice, receipt, letter, contract, photo, diagram), a suggested descriptive title (max 60 chars), 3-5 relevant keywords, and suggest an appropriate folder structure path (e.g., "Invoices/2025/Supplier Name" or "Photos/Vacation/Italy"). The folder path should be logical and help organize this document.';
-      
+
       contentPayload = [
         {
           type: 'text',
@@ -197,7 +189,7 @@ serve(async (req) => {
         {
           type: 'image_url',
           image_url: {
-            url: `data:${file.mime};base64,${base64Content}`,
+            url: signedData.signedUrl,
           },
         },
       ];
