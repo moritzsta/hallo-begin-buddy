@@ -65,8 +65,7 @@ export const DocumentViewer = ({ fileId, fileName, mimeType, onClose }: Document
         if (isImage) {
           const { data, error: urlError } = await supabase.functions.invoke('generate-signed-url', {
             body: {
-              bucket: 'documents',
-              path: `${fileId}`,
+              fileId: fileId,
               expiresIn: 3600,
             },
           });
