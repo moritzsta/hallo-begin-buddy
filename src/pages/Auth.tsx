@@ -45,7 +45,7 @@ const Auth = () => {
   return (
     <>
       <LifestyleGradientBar />
-      <div className="flex items-center justify-center min-h-screen bg-background">
+      <div className="flex items-center justify-center min-h-screen bg-background pt-1">
       <div className="absolute top-4 right-4 flex gap-2">
         <ThemeSwitcher />
         <LanguageSwitcher />

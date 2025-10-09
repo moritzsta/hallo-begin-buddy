@@ -41,9 +41,10 @@ const Index = () => {
   };
 
   return (
-    <SidebarProvider>
+    <>
       <LifestyleGradientBar />
-      <div className="min-h-screen w-full flex bg-background">
+      <SidebarProvider>
+        <div className="min-h-screen w-full flex bg-background">
         {/* Sidebar with Folder Tree */}
         <Sidebar className="border-r">
           <SidebarContent>
@@ -108,8 +109,9 @@ const Index = () => {
             </Tabs>
           </main>
         </div>
-      </div>
-    </SidebarProvider>
+        </div>
+      </SidebarProvider>
+    </>
   );
 };
 
