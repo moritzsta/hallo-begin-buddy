@@ -25,6 +25,7 @@ interface MetadataConfirmDialogProps {
     party?: string;
     amount?: string;
     keywords?: string[];
+    suggested_path?: string;
   };
   suggestedPath?: string;
   newFolders?: string[];
@@ -80,9 +81,10 @@ export const MetadataConfirmDialog = ({
 
   // Render path with badges for new folders
   const renderPathPreview = () => {
-    if (!suggestedPath) return null;
+    const displayPath = suggestedPath || metadata.suggested_path;
+    if (!displayPath) return null;
 
-    const pathParts = suggestedPath.split('/').filter(Boolean);
+    const pathParts = displayPath.split('/').filter(Boolean);
     
     return (
       <div className="flex flex-wrap items-center gap-2 p-3 bg-muted/50 rounded-md">
@@ -130,7 +132,7 @@ export const MetadataConfirmDialog = ({
 
         <div className="space-y-4 py-4">
           {/* Path Preview */}
-          {suggestedPath && (
+          {(suggestedPath || metadata.suggested_path) && (
             <div className="space-y-2">
               <Label className="text-sm font-medium">
                 {t('upload.suggestedPath', { defaultValue: 'Vorgeschlagener Ablageort' })}
@@ -144,6 +146,11 @@ export const MetadataConfirmDialog = ({
                   })}
                 </p>
               )}
+              <p className="text-xs text-muted-foreground italic">
+                {t('upload.aiSuggestedPath', { 
+                  defaultValue: 'Dieser Pfad wurde von der KI basierend auf dem Dokumentinhalt vorgeschlagen.' 
+                })}
+              </p>
             </div>
           )}
 

@@ -59,7 +59,7 @@ serve(async (req) => {
       );
     }
 
-    // Support images and PDFs
+    // Check file type
     const isImage = file.mime.startsWith('image/');
     const isPdf = file.mime === 'application/pdf';
     const isOffice = file.mime.includes('officedocument') || 
@@ -81,172 +81,145 @@ serve(async (req) => {
       );
     }
 
-    // For Office documents, use filename-based analysis as fallback
-    if (isOffice) {
-      console.log(`Processing Office document: ${file.title}`);
-      
-      // Extract info from filename
-      const fileExt = file.title.split('.').pop()?.toLowerCase() || '';
-      let docType = 'document';
-      
-      if (fileExt === 'docx' || fileExt === 'doc') {
-        docType = 'document';
-      } else if (fileExt === 'xlsx' || fileExt === 'xls') {
-        docType = 'spreadsheet';
-      } else if (fileExt === 'pptx' || fileExt === 'ppt') {
-        docType = 'presentation';
-      }
-
-      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-      if (!LOVABLE_API_KEY) {
-        throw new Error('LOVABLE_API_KEY not configured');
-      }
-
-      // Use AI to suggest title and keywords based on filename
-      const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'google/gemini-2.5-flash',
-          messages: [
-            {
-              role: 'system',
-              content: 'You are a document analysis assistant. Based on filename, suggest a descriptive title and relevant keywords.',
-            },
-            {
-              role: 'user',
-              content: `Analyze this Office document filename: "${file.title}". Extract: document type (document, spreadsheet, presentation, report, template), a suggested descriptive title (max 60 chars), and 3-5 relevant keywords.`,
-            },
-          ],
-          tools: [
-            {
-              type: 'function',
-              function: {
-                name: 'extract_metadata',
-                description: 'Extract document metadata from filename',
-                parameters: {
-                  type: 'object',
-                  properties: {
-                    document_type: {
-                      type: 'string',
-                      description: 'Type of document (document, spreadsheet, presentation, report, template)',
-                    },
-                    suggested_title: {
-                      type: 'string',
-                      description: 'Descriptive title for the document (max 60 characters)',
-                    },
-                    keywords: {
-                      type: 'array',
-                      items: { type: 'string' },
-                      description: 'Array of 3-5 relevant keywords',
-                    },
-                  },
-                  required: ['document_type', 'suggested_title', 'keywords'],
-                  additionalProperties: false,
-                },
-              },
-            },
-          ],
-          tool_choice: { type: 'function', function: { name: 'extract_metadata' } },
-        }),
-      });
-
-      if (!aiResponse.ok) {
-        const errorText = await aiResponse.text();
-        console.error('AI Gateway error for Office doc:', aiResponse.status, errorText);
-        
-        if (aiResponse.status === 429) {
-          throw new Error('AI rate limit exceeded. Please try again later.');
-        }
-        if (aiResponse.status === 402) {
-          throw new Error('AI credits exhausted. Please add credits to your workspace.');
-        }
-        
-        throw new Error('AI extraction failed');
-      }
-
-      const aiData = await aiResponse.json();
-      const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
-      
-      if (toolCall) {
-        const extracted = JSON.parse(toolCall.function.arguments);
-
-        // Track usage
-        await incrementUsageTracking(supabase, file.owner_id, 'smart_upload');
-
-        console.log(`Smart upload completed for Office file ${file_id}:`, extracted);
-
-        return new Response(
-          JSON.stringify({
-            success: true,
-            extracted,
-          }),
-          {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          }
-        );
-      }
-    }
-
-    // Get signed URL for file
-    const { data: signedData, error: signedError } = await supabase.storage
-      .from('documents')
-      .createSignedUrl(file.storage_path, 300);
-
-    if (signedError || !signedData) {
-      throw new Error('Failed to get signed URL');
-    }
-
-    // Download file content
-    const fileResponse = await fetch(signedData.signedUrl);
-    if (!fileResponse.ok) {
-      throw new Error('Failed to download file');
-    }
-    
-    const fileBuffer = await fileResponse.arrayBuffer();
-    const base64Content = btoa(String.fromCharCode(...new Uint8Array(fileBuffer)));
-    
-    // Build content based on file type
-    let contentPayload;
-    if (isImage) {
-      // For images, use image_url
-      contentPayload = [
-        {
-          type: 'text',
-          text: 'Analyze this document and extract: document type (e.g., invoice, receipt, letter, contract, photo, diagram), a suggested descriptive title (max 60 chars), and 3-5 relevant keywords.',
-        },
-        {
-          type: 'image_url',
-          image_url: {
-            url: `data:${file.mime};base64,${base64Content}`,
-          },
-        },
-      ];
-    } else if (isPdf) {
-      // For PDFs, we send the first page or text extraction request
-      contentPayload = [
-        {
-          type: 'text',
-          text: `Analyze this PDF document (filename: ${file.title}) and extract: document type (e.g., invoice, receipt, letter, contract, report), a suggested descriptive title (max 60 chars), and 3-5 relevant keywords. Use the filename and context to infer document type if needed.`,
-        },
-        {
-          type: 'image_url',
-          image_url: {
-            url: `data:${file.mime};base64,${base64Content}`,
-          },
-        },
-      ];
-    }
-
-    // Call Lovable AI Gateway with Vision
+    // Get LOVABLE_API_KEY
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
+    // For PDFs and Office documents, extract text content first
+    let extractedText = '';
+    
+    if (isPdf || isOffice) {
+      console.log(`Extracting text content from ${isPdf ? 'PDF' : 'Office'} document: ${file.title}`);
+      
+      // Get signed URL for file download
+      const { data: signedData, error: signedError } = await supabase.storage
+        .from('documents')
+        .createSignedUrl(file.storage_path, 300);
+
+      if (signedError || !signedData) {
+        throw new Error('Failed to get signed URL for text extraction');
+      }
+
+      // For Office documents (.docx), try to extract text using basic approach
+      // For PDFs, we'll use OCR via Gemini's vision capabilities
+      if (isOffice) {
+        // For Office documents, we'll send the filename and ask AI to analyze based on it
+        // This is a fallback since we can't easily extract .docx content in Deno
+        console.log('Using filename-based analysis for Office document');
+        extractedText = `Document filename: ${file.title}`;
+      } else if (isPdf) {
+        // For PDFs, we'll convert to base64 and send to Gemini for OCR
+        console.log('Preparing PDF for OCR analysis');
+        
+        const fileResponse = await fetch(signedData.signedUrl);
+        if (!fileResponse.ok) {
+          throw new Error('Failed to download PDF file');
+        }
+        
+        const fileBuffer = await fileResponse.arrayBuffer();
+        const base64Content = btoa(String.fromCharCode(...new Uint8Array(fileBuffer)));
+        
+        // Use Gemini to extract text from PDF via OCR
+        const ocrResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'google/gemini-2.5-flash',
+            messages: [
+              {
+                role: 'user',
+                content: [
+                  {
+                    type: 'text',
+                    text: 'Extract all text content from this PDF document. Return only the extracted text, nothing else.',
+                  },
+                  {
+                    type: 'image_url',
+                    image_url: {
+                      url: `data:${file.mime};base64,${base64Content}`,
+                    },
+                  },
+                ],
+              },
+            ],
+          }),
+        });
+
+        if (!ocrResponse.ok) {
+          const errorText = await ocrResponse.text();
+          console.error('OCR extraction error:', ocrResponse.status, errorText);
+          
+          // Fallback to filename-based analysis if OCR fails
+          console.log('OCR failed, falling back to filename analysis');
+          extractedText = `Document filename: ${file.title}`;
+        } else {
+          const ocrData = await ocrResponse.json();
+          extractedText = ocrData.choices?.[0]?.message?.content || `Document filename: ${file.title}`;
+          console.log(`Extracted ${extractedText.length} characters from PDF`);
+        }
+      }
+    }
+
+    // Now analyze the document (image, PDF text, or Office doc)
+    let contentPayload;
+    let analysisPrompt = '';
+    
+    if (isImage) {
+      // For images, download and send as base64
+      const { data: signedData, error: signedError } = await supabase.storage
+        .from('documents')
+        .createSignedUrl(file.storage_path, 300);
+
+      if (signedError || !signedData) {
+        throw new Error('Failed to get signed URL for image');
+      }
+
+      const fileResponse = await fetch(signedData.signedUrl);
+      if (!fileResponse.ok) {
+        throw new Error('Failed to download image');
+      }
+      
+      const fileBuffer = await fileResponse.arrayBuffer();
+      const base64Content = btoa(String.fromCharCode(...new Uint8Array(fileBuffer)));
+      
+      analysisPrompt = 'Analyze this image/document and extract: document type (e.g., invoice, receipt, letter, contract, photo, diagram), a suggested descriptive title (max 60 chars), 3-5 relevant keywords, and suggest an appropriate folder structure path (e.g., "Invoices/2025/Supplier Name" or "Photos/Vacation/Italy"). The folder path should be logical and help organize this document.';
+      
+      contentPayload = [
+        {
+          type: 'text',
+          text: analysisPrompt,
+        },
+        {
+          type: 'image_url',
+          image_url: {
+            url: `data:${file.mime};base64,${base64Content}`,
+          },
+        },
+      ];
+    } else {
+      // For PDFs and Office docs, use extracted text
+      analysisPrompt = `Analyze this document and extract metadata to help organize it intelligently.
+
+Document: ${file.title}
+${extractedText ? `Content preview: ${extractedText.substring(0, 2000)}` : ''}
+
+Extract:
+1. document_type: Type of document (invoice, receipt, letter, contract, report, presentation, spreadsheet, etc.)
+2. suggested_title: A descriptive title (max 60 chars) based on content
+3. keywords: 3-5 relevant keywords from the content
+4. suggested_path: A logical folder structure path to organize this document (e.g., "Invoices/2025/Company Name", "Reports/Annual/2025", "Presentations/Marketing/Q1")
+
+The folder path should be based on the content and help create an intelligent filing system.`;
+
+      contentPayload = analysisPrompt;
+    }
+
+    // Call Lovable AI Gateway
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -258,7 +231,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a document analysis assistant. Extract key information from documents (images and PDFs) to help users organize them.',
+            content: 'You are an intelligent document filing assistant. Analyze documents and suggest metadata and folder structures for optimal organization.',
           },
           {
             role: 'user',
@@ -270,29 +243,29 @@ serve(async (req) => {
             type: 'function',
             function: {
               name: 'extract_metadata',
-              description: 'Extract document metadata from image',
+              description: 'Extract document metadata and suggest folder structure',
               parameters: {
                 type: 'object',
                 properties: {
                   document_type: {
                     type: 'string',
-                    description: 'Type of document (e.g., invoice, receipt, letter, contract, photo)',
+                    description: 'Type of document (invoice, receipt, letter, contract, report, etc.)',
                   },
                   suggested_title: {
                     type: 'string',
-                    description: 'Descriptive title for the document (max 60 characters)',
+                    description: 'Descriptive title based on document content (max 60 characters)',
                   },
                   keywords: {
                     type: 'array',
                     items: { type: 'string' },
-                    description: 'Array of 3-5 relevant keywords',
+                    description: 'Array of 3-5 relevant keywords from content',
                   },
-                  extracted_text: {
+                  suggested_path: {
                     type: 'string',
-                    description: 'Key text content from the document (first 500 chars)',
+                    description: 'Suggested folder path for organizing this document (e.g., "Invoices/2025/Supplier")',
                   },
                 },
-                required: ['document_type', 'suggested_title', 'keywords'],
+                required: ['document_type', 'suggested_title', 'keywords', 'suggested_path'],
                 additionalProperties: false,
               },
             },
@@ -307,51 +280,44 @@ serve(async (req) => {
       console.error('AI Gateway error:', aiResponse.status, errorText);
       
       if (aiResponse.status === 429) {
-        throw new Error('AI rate limit exceeded. Please try again later.');
+        return new Response(
+          JSON.stringify({
+            error: 'AI rate limit exceeded. Please try again later.',
+          }),
+          {
+            status: 429,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
       }
       if (aiResponse.status === 402) {
-        throw new Error('AI credits exhausted. Please add credits to your workspace.');
+        return new Response(
+          JSON.stringify({
+            error: 'AI credits exhausted. Please add credits to your workspace.',
+          }),
+          {
+            status: 402,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
       }
       
-      throw new Error('AI extraction failed');
+      throw new Error(`AI extraction failed: ${errorText}`);
     }
 
     const aiData = await aiResponse.json();
     const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
     
     if (!toolCall) {
-      throw new Error('No metadata extracted');
+      throw new Error('No metadata extracted from AI response');
     }
 
     const extracted = JSON.parse(toolCall.function.arguments);
 
-    // Update file record with AI-extracted metadata
-    const { error: updateError } = await supabase
-      .from('files')
-      .update({
-        meta: {
-          ...file.meta,
-          ai_extracted: {
-            document_type: extracted.document_type,
-            suggested_title: extracted.suggested_title,
-            keywords: extracted.keywords,
-            extracted_text: extracted.extracted_text || '',
-            extracted_at: new Date().toISOString(),
-          },
-        },
-        // Optionally update tags with keywords
-        tags: extracted.keywords || [],
-      })
-      .eq('id', file_id);
-
-    if (updateError) {
-      console.error('Failed to update file:', updateError);
-    }
-
     // Track usage
     await incrementUsageTracking(supabase, file.owner_id, 'smart_upload');
 
-    console.log(`Smart upload completed for file ${file_id}:`, extracted);
+    console.log(`Smart upload completed for ${file.mime} file ${file_id}:`, extracted);
 
     return new Response(
       JSON.stringify({

@@ -49,7 +49,8 @@
     "confirmAndSave": "Confirm & Save",
     "metadataConfirmed": "Metadata confirmed",
     "metadataConfirmedDesc": "File was saved with updated metadata.",
-    "metadataUpdateError": "Update error"
+    "metadataUpdateError": "Update error",
+    "aiSuggestedPath": "This path was suggested by AI based on the document content."
   },
   "documents": {
     "title": "My Documents",

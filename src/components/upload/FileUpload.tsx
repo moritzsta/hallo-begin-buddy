@@ -276,6 +276,7 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
           title: data.extracted.suggested_title || uploadFile.file.name,
           doc_type: data.extracted.document_type || undefined,
           keywords: data.extracted.keywords || [],
+          suggested_path: data.extracted.suggested_path || undefined,
         };
         
         // Update upload file with metadata and show confirmation dialog
@@ -322,12 +323,63 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
     if (!uploadFile?.fileId) return;
 
     try {
-      // Update file with confirmed metadata and tags
+      let targetFolderId = folderId; // Default to current folder
+
+      // If there's a suggested_path from AI, create folder structure
+      if (uploadFile.smartMetadata?.suggested_path) {
+        const pathParts = uploadFile.smartMetadata.suggested_path.split('/').filter(Boolean);
+        
+        if (pathParts.length > 0) {
+          // Fetch all folders to check which ones exist
+          const { data: allFolders } = await supabase
+            .from('folders')
+            .select('*')
+            .eq('owner_id', user!.id);
+
+          let currentParentId: string | null = null;
+          
+          // Create folder hierarchy
+          for (const folderName of pathParts) {
+            // Check if folder exists at this level
+            const existingFolder = allFolders?.find(
+              f => f.name === folderName && f.parent_id === currentParentId
+            );
+
+            if (existingFolder) {
+              currentParentId = existingFolder.id;
+            } else {
+              // Create new folder
+              const { data: newFolder, error: folderError } = await supabase
+                .from('folders')
+                .insert({
+                  owner_id: user!.id,
+                  name: folderName,
+                  parent_id: currentParentId,
+                })
+                .select()
+                .single();
+
+              if (folderError) {
+                console.error('Failed to create folder:', folderError);
+                throw new Error(`Fehler beim Erstellen des Ordners "${folderName}"`);
+              }
+
+              currentParentId = newFolder.id;
+            }
+          }
+
+          // Use the last folder as target
+          targetFolderId = currentParentId;
+        }
+      }
+
+      // Update file with confirmed metadata, tags, and folder location
       const { error: updateError } = await supabase
         .from('files')
         .update({
           title: updatedMetadata.title,
           tags,
+          folder_id: targetFolderId,
           meta: {
             ...(uploadFile.file ? { original_name: uploadFile.file.name } : {}),
             doc_type: updatedMetadata.doc_type,
@@ -335,6 +387,7 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
             party: updatedMetadata.party,
             amount: updatedMetadata.amount,
             smart_upload: true,
+            ai_suggested_path: uploadFile.smartMetadata?.suggested_path,
           },
         })
         .eq('id', uploadFile.fileId);
