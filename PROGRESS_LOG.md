@@ -27,6 +27,7 @@
 | T14 | Settings Page (Profile, Plan, Usage) | ✅ Done |
 | T15 | Security Scan & RLS Verification | ✅ Done |
 | T16 | Search & Filter (no AI) | ✅ Done |
+| T17 | Badges & Neue Dateien-Indikator | ✅ Done |
 | T05 | Create `user_roles` Table | ✅ Done (already exists) |
 | T06 | RLS Policies – Owner-Only Access | Backlog |
 | T07 | Storage Bucket & RLS | Backlog |
@@ -106,7 +107,49 @@
 - RLS:
   - Filter respektieren Owner-Isolation (nur eigene Dateien durchsuchbar)
   - Alle Queries laufen durch existierende RLS-Policies
-- Next Step: T16 – Badges & "Neue Dateien"-Indikator
+- Next Step: T17 – Badges & "Neue Dateien"-Indikator
+
+### 2025-10-09T22:30:00Z – T17 Completed
+- **[T17]** Badges & Neue Dateien-Indikator implementiert
+- Database Migration:
+  - `profiles` Tabelle erweitert um `last_seen_at` TIMESTAMP
+  - Default: now() (initialer Wert = Registrierungszeit)
+  - Tracking wann User zuletzt die Dateiliste angesehen hat
+- Features:
+  - **New Files Badge**:
+    - Card mit Count von neuen Dateien (created_at > last_seen_at)
+    - Zeigt Badge nur bei neuen Dateien (> 0)
+    - Anzeige: "X neue Datei(en) – Seit Ihrem letzten Besuch"
+    - Primary-Farbe für hohe Sichtbarkeit (bg-primary/5 border-primary/20)
+  - **Mark as Seen Button**:
+    - Button "Alle als gesehen markieren" mit CheckCheck-Icon
+    - Aktualisiert last_seen_at auf aktuellen Timestamp
+    - Toast-Feedback bei Erfolg ("Markiert – Alle Dateien wurden als gesehen markiert")
+    - Disabled während Request läuft (Doppel-Clicks vermeiden)
+  - **Individual File Badges**:
+    - "Neu"-Badge bei jeder einzelnen Datei (created_at > last_seen_at)
+    - Badge in Dateinamen-Spalte neben Titel
+    - Badge variant="default" mit text-xs für kompakte Darstellung
+- Komponenten aktualisiert:
+  - `src/components/documents/DocumentList.tsx`:
+    - Profile Query hinzugefügt (last_seen_at abrufen)
+    - newFilesCount-Berechnung via useMemo
+    - isNewFile()-Helper-Funktion für Badge-Check
+    - markAsSeenMutation für Update-Logik
+    - UI-Elemente: New Files Card & Individual Badges
+- Übersetzungen:
+  - `src/i18n/locales/de.json` – new, newFiles, newFilesDesc, markAsSeenButton, markAsSeenSuccess, markAsSeenSuccessDesc
+  - `src/i18n/locales/en.json` – Englische Entsprechungen
+- UX Details:
+  - Badge verschwindet nach "Mark as seen"-Klick (sofortige UI-Aktualisierung)
+  - Individual Badges verschwinden ebenfalls
+  - Funktioniert pro User isoliert (jeder User hat eigenen last_seen_at)
+  - New Files Badge wird nur angezeigt wenn Count > 0
+- Performance:
+  - Profile Query nur einmal beim Laden
+  - useMemo für Badge-Counts (keine redundanten Berechnungen)
+  - Mutation invalidiert profile-Query (automatisches UI-Update)
+- Next Step: T18 – Manuelles Tag-System
 
 ### 2025-10-09T21:30:00Z – T15 Completed
 - **[T15]** Security Scan & RLS Verification abgeschlossen

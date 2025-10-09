@@ -75,7 +75,13 @@
     "moveSuccess": "File moved",
     "moveSuccessDesc": "The file was successfully moved",
     "moveError": "Error moving file",
-    "currentFolder": "current folder"
+    "currentFolder": "current folder",
+    "new": "New",
+    "newFiles": "{{count}} new file(s)",
+    "newFilesDesc": "Since your last visit",
+    "markAsSeenButton": "Mark all as seen",
+    "markAsSeenSuccess": "Marked",
+    "markAsSeenSuccessDesc": "All files have been marked as seen."
   },
   "common": {
     "unknownError": "Unknown error",

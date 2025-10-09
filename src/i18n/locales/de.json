@@ -75,7 +75,13 @@
     "moveSuccess": "Datei verschoben",
     "moveSuccessDesc": "Die Datei wurde erfolgreich verschoben",
     "moveError": "Fehler beim Verschieben",
-    "currentFolder": "aktueller Ordner"
+    "currentFolder": "aktueller Ordner",
+    "new": "Neu",
+    "newFiles": "{{count}} neue Datei(en)",
+    "newFilesDesc": "Seit Ihrem letzten Besuch",
+    "markAsSeenButton": "Alle als gesehen markieren",
+    "markAsSeenSuccess": "Markiert",
+    "markAsSeenSuccessDesc": "Alle Dateien wurden als gesehen markiert."
   },
   "common": {
     "unknownError": "Unbekannter Fehler",

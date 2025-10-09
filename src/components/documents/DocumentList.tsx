@@ -39,7 +39,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Card } from '@/components/ui/card';
-import { MoreVertical, Download, Trash2, Edit, FileIcon, Loader2, Search, Folder as FolderIcon, SlidersHorizontal } from 'lucide-react';
+import { MoreVertical, Download, Trash2, Edit, FileIcon, Loader2, Search, Folder as FolderIcon, SlidersHorizontal, CheckCheck } from 'lucide-react';
 import { MoveFileDialog } from './MoveFileDialog';
 import { DocumentPreview } from './DocumentPreview';
 import { FilterPanel, FileFilters } from './FilterPanel';
@@ -89,6 +89,22 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
     tags: [],
   });
 
+  // Fetch profile to get last_seen_at
+  const { data: profile } = useQuery({
+    queryKey: ['profile', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('last_seen_at')
+        .eq('id', user!.id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
   // Debounce search query
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -126,6 +142,18 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
     },
     enabled: !!user,
   });
+
+  // Check for new files
+  const newFilesCount = useMemo(() => {
+    if (!allFiles || !profile?.last_seen_at) return 0;
+    const lastSeenDate = new Date(profile.last_seen_at);
+    return allFiles.filter((file) => new Date(file.created_at) > lastSeenDate).length;
+  }, [allFiles, profile]);
+
+  const isNewFile = (file: FileRecord): boolean => {
+    if (!profile?.last_seen_at) return false;
+    return new Date(file.created_at) > new Date(profile.last_seen_at);
+  };
 
   // Apply client-side filters
   const files = useMemo(() => {
@@ -288,6 +316,32 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
     },
   });
 
+  // Mark all as seen mutation
+  const markAsSeenMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ last_seen_at: new Date().toISOString() })
+        .eq('id', user!.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      toast({
+        title: t('documents.markAsSeenSuccess'),
+        description: t('documents.markAsSeenSuccessDesc'),
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: t('common.error'),
+        description: error instanceof Error ? error.message : t('common.unknownError'),
+        variant: 'destructive',
+      });
+    },
+  });
+
   const startEdit = (file: FileRecord) => {
     setEditingId(file.id);
     setEditTitle(file.title);
@@ -316,6 +370,32 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
 
   return (
     <div className="space-y-4">
+      {/* New Files Badge and Mark as Seen */}
+      {newFilesCount > 0 && (
+        <Card className="p-4 bg-primary/5 border-primary/20">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Badge variant="default" className="text-sm">
+                {t('documents.newFiles', { count: newFilesCount })}
+              </Badge>
+              <span className="text-sm text-muted-foreground">
+                {t('documents.newFilesDesc')}
+              </span>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => markAsSeenMutation.mutate()}
+              disabled={markAsSeenMutation.isPending}
+              className="gap-2"
+            >
+              <CheckCheck className="h-4 w-4" />
+              {t('documents.markAsSeenButton')}
+            </Button>
+          </div>
+        </Card>
+      )}
+
       {/* Search and Filter */}
       <Card className="p-4">
         <div className="flex flex-col sm:flex-row gap-4">
@@ -417,6 +497,11 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
                           size="sm"
                         />
                         <span className="font-medium">{file.title}</span>
+                        {isNewFile(file) && (
+                          <Badge variant="default" className="text-xs">
+                            {t('documents.new')}
+                          </Badge>
+                        )}
                       </div>
                     )}
                   </TableCell>
