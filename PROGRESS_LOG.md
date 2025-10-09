@@ -13,6 +13,7 @@
 |---------|-------|--------|
 | T01 | Enable Lovable Cloud | ✅ Done |
 | T02 | Database Schema & RLS | ✅ Done |
+| T03 | Storage Buckets & Signed URLs | ✅ Done |
 | T03 | Create `document_fields` Table | Backlog |
 | T04 | Create `document_types` Table | Backlog |
 | T05 | Create `user_roles` Table | Backlog |
@@ -53,6 +54,20 @@
 ## Change Log
 
 *Neueste Einträge oben. Format: [UTC Timestamp] [Task-ID] Beschreibung – Dateien/Ordner – Diffs (Stichpunkte)*
+
+### 2025-10-09T15:30:00Z – T03 Completed
+- **[T03]** Storage-Buckets & Signed URLs erstellt
+- Migration `002_storage_buckets.sql` deployed:
+  - Buckets: `documents` (2GB max), `previews` (100MB max) – beide private
+  - RLS-Policies für storage.objects (Owner-Only Upload/View/Update/Delete)
+  - File size limits: documents 2GB, previews 100MB
+- Edge Function `generate-signed-url` implementiert:
+  - Auth-Check + Owner-Verification
+  - Signierte URLs mit konfigurierbarer Ablaufzeit (default 5 Min)
+  - CORS-Header konfiguriert
+  - Logging für Debugging
+- `supabase/config.toml` aktualisiert mit Function-Config
+- Next Step: T04 – Auth & Profil-Management
 
 ### 2025-10-09T15:00:00Z – T02 Completed
 - **[T02]** Datenbank-Schema & RLS erstellt
@@ -165,14 +180,16 @@
 
 ## Next Step
 
-**Task ID:** T03 – Storage-Buckets & Signed URLs  
+**Task ID:** T04 – Auth & Profil-Management  
 **Akzeptanzkriterien:**
-- Buckets `documents` und `previews` erstellt (private)
-- RLS-Policies für storage.objects aktiv (Owner-Only)
-- Edge Function `generate-signed-url` implementiert
-- Auth-Check + signierte URLs mit Ablaufzeit funktionieren
+- Supabase Auth aktiviert (Email/Password, auto-confirm)
+- Profile-Trigger erstellt (auto-create bei Signup)
+- Login/Signup UI-Components implementiert
+- AuthContext mit Profile-Daten
+- Protected Routes funktionieren
+- Logout löscht Auth-Token
 
-**Aktion:** Migration für Storage-Buckets erstellen und Edge Function für signierte URLs implementieren.
+**Aktion:** Auth konfigurieren, UI-Components für Login/Signup erstellen, AuthContext implementieren, Protected Routes einrichten.
 
 ---
 
