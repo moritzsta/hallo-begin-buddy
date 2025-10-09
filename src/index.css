@@ -146,6 +146,92 @@ All colors MUST be HSL.
     --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.9), 0 8px 10px -6px rgb(0 0 0 / 0.9);
     --shadow-glow: 0 0 20px hsl(var(--primary) / 0.4);
   }
+
+  .lifestyle {
+    /* Base Colors */
+    --background: 0 0% 100%;
+    --foreground: 231 15% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 231 15% 12%;
+
+    --popover: 0 0% 100% / 0.75;
+    --popover-foreground: 231 15% 12%;
+
+    /* Primary Brand Colors - Vivid Purple */
+    --primary: 268 89% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 268 89% 50%;
+    --primary-glow: 268 89% 70%;
+
+    /* Secondary Colors - Azure */
+    --secondary: 196 88% 48%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Tertiary Colors - Tangerine */
+    --tertiary: 25 95% 57%;
+    --tertiary-foreground: 0 0% 100%;
+
+    /* Muted Colors */
+    --muted: 230 20% 96%;
+    --muted-foreground: 230 12% 40%;
+
+    /* Accent Colors */
+    --accent: 268 89% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Status Colors */
+    --destructive: 350 84% 55%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --success: 146 64% 44%;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 96% 52%;
+    --warning-foreground: 0 0% 100%;
+    
+    --info: 196 88% 48%;
+    --info-foreground: 0 0% 100%;
+
+    /* Border & Input */
+    --border: 230 18% 88%;
+    --input: 230 18% 88%;
+    --ring: 268 89% 60%;
+
+    /* Border Radius - larger for lifestyle */
+    --radius: 1rem;
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 231 15% 12%;
+    --sidebar-primary: 268 89% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 230 20% 96%;
+    --sidebar-accent-foreground: 231 15% 12%;
+    --sidebar-border: 230 18% 88%;
+    --sidebar-ring: 268 89% 60%;
+
+    /* Gradients */
+    --gradient-from: 268 89% 60%;
+    --gradient-via: 196 88% 48%;
+    --gradient-to: 25 95% 57%;
+
+    /* Glow Effect */
+    --glow: 196 88% 48% / 0.35;
+
+    /* Shadows - softer, more colorful */
+    --shadow-sm: 0 2px 4px 0 hsl(268 89% 60% / 0.08);
+    --shadow: 0 2px 8px 0 hsl(268 89% 60% / 0.1), 0 4px 12px -2px hsl(196 88% 48% / 0.08);
+    --shadow-md: 0 6px 12px -2px hsl(268 89% 60% / 0.12), 0 4px 8px -4px hsl(196 88% 48% / 0.1);
+    --shadow-lg: 0 12px 24px -6px hsl(268 89% 60% / 0.15), 0 8px 16px -8px hsl(196 88% 48% / 0.12);
+    --shadow-xl: 0 24px 48px -12px hsl(268 89% 60% / 0.2), 0 16px 32px -16px hsl(196 88% 48% / 0.15);
+    --shadow-glow: 0 0 20px hsl(var(--glow));
+
+    /* Transitions - slightly bouncier */
+    --transition-base: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
 }
 
 @layer base {
@@ -156,6 +242,26 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* Lifestyle Theme Typography */
+  .lifestyle h1,
+  .lifestyle h2,
+  .lifestyle h3,
+  .lifestyle h4,
+  .lifestyle h5,
+  .lifestyle h6 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .lifestyle button,
+  .lifestyle .btn {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.01em;
   }
 
   /* Smooth Scrolling */
@@ -215,6 +321,20 @@ All colors MUST be HSL.
     background: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
   }
 
+  /* Lifestyle Theme Gradients */
+  .lifestyle .gradient-lifestyle {
+    background: linear-gradient(135deg, hsl(var(--gradient-from)) 0%, hsl(var(--gradient-via)) 50%, hsl(var(--gradient-to)) 100%);
+  }
+
+  .lifestyle .gradient-lifestyle-soft {
+    background: linear-gradient(180deg, hsl(var(--gradient-from) / 0.1) 0%, hsl(var(--gradient-via) / 0.05) 100%);
+  }
+
+  .lifestyle .gradient-header {
+    background: linear-gradient(90deg, hsl(var(--gradient-from)) 0%, hsl(var(--gradient-via)) 50%, hsl(var(--gradient-to)) 100%);
+    height: 0.25rem;
+  }
+
   /* Hover Effects */
   .hover-lift {
     @apply transition-smooth;
@@ -231,5 +351,27 @@ All colors MUST be HSL.
   /* Glass Effect */
   .glass {
     @apply bg-background/80 backdrop-blur-md;
+  }
+
+  /* Lifestyle Hover Effects */
+  .lifestyle .hover-scale {
+    @apply transition-smooth;
+  }
+
+  .lifestyle .hover-scale:hover {
+    @apply scale-[1.02];
+  }
+
+  .lifestyle .hover-bounce {
+    @apply transition-bounce;
+  }
+
+  .lifestyle .pulse-glow {
+    animation: pulse-glow 150ms ease-out;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 0 0 hsl(var(--glow)); }
+    50% { box-shadow: 0 0 20px 5px hsl(var(--glow)); }
   }
 }

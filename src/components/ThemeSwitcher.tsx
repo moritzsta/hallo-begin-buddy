@@ -31,9 +31,9 @@ export function ThemeSwitcher() {
           <Moon className="mr-2 h-4 w-4" />
           <span>{t('theme.dark')}</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('system')}>
+        <DropdownMenuItem onClick={() => setTheme('lifestyle')}>
           <Monitor className="mr-2 h-4 w-4" />
-          <span>{t('theme.system')}</span>
+          <span>{t('theme.lifestyle')}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
