@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { ChevronRight, ChevronDown, Folder, FolderOpen, MoreVertical, Plus } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useFolders, type Folder as FolderType } from '@/hooks/useFolders';
 import { Button } from '@/components/ui/button';
+import { listItem, getAnimationProps } from '@/lib/animations';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -71,12 +73,14 @@ export function FolderTree({ selectedFolderId, onSelectFolder }: FolderTreeProps
     const hasChildren = children.length > 0;
 
     return (
-      <div key={folder.id} className="select-none">
-        <div
-          className={`flex items-center gap-1 py-1 px-2 rounded-md hover:bg-accent group ${
+      <motion.div key={folder.id} className="select-none" {...getAnimationProps(listItem)}>
+        <motion.div
+          className={`flex items-center gap-1 py-1 px-2 rounded-md hover:bg-accent group transition-colors ${
             isSelected ? 'bg-accent' : ''
           }`}
           style={{ paddingLeft: `${depth * 16 + 8}px` }}
+          whileHover={{ x: 4 }}
+          transition={{ duration: 0.2 }}
         >
           {hasChildren ? (
             <Button
@@ -136,14 +140,14 @@ export function FolderTree({ selectedFolderId, onSelectFolder }: FolderTreeProps
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
+        </motion.div>
 
         {isExpanded && hasChildren && (
           <div>
             {children.map(child => renderFolder(child, depth + 1))}
           </div>
         )}
-      </div>
+      </motion.div>
     );
   };
 

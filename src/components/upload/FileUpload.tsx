@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 import { Upload, X, FileIcon, Loader2, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -11,6 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { TagInput } from '@/components/documents/TagInput';
 import { useQuery } from '@tanstack/react-query';
 import { MetadataConfirmDialog } from './MetadataConfirmDialog';
+import { fadeInUp, staggerContainer, getAnimationProps } from '@/lib/animations';
 
 interface UploadFile {
   file: File;
@@ -377,19 +379,30 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
         </p>
       </Card>
 
-      {uploadFiles.length > 0 && (
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium">{t('upload.uploads')} ({uploadFiles.length})</h3>
-            {uploadFiles.some(f => f.status === 'success') && (
-              <Button onClick={clearCompleted} variant="ghost" size="sm">
-                {t('upload.clearCompleted')}
-              </Button>
-            )}
-          </div>
+      <AnimatePresence mode="popLayout">
+        {uploadFiles.length > 0 && (
+          <motion.div
+            {...getAnimationProps(staggerContainer)}
+            className="space-y-2"
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-medium">{t('upload.uploads')} ({uploadFiles.length})</h3>
+              {uploadFiles.some(f => f.status === 'success') && (
+                <Button onClick={clearCompleted} variant="ghost" size="sm">
+                  {t('upload.clearCompleted')}
+                </Button>
+              )}
+            </div>
 
-          {uploadFiles.map(uploadFile => (
-            <Card key={uploadFile.id} className="p-4">
+            <AnimatePresence mode="popLayout">
+              {uploadFiles.map(uploadFile => (
+                <motion.div
+                  key={uploadFile.id}
+                  {...getAnimationProps(fadeInUp)}
+                  exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
+                  layout
+                >
+                  <Card className="p-4 hover:shadow-md transition-shadow">
               <div className="flex items-start gap-3">
                 <FileIcon className="h-5 w-5 mt-0.5 text-muted-foreground flex-shrink-0" />
                 <div className="flex-1 min-w-0">
@@ -473,12 +486,15 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
                       </p>
                     </div>
                   )}
+                  </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
+            </motion.div>
           ))}
-        </div>
-      )}
+        </AnimatePresence>
+      </motion.div>
+    )}
+  </AnimatePresence>
 
       {/* Metadata Confirmation Dialog */}
       {currentConfirmUploadFile && (

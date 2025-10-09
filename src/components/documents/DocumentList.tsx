@@ -1,9 +1,11 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { staggerContainer, listItem, getAnimationProps, fadeIn } from '@/lib/animations';
 import {
   Table,
   TableBody,
@@ -379,30 +381,34 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
   return (
     <div className="space-y-4">
       {/* New Files Badge and Mark as Seen */}
-      {newFilesCount > 0 && (
-        <Card className="p-4 bg-primary/5 border-primary/20">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Badge variant="default" className="text-sm">
-                {t('documents.newFiles', { count: newFilesCount })}
-              </Badge>
-              <span className="text-sm text-muted-foreground">
-                {t('documents.newFilesDesc')}
-              </span>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => markAsSeenMutation.mutate()}
-              disabled={markAsSeenMutation.isPending}
-              className="gap-2"
-            >
-              <CheckCheck className="h-4 w-4" />
-              {t('documents.markAsSeenButton')}
-            </Button>
-          </div>
-        </Card>
-      )}
+      <AnimatePresence mode="wait">
+        {newFilesCount > 0 && (
+          <motion.div {...getAnimationProps(fadeIn)} exit={{ opacity: 0, y: -10 }}>
+            <Card className="p-4 bg-primary/5 border-primary/20">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Badge variant="default" className="text-sm">
+                    {t('documents.newFiles', { count: newFilesCount })}
+                  </Badge>
+                  <span className="text-sm text-muted-foreground">
+                    {t('documents.newFilesDesc')}
+                  </span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => markAsSeenMutation.mutate()}
+                  disabled={markAsSeenMutation.isPending}
+                  className="gap-2"
+                >
+                  <CheckCheck className="h-4 w-4" />
+                  {t('documents.markAsSeenButton')}
+                </Button>
+              </div>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Search and Filter */}
       <Card className="p-4">
@@ -477,8 +483,16 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {files.map((file) => (
-                <TableRow key={file.id}>
+              <AnimatePresence mode="popLayout">
+                {files.map((file, index) => (
+                  <motion.tr
+                    key={file.id}
+                    {...getAnimationProps(listItem)}
+                    custom={index}
+                    exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}
+                    layout
+                    className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                  >
                   <TableCell>
                     {editingId === file.id ? (
                       <div className="flex gap-2">
@@ -497,7 +511,10 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
                         </Button>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-3">
+                      <motion.div
+                        whileHover={{ scale: 1.02 }}
+                        className="flex items-center gap-3"
+                      >
                         <DocumentPreview 
                           fileId={file.id}
                           fileName={file.title}
@@ -510,7 +527,7 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
                             {t('documents.new')}
                           </Badge>
                         )}
-                      </div>
+                      </motion.div>
                     )}
                   </TableCell>
                   <TableCell>
@@ -569,8 +586,9 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
-                </TableRow>
-              ))}
+                  </motion.tr>
+                ))}
+              </AnimatePresence>
             </TableBody>
           </Table>
         </Card>

@@ -33,6 +33,7 @@
 | T20 | Stripe-Integration (Subscriptions) | ✅ Done |
 | T21 | Server-Side Plan-Gating in Edge Functions | ✅ Done |
 | T22 | Smart Upload Confirmation Dialog | ✅ Done |
+| T23 | UI-Polish & Animations (Framer Motion) | ✅ Done |
 | T05 | Create `user_roles` Table | ✅ Done (already exists) |
 | T06 | RLS Policies – Owner-Only Access | Backlog |
 | T07 | Storage Bucket & RLS | Backlog |
@@ -270,6 +271,59 @@
   - Clientseitige Checks sind nur UX – Server MUSS prüfen
   - Stripe-Integration folgt in nächstem Task (T20)
 - Next Step: T20 – Stripe-Integration (Checkout, Portal, Webhooks)
+
+### 2025-10-10T02:00:00Z – T23 Completed
+- **[T23]** UI-Polish & Animations (Framer Motion) implementiert
+- Core Files erstellt:
+  - `src/lib/animations.ts` – Zentrale Animation-Utilities mit prefers-reduced-motion Support
+- Features:
+  - **Animation Library**:
+    - fadeInUp, fadeIn, scaleIn, slideInRight Variants
+    - staggerContainer & listItem für Listen-Animationen
+    - cardHover & cardTap für interaktive Elemente
+    - getAnimationProps() – respektiert prefers-reduced-motion automatisch
+    - Alle Animationen mit optimierten Easing-Funktionen (cubic-bezier)
+  - **FileUpload Animationen**:
+    - Upload-Liste mit staggerContainer (Staggered Children Animations)
+    - Einzelne Upload-Cards mit fadeInUp Animation
+    - Exit-Animationen beim Entfernen (opacity + y-transform)
+    - Layout-Animationen für smooth Reordering
+    - Hover-Effekte für Cards (shadow-md transition)
+  - **DocumentList Animationen**:
+    - New Files Badge mit fadeIn + Exit Animation
+    - Table Rows mit listItem Animation
+    - Individual Row Exit-Animationen (opacity + x-transform)
+    - Layout-Animationen für Sorting/Filtering
+    - Hover-Effekte für File Names (scale 1.02)
+    - AnimatePresence mit mode="popLayout" für smooth Transitions
+  - **FolderTree Animationen**:
+    - Folder Items mit listItem Animation
+    - Hover-Slide-Effect (x: 4px) bei Folder-Items
+    - Smooth Transitions für alle Hover-States
+    - getAnimationProps für konsistente Animation-Props
+  - **Performance-Optimierungen**:
+    - prefers-reduced-motion Check in getAnimationProps()
+    - Sparsamer Einsatz von Framer Motion (nur wo sinnvoll)
+    - Alle Animationen mit kurzen Durationen (0.2-0.3s)
+    - Layout-Animationen nur bei Listen (kein over-animating)
+- Dependency:
+  - framer-motion@latest hinzugefügt
+- UI/UX Verbesserungen:
+  - Alle Animationen respektieren User-Präferenzen
+  - Konsistente Animation-Timings across Components
+  - Smooth Entry/Exit für alle dynamischen Elemente
+  - Hover/Active-States mit subtilen Animationen
+  - Loading-States bereits vorhanden (Spinner, Skeleton via shadcn)
+- Accessibility:
+  - prefers-reduced-motion wird automatisch gehandelt
+  - Keine Animationen für Nutzer mit reduced-motion Präferenz
+  - Fokus-States bleiben sichtbar trotz Animationen
+- Performance:
+  - GPU-beschleunigte Transforms (x, y, scale, opacity)
+  - Keine heavy Layout-Animations
+  - AnimatePresence mit mode="popLayout" für optimale Performance
+  - Framer Motion tree-shaking (nur verwendete Features)
+- Next Step: T24 – Admin Dashboard oder Deployment/Documentation
 
 ### 2025-10-10T01:00:00Z – T22 Completed
 - **[T22]** Smart Upload Confirmation Dialog implementiert
