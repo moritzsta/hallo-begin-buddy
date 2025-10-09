@@ -11,7 +11,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Download, Trash2, Edit, FolderInput, Tags as TagsIcon, MoreVertical } from 'lucide-react';
+import { Download, Trash2, Edit, FolderInput, Tags as TagsIcon, MoreVertical, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { listItem, getAnimationProps } from '@/lib/animations';
 
@@ -47,6 +47,7 @@ export const DocumentDetailsTable = ({
   onRename,
   onMove,
   onEditTags,
+  onPreview,
   formatFileSize,
 }: DocumentDetailsTableProps) => {
   const { t } = useTranslation();
@@ -172,6 +173,13 @@ export const DocumentDetailsTable = ({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56 rounded-lg bg-popover border-2 border-border shadow-2xl backdrop-blur-md">
+                      <DropdownMenuItem 
+                        onClick={() => onPreview(file)} 
+                        className="gap-2 rounded-md transition-colors hover:bg-accent focus:bg-accent"
+                      >
+                        <Eye className="h-4 w-4 text-indigo-500" />
+                        <span className="font-medium">{t('documents.preview')}</span>
+                      </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => onDownload(file)} 
                         className="gap-2 rounded-md transition-colors hover:bg-accent focus:bg-accent"

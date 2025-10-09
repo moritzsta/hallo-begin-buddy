@@ -600,33 +600,49 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setPreviewFile(file)}>
-                          <Eye className="h-4 w-4 mr-2" />
-                          {t('documents.preview')}
+                      <DropdownMenuContent align="end" className="w-56 rounded-lg bg-popover border-2 border-border shadow-2xl backdrop-blur-md">
+                        <DropdownMenuItem 
+                          onClick={() => setPreviewFile(file)}
+                          className="gap-2 rounded-md transition-colors hover:bg-accent focus:bg-accent"
+                        >
+                          <Eye className="h-4 w-4 text-indigo-500" />
+                          <span className="font-medium">{t('documents.preview')}</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => downloadFile(file)}>
-                          <Download className="h-4 w-4 mr-2" />
-                          {t('documents.download')}
+                        <DropdownMenuItem 
+                          onClick={() => downloadFile(file)}
+                          className="gap-2 rounded-md transition-colors hover:bg-accent focus:bg-accent"
+                        >
+                          <Download className="h-4 w-4 text-blue-500" />
+                          <span className="font-medium">{t('documents.download')}</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => startEdit(file)}>
-                          <Edit className="h-4 w-4 mr-2" />
-                          {t('documents.rename')}
+                        <DropdownMenuItem 
+                          onClick={() => startEdit(file)}
+                          className="gap-2 rounded-md transition-colors hover:bg-accent focus:bg-accent"
+                        >
+                          <Edit className="h-4 w-4 text-green-500" />
+                          <span className="font-medium">{t('documents.rename')}</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setMoveFileId(file.id)}>
-                          <FolderIcon className="h-4 w-4 mr-2" />
-                          {t('documents.move')}
+                        <DropdownMenuItem 
+                          onClick={() => setMoveFileId(file.id)}
+                          className="gap-2 rounded-md transition-colors hover:bg-accent focus:bg-accent"
+                        >
+                          <FolderIcon className="h-4 w-4 text-purple-500" />
+                          <span className="font-medium">{t('documents.move')}</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => startEditTags(file)}>
-                          <Tags className="h-4 w-4 mr-2" />
-                          {t('documents.editTags')}
+                        <DropdownMenuItem 
+                          onClick={() => startEditTags(file)}
+                          className="gap-2 rounded-md transition-colors hover:bg-accent focus:bg-accent"
+                        >
+                          <Tags className="h-4 w-4 text-orange-500" />
+                          <span className="font-medium">{t('documents.editTags')}</span>
                         </DropdownMenuItem>
+                        <div className="my-1 h-px bg-border" />
                         <DropdownMenuItem
                           onClick={() => setDeleteId(file.id)}
-                          className="text-destructive"
+                          className="gap-2 text-destructive focus:text-destructive hover:bg-destructive/10 focus:bg-destructive/10 rounded-md transition-colors"
                         >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          {t('documents.delete')}
+                          <Trash2 className="h-4 w-4" />
+                          <span className="font-medium">{t('documents.delete')}</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
