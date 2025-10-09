@@ -36,16 +36,7 @@ export const useFolderUnreadCounts = () => {
     if (!user) return;
 
     try {
-      const { error } = await supabase.functions.invoke('reset-folder-visit', {
-        body: { folder_id: folderId },
-      });
-
-      if (error) {
-        console.error('Failed to reset folder visit:', error);
-        return;
-      }
-
-      // Optimistically update the cache
+      // Optimistically remove from cache immediately
       queryClient.setQueryData<Map<string, number>>(
         ['folder-unread-counts', user.id],
         (oldData) => {
@@ -56,10 +47,23 @@ export const useFolderUnreadCounts = () => {
         }
       );
 
-      // Refetch to get updated parent counts
-      queryClient.invalidateQueries({ queryKey: ['folder-unread-counts', user.id] });
+      const { error } = await supabase.functions.invoke('reset-folder-visit', {
+        body: { folder_id: folderId },
+      });
+
+      if (error) {
+        console.error('Failed to reset folder visit:', error);
+        // Revert optimistic update on error
+        queryClient.invalidateQueries({ queryKey: ['folder-unread-counts', user.id] });
+        return;
+      }
+
+      // Force refetch to get updated parent counts
+      await queryClient.invalidateQueries({ queryKey: ['folder-unread-counts', user.id] });
     } catch (error) {
       console.error('Error resetting folder visit:', error);
+      // Revert optimistic update on error
+      queryClient.invalidateQueries({ queryKey: ['folder-unread-counts', user.id] });
     }
   };
 
