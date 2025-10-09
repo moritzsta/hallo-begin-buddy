@@ -28,6 +28,7 @@
 | T15 | Security Scan & RLS Verification | ✅ Done |
 | T16 | Search & Filter (no AI) | ✅ Done |
 | T17 | Badges & Neue Dateien-Indikator | ✅ Done |
+| T18 | Manuelles Tag-System | ✅ Done |
 | T05 | Create `user_roles` Table | ✅ Done (already exists) |
 | T06 | RLS Policies – Owner-Only Access | Backlog |
 | T07 | Storage Bucket & RLS | Backlog |
@@ -150,6 +151,64 @@
   - useMemo für Badge-Counts (keine redundanten Berechnungen)
   - Mutation invalidiert profile-Query (automatisches UI-Update)
 - Next Step: T18 – Manuelles Tag-System
+
+### 2025-10-09T23:00:00Z – T18 Completed
+- **[T18]** Manuelles Tag-System implementiert
+- Components erstellt:
+  - `src/components/documents/TagInput.tsx` – Wiederverwendbare Tag-Input-Komponente
+  - `src/components/documents/EditTagsDialog.tsx` – Dialog zum Tag-Bearbeiten
+- Features:
+  - **Tag-Eingabe beim Upload**:
+    - TagInput-Komponente in FileUpload integriert
+    - Tags werden pro Datei während Upload-Queue gespeichert
+    - Tags werden bei DB-Insert mitgespeichert (files.tags Array)
+    - Verfügbar für pending & success Status
+  - **Tag-Verwaltung in DocumentList**:
+    - "Tags bearbeiten"-Menüpunkt im Dropdown
+    - EditTagsDialog mit vollständiger CRUD-Funktionalität
+    - Tag-Suggestions aus allen User-Dateien
+    - Update via Mutation mit Toast-Feedback
+  - **TagInput-Component Features**:
+    - Add/Remove Tags via UI (Badge mit X-Button)
+    - Keyboard Support: Enter zum Hinzufügen, Backspace zum Entfernen
+    - Auto-Suggest Dropdown (zeigt existierende Tags, max 5)
+    - Max 10 Tags pro Datei (konfigurierbar)
+    - Input disabled bei max Tags erreicht
+    - Helper Text: "X/10 Tags"
+  - **UX Details**:
+    - Tag-Normalisierung: trim + lowercase
+    - Duplikat-Prävention (gleiche Tags nicht mehrfach)
+    - Suggestions filtern bereits verwendete Tags aus
+    - ESC zum Schließen der Suggestions
+    - Click außerhalb schließt Suggestions
+    - Responsive Design
+- Komponenten aktualisiert:
+  - `src/components/upload/FileUpload.tsx`:
+    - TagInput pro Upload-File hinzugefügt
+    - Tags State im UploadFile Interface
+    - updateFileTags-Funktion für lokale Tag-Updates
+    - Tags Query für Suggestions (alle User-Tags)
+  - `src/components/documents/DocumentList.tsx`:
+    - "Tags bearbeiten"-Menüpunkt hinzugefügt
+    - EditTagsDialog-Integration
+    - State für editTagsFileId & editTagsCurrentTags
+- Übersetzungen:
+  - `src/i18n/locales/de.json`:
+    - documents.editTags
+    - tags.inputPlaceholder, addTags, helperText, editTitle, editDesc
+    - tags.updateSuccess, updateSuccessDesc, updateError
+    - common.saving
+  - `src/i18n/locales/en.json` – Englische Entsprechungen
+- DB-Integration:
+  - files.tags bereits vorhanden (text[] Array)
+  - Tags bei Insert mitgespeichert
+  - Tags bei Update über EditTagsDialog aktualisiert
+  - RLS: Owner-Only (nur eigene Tags sichtbar/bearbeitbar)
+- Performance:
+  - Tag-Suggestions werden gecached (React Query)
+  - Client-seitige Tag-Normalisierung (keine DB-Calls für Validierung)
+  - Debounced Input für Suggestion-Filtering (optional erweiterbar)
+- Next Step: T19 – Prospektives Ablageschema oder weitere Features
 
 ### 2025-10-09T21:30:00Z – T15 Completed
 - **[T15]** Security Scan & RLS Verification abgeschlossen

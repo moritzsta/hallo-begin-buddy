@@ -81,7 +81,18 @@
     "newFilesDesc": "Since your last visit",
     "markAsSeenButton": "Mark all as seen",
     "markAsSeenSuccess": "Marked",
-    "markAsSeenSuccessDesc": "All files have been marked as seen."
+    "markAsSeenSuccessDesc": "All files have been marked as seen.",
+    "editTags": "Edit tags"
+  },
+  "tags": {
+    "inputPlaceholder": "Add tag...",
+    "addTags": "Add tags (optional)",
+    "helperText": "{{count}}/{{max}} tags",
+    "editTitle": "Edit Tags",
+    "editDesc": "Add or remove tags. Press Enter to add a tag.",
+    "updateSuccess": "Tags updated",
+    "updateSuccessDesc": "Tags have been successfully updated.",
+    "updateError": "Error updating tags"
   },
   "common": {
     "unknownError": "Unknown error",
@@ -91,6 +102,7 @@
     "success": "Success",
     "cancel": "Cancel",
     "save": "Save",
+    "saving": "Saving...",
     "delete": "Delete",
     "edit": "Edit",
     "close": "Close",

@@ -81,7 +81,18 @@
     "newFilesDesc": "Seit Ihrem letzten Besuch",
     "markAsSeenButton": "Alle als gesehen markieren",
     "markAsSeenSuccess": "Markiert",
-    "markAsSeenSuccessDesc": "Alle Dateien wurden als gesehen markiert."
+    "markAsSeenSuccessDesc": "Alle Dateien wurden als gesehen markiert.",
+    "editTags": "Tags bearbeiten"
+  },
+  "tags": {
+    "inputPlaceholder": "Tag hinzufügen...",
+    "addTags": "Tags hinzufügen (optional)",
+    "helperText": "{{count}}/{{max}} Tags",
+    "editTitle": "Tags bearbeiten",
+    "editDesc": "Tags hinzufügen oder entfernen. Drücken Sie Enter, um ein Tag hinzuzufügen.",
+    "updateSuccess": "Tags aktualisiert",
+    "updateSuccessDesc": "Die Tags wurden erfolgreich aktualisiert.",
+    "updateError": "Fehler beim Aktualisieren der Tags"
   },
   "common": {
     "unknownError": "Unbekannter Fehler",
@@ -91,6 +102,7 @@
     "success": "Erfolg",
     "cancel": "Abbrechen",
     "save": "Speichern",
+    "saving": "Speichert...",
     "delete": "Löschen",
     "edit": "Bearbeiten",
     "close": "Schließen",

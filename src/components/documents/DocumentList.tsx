@@ -39,10 +39,11 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Card } from '@/components/ui/card';
-import { MoreVertical, Download, Trash2, Edit, FileIcon, Loader2, Search, Folder as FolderIcon, SlidersHorizontal, CheckCheck } from 'lucide-react';
+import { MoreVertical, Download, Trash2, Edit, FileIcon, Loader2, Search, Folder as FolderIcon, SlidersHorizontal, CheckCheck, Tags } from 'lucide-react';
 import { MoveFileDialog } from './MoveFileDialog';
 import { DocumentPreview } from './DocumentPreview';
 import { FilterPanel, FileFilters } from './FilterPanel';
+import { EditTagsDialog } from './EditTagsDialog';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -79,6 +80,8 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [moveFileId, setMoveFileId] = useState<string | null>(null);
+  const [editTagsFileId, setEditTagsFileId] = useState<string | null>(null);
+  const [editTagsCurrentTags, setEditTagsCurrentTags] = useState<string[]>([]);
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [filters, setFilters] = useState<FileFilters>({
     mimeTypes: [],
@@ -347,6 +350,11 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
     setEditTitle(file.title);
   };
 
+  const startEditTags = (file: FileRecord) => {
+    setEditTagsFileId(file.id);
+    setEditTagsCurrentTags(file.tags || []);
+  };
+
   const saveEdit = () => {
     if (editingId && editTitle.trim()) {
       renameMutation.mutate({ id: editingId, title: editTitle.trim() });
@@ -547,6 +555,10 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
                           <FolderIcon className="h-4 w-4 mr-2" />
                           {t('documents.move')}
                         </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => startEditTags(file)}>
+                          <Tags className="h-4 w-4 mr-2" />
+                          {t('documents.editTags')}
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => setDeleteId(file.id)}
                           className="text-destructive"
@@ -589,6 +601,18 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
         onOpenChange={(open) => !open && setMoveFileId(null)}
         fileId={moveFileId}
         currentFolderId={folderId}
+      />
+
+      <EditTagsDialog
+        open={!!editTagsFileId}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditTagsFileId(null);
+            setEditTagsCurrentTags([]);
+          }
+        }}
+        fileId={editTagsFileId}
+        currentTags={editTagsCurrentTags}
       />
     </div>
   );

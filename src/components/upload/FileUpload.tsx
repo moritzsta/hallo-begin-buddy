@@ -8,6 +8,8 @@ import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { TagInput } from '@/components/documents/TagInput';
+import { useQuery } from '@tanstack/react-query';
 
 interface UploadFile {
   file: File;
@@ -15,6 +17,7 @@ interface UploadFile {
   progress: number;
   status: 'pending' | 'uploading' | 'success' | 'error';
   error?: string;
+  tags?: string[];
 }
 
 const PLAN_LIMITS = {
@@ -37,6 +40,27 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
 
   const planTier = (profile?.plan_tier || 'free') as keyof typeof PLAN_LIMITS;
   const limits = PLAN_LIMITS[planTier];
+
+  // Fetch all available tags for suggestions
+  const { data: allFiles } = useQuery({
+    queryKey: ['files', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('files')
+        .select('tags')
+        .eq('owner_id', user!.id);
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const availableTags = Array.from(
+    new Set(
+      allFiles?.flatMap(file => file.tags || []) || []
+    )
+  ).sort();
 
   const validateFile = (file: File): string | null => {
     if (file.size > limits.maxSize) {
@@ -122,6 +146,7 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
           size: file.size,
           hash_sha256: hashHex,
           folder_id: targetFolderId,
+          tags: uploadFile.tags || [],
           meta: {
             original_name: file.name,
             uploaded_at: new Date().toISOString(),
@@ -217,6 +242,12 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
     setUploadFiles(prev => prev.filter(f => f.id !== id));
   };
 
+  const updateFileTags = (id: string, tags: string[]) => {
+    setUploadFiles(prev =>
+      prev.map(f => f.id === id ? { ...f, tags } : f)
+    );
+  };
+
   const clearCompleted = () => {
     setUploadFiles(prev => prev.filter(f => f.status === 'uploading'));
     if (onUploadComplete) onUploadComplete();
@@ -292,6 +323,19 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
                     <div className="flex items-center gap-1 text-xs text-muted-foreground">
                       <Loader2 className="h-3 w-3 animate-spin" />
                       {t('upload.waiting')}
+                    </div>
+                  )}
+
+                  {/* Tag Input for pending/success files */}
+                  {(uploadFile.status === 'pending' || uploadFile.status === 'success') && (
+                    <div className="mt-3 pt-3 border-t">
+                      <TagInput
+                        tags={uploadFile.tags || []}
+                        onTagsChange={(tags) => updateFileTags(uploadFile.id, tags)}
+                        suggestions={availableTags}
+                        placeholder={t('tags.addTags')}
+                        maxTags={10}
+                      />
                     </div>
                   )}
                 </div>
