@@ -192,22 +192,22 @@ export const DocumentViewer = ({ fileId, fileName, mimeType, onClose }: Document
     <Dialog open={!!fileId} onOpenChange={onClose}>
       <DialogContent className="max-w-[95vw] max-h-[95vh] h-[95vh] p-0 gap-0">
         {/* Header Toolbar */}
-        <DialogHeader className="px-4 py-2 border-b flex flex-row items-center justify-between space-y-0">
-          <div className="flex items-center gap-3">
+        <DialogHeader className="px-3 py-1 border-b flex flex-row items-center justify-between space-y-0">
+          <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="icon"
               onClick={onClose}
-              className="shrink-0"
+              className="shrink-0 h-7 w-7"
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4" />
             </Button>
-            <DialogTitle className="text-lg font-semibold truncate">
+            <DialogTitle className="text-sm font-medium truncate">
               {fileName}
             </DialogTitle>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <ZoomControls
               zoom={zoom}
               onZoomIn={handleZoomIn}
@@ -219,9 +219,9 @@ export const DocumentViewer = ({ fileId, fileName, mimeType, onClose }: Document
               variant="outline"
               size="sm"
               onClick={handleDownload}
-              className="gap-2"
+              className="gap-1 h-7 text-xs px-2"
             >
-              <Download className="h-4 w-4" />
+              <Download className="h-3 w-3" />
               {t('documents.download')}
             </Button>
           </div>
