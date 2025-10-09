@@ -24,6 +24,7 @@
 | T11 | Smart Upload Edge Function (OCR + AI) | ✅ Done |
 | T12 | Document Preview Edge Function | ✅ Done |
 | T13 | Design System & UI Polish | ✅ Done |
+| T14 | Settings Page (Profile, Plan, Usage) | ✅ Done |
 | T05 | Create `user_roles` Table | ✅ Done (already exists) |
 | T06 | RLS Policies – Owner-Only Access | Backlog |
 | T07 | Storage Bucket & RLS | Backlog |
@@ -62,6 +63,51 @@
 ## Change Log
 
 *Neueste Einträge oben. Format: [UTC Timestamp] [Task-ID] Beschreibung – Dateien/Ordner – Diffs (Stichpunkte)*
+
+### 2025-10-09T21:00:00Z – T14 Completed
+- **[T14]** Settings Page (Profile, Plan, Usage) implementiert
+- Seite erstellt:
+  - `src/pages/Settings.tsx` – Vollständige Settings-Seite mit Tabs
+- Features:
+  - **Profile Tab**:
+    - Email-Anzeige (read-only)
+    - Display Name-Eingabe (UI-only, keine DB-Änderung)
+    - Sprach-Auswahl (LanguageSwitcher)
+    - Theme-Auswahl (ThemeSwitcher)
+    - Save-Button mit Toast-Feedback
+  - **Plan Tab**:
+    - Aktuelle Plan-Anzeige mit Badge (Free/Basic/Plus/Max)
+    - Plan-Limits-Übersicht:
+      - Smart-Upload-Limit pro Monat
+      - Storage-Limit in GB
+      - Max. Dateigröße
+    - Upgrade-Hinweis für Free-User
+  - **Usage Tab**:
+    - Smart-Upload-Nutzung mit Progress-Bar
+    - Storage-Nutzung mit Progress-Bar
+    - Warning bei 90% Speicher-Auslastung
+    - Limit-Reached-Hinweis bei Smart-Uploads
+  - Real-time Daten via React Query:
+    - Usage aus `usage_tracking` Tabelle
+    - Storage aus `files` Aggregation
+- Navigation:
+  - Route `/settings` hinzugefügt (Protected)
+  - Settings-Icon-Button im Header von Index.tsx
+  - Back-Button zu Index
+- UI/UX:
+  - Responsive Layout mit Cards & Tabs
+  - Progress-Bars für visuelle Usage-Darstellung
+  - Status-Badges (Success/Warning/Destructive)
+  - Animierte Tab-Transitions
+- Übersetzungen:
+  - `src/i18n/locales/de.json` – Vollständige Settings-Übersetzungen
+  - `src/i18n/locales/en.json` – English Settings Translations
+- Routing:
+  - `src/App.tsx` – Settings-Route hinzugefügt
+- Hinweis:
+  - Display Name wird aktuell nicht in DB gespeichert (profiles.meta existiert nicht)
+  - Prospektiv: Migration für profiles.display_name oder profiles.meta JSONB-Feld
+- Next Step: T15 – Admin Panel (Type & Field Config) oder Security Scan
 
 ### 2025-10-09T20:30:00Z – T13 Completed
 - **[T13]** Design System & UI Polish implementiert
@@ -457,16 +503,16 @@
 
 ## Next Step
 
-**Task ID:** T14 – Settings Page (Profile, Plan, Usage)  
+**Task ID:** T15 – Security Scan & RLS Verification  
 **Akzeptanzkriterien:**
-- Settings-Seite mit User-Profil (Name, Email, Locale, Theme)
-- Plan-Tier-Anzeige mit Limits & Upgrades
-- Usage-Tracking-Übersicht (Smart-Uploads, Storage)
-- Profil-Update-Funktion (Name, Sprache, Theme)
-- Responsive Design mit Cards & Tabs
-- Navigation von Index zu Settings
+- Security-Scan durchführen zur Überprüfung aller Tabellen
+- RLS-Policies für alle Owner-Only-Tabellen verifizieren
+- Security-Findings analysieren und beheben
+- Authentifizierungs-Flows testen
+- Storage-RLS-Policies überprüfen
+- Edge-Function-Auth verifizieren
 
-**Aktion:** Settings-Seite erstellen, Profile-Update-Hook implementieren, Usage-Anzeige mit Charts, Plan-Limits-Tabelle, Route & Navigation hinzufügen.
+**Aktion:** Security-Scan-Tool ausführen, Findings reviewen, kritische Issues beheben, RLS-Policies optimieren.
 
 ---
 

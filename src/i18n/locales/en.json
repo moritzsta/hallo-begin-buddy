@@ -89,6 +89,7 @@
     "edit": "Edit",
     "close": "Close",
     "logout": "Logout",
+    "back": "Back",
     "or": "or"
   },
   "theme": {
@@ -100,6 +101,7 @@
   "folders": {
     "title": "Folders",
     "allFiles": "All Files",
+    "myFolders": "My Folders",
     "name": "Name",
     "namePlaceholder": "Enter folder name",
     "create": "Create",
@@ -123,5 +125,41 @@
     "deleteError": "Error deleting folder",
     "maxDepthError": "Maximum folder depth (3 levels) reached",
     "circularError": "Circular reference not allowed"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your profile, plan, and usage",
+    "profile": "Profile",
+    "plan": "Plan",
+    "usage": "Usage",
+    "profileSettings": "Profile Settings",
+    "profileDesc": "Manage your personal information and preferences",
+    "displayName": "Display Name",
+    "displayNamePlaceholder": "Your name",
+    "emailNotEditable": "Email address cannot be changed",
+    "language": "Language",
+    "theme": "Theme",
+    "currentPlan": "Current Plan",
+    "planDesc": "Details and limits of your current plan",
+    "smartUploadsLimit": "Smart Upload Limit",
+    "perMonth": "Per month",
+    "storageLimit": "Storage Limit",
+    "totalStorage": "Total",
+    "maxFileSize": "Max File Size",
+    "perFile": "Per file",
+    "unlimited": "Unlimited",
+    "upgradeTitle": "Upgrade Available",
+    "upgradeDesc": "Expand your limits with a higher tier plan",
+    "smartUploadsUsage": "Smart Upload Usage",
+    "thisMonth": "This month",
+    "used": "Used",
+    "limitReached": "Limit reached! Upgrade your plan for more smart uploads.",
+    "storageUsage": "Storage Usage",
+    "totalUsed": "Total used",
+    "storageWarning": "Warning: You have reached 90% of your storage limit",
+    "nameRequired": "Name is required",
+    "saveSuccess": "Successfully saved",
+    "saveSuccessDesc": "Your settings have been updated",
+    "saveError": "Error saving"
   }
 }

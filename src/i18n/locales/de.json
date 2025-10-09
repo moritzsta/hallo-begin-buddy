@@ -89,6 +89,7 @@
     "edit": "Bearbeiten",
     "close": "Schließen",
     "logout": "Abmelden",
+    "back": "Zurück",
     "or": "oder"
   },
   "theme": {
@@ -100,6 +101,7 @@
   "folders": {
     "title": "Ordner",
     "allFiles": "Alle Dateien",
+    "myFolders": "Meine Ordner",
     "name": "Name",
     "namePlaceholder": "Ordnername eingeben",
     "create": "Erstellen",
@@ -123,5 +125,41 @@
     "deleteError": "Fehler beim Löschen",
     "maxDepthError": "Maximale Ordnertiefe (3 Ebenen) erreicht",
     "circularError": "Zirkuläre Referenz nicht erlaubt"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "subtitle": "Verwalten Sie Ihr Profil, Ihren Plan und Ihre Nutzung",
+    "profile": "Profil",
+    "plan": "Plan",
+    "usage": "Nutzung",
+    "profileSettings": "Profil-Einstellungen",
+    "profileDesc": "Verwalten Sie Ihre persönlichen Daten und Präferenzen",
+    "displayName": "Anzeigename",
+    "displayNamePlaceholder": "Ihr Name",
+    "emailNotEditable": "Die E-Mail-Adresse kann nicht geändert werden",
+    "language": "Sprache",
+    "theme": "Design",
+    "currentPlan": "Aktueller Plan",
+    "planDesc": "Details und Limits Ihres aktuellen Plans",
+    "smartUploadsLimit": "Smart-Upload-Limit",
+    "perMonth": "Pro Monat",
+    "storageLimit": "Speicher-Limit",
+    "totalStorage": "Gesamt",
+    "maxFileSize": "Maximale Dateigröße",
+    "perFile": "Pro Datei",
+    "unlimited": "Unbegrenzt",
+    "upgradeTitle": "Upgrade verfügbar",
+    "upgradeDesc": "Erweitern Sie Ihre Limits mit einem höheren Plan",
+    "smartUploadsUsage": "Smart-Upload-Nutzung",
+    "thisMonth": "Diesen Monat",
+    "used": "Genutzt",
+    "limitReached": "Limit erreicht! Upgraden Sie Ihren Plan für mehr Smart-Uploads.",
+    "storageUsage": "Speicher-Nutzung",
+    "totalUsed": "Insgesamt genutzt",
+    "storageWarning": "Warnung: Sie haben 90% Ihres Speicherlimits erreicht",
+    "nameRequired": "Name ist erforderlich",
+    "saveSuccess": "Erfolgreich gespeichert",
+    "saveSuccessDesc": "Ihre Einstellungen wurden aktualisiert",
+    "saveError": "Fehler beim Speichern"
   }
 }
