@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 import { Menu, X, FileText } from 'lucide-react';
 import {
   DropdownMenu,
@@ -59,6 +60,7 @@ export function PublicNavbar() {
 
           {/* Right Side */}
           <div className="hidden md:flex items-center gap-4">
+            <ThemeSwitcher />
             <LanguageSwitcher />
             <Button variant="lifestyle" className="rounded-xl" asChild>
               <Link to="/auth">{t('public.nav.cta')}</Link>
@@ -124,6 +126,7 @@ export function PublicNavbar() {
               </Link>
             </div>
             <div className="flex items-center gap-4 pt-4">
+              <ThemeSwitcher />
               <LanguageSwitcher />
               <Button variant="lifestyle" className="rounded-xl flex-1" asChild>
                 <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
