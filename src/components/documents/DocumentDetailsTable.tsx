@@ -76,11 +76,11 @@ export const DocumentDetailsTable = ({
 
   const [resizing, setResizing] = useState<{ columnKey: string; startX: number; startWidth: number } | null>(null);
 
-  // Virtual scrolling
+  // Virtual scrolling with adjusted row size for spacing
   const rowVirtualizer = useVirtualizer({
     count: files.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 40,
+    estimateSize: () => 48, // Increased from 40 to account for spacing
     overscan: 10,
   });
 
@@ -217,7 +217,7 @@ export const DocumentDetailsTable = ({
     <div className="relative">
       <div
         ref={parentRef}
-        className="overflow-auto rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm shadow-sm"
+        className="overflow-auto rounded-xl bg-background"
         style={{ height: '600px' }}
         onKeyDown={handleKeyDown}
         tabIndex={0}
@@ -226,13 +226,13 @@ export const DocumentDetailsTable = ({
       >
         {/* Sticky Header */}
         <div
-          className="sticky top-0 z-10 bg-gradient-to-b from-muted/95 to-muted/90 backdrop-blur-md border-b border-border/50 flex shadow-sm"
+          className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/30 flex px-2 py-3"
           style={{ minWidth: totalWidth }}
         >
           {columns.map((column, idx) => (
             <div
               key={column.key}
-              className="relative flex items-center px-4 py-3 text-xs font-semibold tracking-wide text-muted-foreground/80 uppercase border-r border-border/30 last:border-r-0"
+              className="relative flex items-center px-4 py-1 text-xs font-semibold tracking-wide text-muted-foreground/70 uppercase"
               style={{ width: column.width, minWidth: column.minWidth }}
               role="columnheader"
             >
@@ -255,6 +255,7 @@ export const DocumentDetailsTable = ({
 
         {/* Virtual Rows */}
         <div
+          className="px-2 py-2"
           style={{
             height: `${rowVirtualizer.getTotalSize()}px`,
             width: '100%',
@@ -273,15 +274,15 @@ export const DocumentDetailsTable = ({
                 <ContextMenuTrigger asChild>
                   <div
                     className={cn(
-                      "absolute top-0 left-0 w-full flex items-center border-b border-border/30 transition-all duration-200 cursor-pointer group",
-                      isSelected && "bg-primary/10 border-primary/20",
+                      "absolute top-0 left-0 w-full flex items-center rounded-lg border border-border/50 bg-card transition-all duration-200 cursor-pointer group mb-2",
+                      isSelected && "bg-primary/10 border-primary/30 shadow-md",
                       isFocused && "ring-2 ring-primary/50 ring-inset",
-                      !isSelected && "hover:bg-accent/50"
+                      !isSelected && "hover:shadow-md hover:border-border"
                     )}
                     style={{
-                      height: `${virtualRow.size}px`,
+                      height: `${virtualRow.size - 8}px`,
                       transform: `translateY(${virtualRow.start}px)`,
-                      minWidth: totalWidth,
+                      minWidth: `calc(${totalWidth}px - 16px)`,
                     }}
                     onClick={(e) => handleRowClick(virtualRow.index, e)}
                     role="row"
@@ -290,7 +291,7 @@ export const DocumentDetailsTable = ({
                   >
                     {/* Name */}
                     <div
-                      className="px-4 py-2 flex items-center gap-3 border-r border-border/30"
+                      className="px-4 py-3 flex items-center gap-3"
                       style={{ width: columns[0].width, minWidth: columns[0].minWidth }}
                       role="gridcell"
                     >
@@ -314,7 +315,7 @@ export const DocumentDetailsTable = ({
 
                     {/* Type */}
                     <div
-                      className="px-4 py-2 border-r border-border/30"
+                      className="px-4 py-3"
                       style={{ width: columns[1].width, minWidth: columns[1].minWidth }}
                       role="gridcell"
                     >
@@ -328,7 +329,7 @@ export const DocumentDetailsTable = ({
 
                     {/* Size */}
                     <div
-                      className="px-4 py-2 border-r border-border/30"
+                      className="px-4 py-3"
                       style={{ width: columns[2].width, minWidth: columns[2].minWidth }}
                       role="gridcell"
                     >
@@ -339,7 +340,7 @@ export const DocumentDetailsTable = ({
 
                     {/* Tags */}
                     <div
-                      className="px-4 py-2 border-r border-border/30 overflow-hidden"
+                      className="px-4 py-3 overflow-hidden"
                       style={{ width: columns[3].width, minWidth: columns[3].minWidth }}
                       role="gridcell"
                     >
@@ -389,7 +390,7 @@ export const DocumentDetailsTable = ({
 
                     {/* Date */}
                     <div
-                      className="px-4 py-2 border-r border-border/30"
+                      className="px-4 py-3"
                       style={{ width: columns[4].width, minWidth: columns[4].minWidth }}
                       role="gridcell"
                     >
@@ -404,7 +405,7 @@ export const DocumentDetailsTable = ({
 
                     {/* Actions */}
                     <div
-                      className="px-4 py-2 flex items-center justify-center"
+                      className="px-4 py-3 flex items-center justify-center"
                       style={{ width: columns[5].width, minWidth: columns[5].minWidth }}
                       role="gridcell"
                     >
