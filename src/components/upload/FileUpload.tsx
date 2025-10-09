@@ -43,6 +43,7 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
     open: boolean;
     uploadFileId: string | null;
   }>({ open: false, uploadFileId: null });
+  const [smartUploadLoading, setSmartUploadLoading] = useState<string | null>(null);
   
   const { toast } = useToast();
   const { user, profile } = useAuth();
@@ -259,6 +260,8 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
     const uploadFile = uploadFiles.find(f => f.id === uploadFileId);
     if (!uploadFile?.fileId) return;
 
+    setSmartUploadLoading(uploadFileId);
+
     try {
       // Call smart-upload edge function
       const { data, error } = await supabase.functions.invoke('smart-upload', {
@@ -267,18 +270,24 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
 
       if (error) throw error;
 
-      if (data?.metadata) {
+      if (data?.extracted) {
         // Update upload file with metadata and show confirmation dialog
         setUploadFiles(prev =>
           prev.map(f =>
             f.id === uploadFileId
-              ? { ...f, status: 'awaiting-confirmation' as const, smartMetadata: data.metadata }
+              ? { ...f, status: 'awaiting-confirmation' as const, smartMetadata: data.extracted }
               : f
           )
         );
         setConfirmDialogState({ open: true, uploadFileId });
+      } else if (data?.message) {
+        // Feature not supported or skipped
+        toast({
+          title: t('upload.smartUploadSkipped', { defaultValue: 'Smart Upload nicht verfügbar' }),
+          description: data.message,
+        });
       } else {
-        // No metadata extracted, just mark as success
+        // No metadata extracted
         toast({
           title: t('upload.smartUploadSkipped', { defaultValue: 'Smart Upload übersprungen' }),
           description: t('upload.smartUploadSkippedDesc', { 
@@ -293,6 +302,8 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
         description: error instanceof Error ? error.message : t('common.unknownError'),
         variant: 'destructive',
       });
+    } finally {
+      setSmartUploadLoading(null);
     }
   };
 
@@ -466,10 +477,20 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
                         variant="outline"
                         size="sm"
                         onClick={() => triggerSmartUpload(uploadFile.id)}
+                        disabled={smartUploadLoading === uploadFile.id}
                         className="w-full"
                       >
-                        <Sparkles className="h-4 w-4 mr-2" />
-                        {t('upload.smartUpload', { defaultValue: 'Smart Upload' })}
+                        {smartUploadLoading === uploadFile.id ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            {t('upload.smartUploadProcessing', { defaultValue: 'Analysiere Dokument...' })}
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="h-4 w-4 mr-2" />
+                            {t('upload.smartUpload', { defaultValue: 'Smart Upload' })}
+                          </>
+                        )}
                       </Button>
                     </div>
                   )}

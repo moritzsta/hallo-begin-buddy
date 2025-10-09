@@ -62,19 +62,133 @@ serve(async (req) => {
     // Support images and PDFs
     const isImage = file.mime.startsWith('image/');
     const isPdf = file.mime === 'application/pdf';
+    const isOffice = file.mime.includes('officedocument') || 
+                     file.mime.includes('msword') || 
+                     file.mime.includes('ms-excel') || 
+                     file.mime.includes('ms-powerpoint');
     
-    if (!isImage && !isPdf) {
+    if (!isImage && !isPdf && !isOffice) {
       console.log(`Skipping unsupported file type: ${file.mime}`);
       return new Response(
         JSON.stringify({
           success: true,
-          message: 'Smart upload supports images and PDFs',
+          message: 'Dieser Dateityp wird für Smart Upload nicht unterstützt. Nur Bilder, PDFs und Office-Dokumente werden analysiert.',
           extracted: null,
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         }
       );
+    }
+
+    // For Office documents, use filename-based analysis as fallback
+    if (isOffice) {
+      console.log(`Processing Office document: ${file.title}`);
+      
+      // Extract info from filename
+      const fileExt = file.title.split('.').pop()?.toLowerCase() || '';
+      let docType = 'document';
+      
+      if (fileExt === 'docx' || fileExt === 'doc') {
+        docType = 'document';
+      } else if (fileExt === 'xlsx' || fileExt === 'xls') {
+        docType = 'spreadsheet';
+      } else if (fileExt === 'pptx' || fileExt === 'ppt') {
+        docType = 'presentation';
+      }
+
+      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+      if (!LOVABLE_API_KEY) {
+        throw new Error('LOVABLE_API_KEY not configured');
+      }
+
+      // Use AI to suggest title and keywords based on filename
+      const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a document analysis assistant. Based on filename, suggest a descriptive title and relevant keywords.',
+            },
+            {
+              role: 'user',
+              content: `Analyze this Office document filename: "${file.title}". Extract: document type (document, spreadsheet, presentation, report, template), a suggested descriptive title (max 60 chars), and 3-5 relevant keywords.`,
+            },
+          ],
+          tools: [
+            {
+              type: 'function',
+              function: {
+                name: 'extract_metadata',
+                description: 'Extract document metadata from filename',
+                parameters: {
+                  type: 'object',
+                  properties: {
+                    document_type: {
+                      type: 'string',
+                      description: 'Type of document (document, spreadsheet, presentation, report, template)',
+                    },
+                    suggested_title: {
+                      type: 'string',
+                      description: 'Descriptive title for the document (max 60 characters)',
+                    },
+                    keywords: {
+                      type: 'array',
+                      items: { type: 'string' },
+                      description: 'Array of 3-5 relevant keywords',
+                    },
+                  },
+                  required: ['document_type', 'suggested_title', 'keywords'],
+                  additionalProperties: false,
+                },
+              },
+            },
+          ],
+          tool_choice: { type: 'function', function: { name: 'extract_metadata' } },
+        }),
+      });
+
+      if (!aiResponse.ok) {
+        const errorText = await aiResponse.text();
+        console.error('AI Gateway error for Office doc:', aiResponse.status, errorText);
+        
+        if (aiResponse.status === 429) {
+          throw new Error('AI rate limit exceeded. Please try again later.');
+        }
+        if (aiResponse.status === 402) {
+          throw new Error('AI credits exhausted. Please add credits to your workspace.');
+        }
+        
+        throw new Error('AI extraction failed');
+      }
+
+      const aiData = await aiResponse.json();
+      const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
+      
+      if (toolCall) {
+        const extracted = JSON.parse(toolCall.function.arguments);
+
+        // Track usage
+        await incrementUsageTracking(supabase, file.owner_id, 'smart_upload');
+
+        console.log(`Smart upload completed for Office file ${file_id}:`, extracted);
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            extracted,
+          }),
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      }
     }
 
     // Get signed URL for file
