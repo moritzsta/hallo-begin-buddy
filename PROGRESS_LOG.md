@@ -11,7 +11,7 @@
 
 | Task ID | Title | Status |
 |---------|-------|--------|
-| T01 | Enable Lovable Cloud | Backlog |
+| T01 | Enable Lovable Cloud | ✅ Done |
 | T02 | Create `documents` Table | Backlog |
 | T03 | Create `document_fields` Table | Backlog |
 | T04 | Create `document_types` Table | Backlog |
@@ -53,6 +53,16 @@
 ## Change Log
 
 *Neueste Einträge oben. Format: [UTC Timestamp] [Task-ID] Beschreibung – Dateien/Ordner – Diffs (Stichpunkte)*
+
+### 2025-10-09T14:30:00Z – T01 Completed
+- **[T01]** Lovable Cloud aktiviert
+- Backend provisioniert:
+  - PostgreSQL Database
+  - Auth (Email/Password)
+  - Storage Bucket
+  - Edge Functions Runtime
+- Supabase Client automatisch konfiguriert
+- Next Step: T02 – Create `documents` Table
 
 ### 2025-10-09T12:00:00Z – Initial Setup
 - **[SETUP]** Projekt initialisiert
@@ -143,15 +153,14 @@
 
 ## Next Step
 
-**Task ID:** T01 – Enable Lovable Cloud  
+**Task ID:** T02 – Create `documents` Table  
 **Akzeptanzkriterien:**
-- Lovable Cloud Dashboard accessible
-- PostgreSQL DB provisioniert
-- Auth (Email/Password) aktiviert
-- Storage Bucket erstellt
-- Supabase Client ENV vars verfügbar
+- Table `documents` mit allen Feldern aus Doku erstellt
+- RLS Owner-Only Policies aktiv
+- Indexes für user_id, folder_id, created_at
+- Trigger für updated_at Timestamp
 
-**Aktion:** Tool `supabase--enable` ausführen, User über Cloud-Features informieren, Docs verlinken.
+**Aktion:** Migration schreiben mit vollständigem Schema inkl. Metadatenfelder, RLS-Policies, Indexes & Trigger.
 
 ---
 
