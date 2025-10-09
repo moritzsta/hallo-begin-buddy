@@ -63,7 +63,7 @@ export const DocumentDetailsTable = ({
   const parentRef = useRef<HTMLDivElement>(null);
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [lastSelectedIndex, setLastSelectedIndex] = useState<number>(-1);
-  const [focusedIndex, setFocusedIndex] = useState<number>(0);
+  const [focusedIndex, setFocusedIndex] = useState<number>(-1);
 
   const [columns, setColumns] = useState<ColumnConfig[]>([
     { key: 'name', label: t('documents.name'), width: 300, minWidth: 150, resizable: true },
@@ -297,7 +297,7 @@ export const DocumentDetailsTable = ({
                       <div className="flex items-center gap-2 flex-1 min-w-0">
                         <span className={cn(
                           "truncate font-medium transition-colors",
-                          isNew ? "text-primary font-semibold" : "text-foreground group-hover:text-primary"
+                          isNew && "font-semibold"
                         )}>
                           {file.title}
                         </span>
@@ -415,38 +415,38 @@ export const DocumentDetailsTable = ({
                   </div>
                 </ContextMenuTrigger>
 
-                <ContextMenuContent className="w-56 rounded-lg border-border/50 shadow-lg">
+                <ContextMenuContent className="w-56 rounded-lg bg-popover border-2 border-border shadow-2xl backdrop-blur-md">
                   <ContextMenuItem 
                     onClick={() => onPreview(file)} 
-                    className="gap-2 rounded-md transition-colors"
+                    className="gap-2 rounded-md transition-colors hover:bg-accent focus:bg-accent"
                   >
                     <Eye className="h-4 w-4 text-primary" />
                     <span className="font-medium">{t('documents.preview')}</span>
                   </ContextMenuItem>
                   <ContextMenuItem 
                     onClick={() => onDownload(file)} 
-                    className="gap-2 rounded-md transition-colors"
+                    className="gap-2 rounded-md transition-colors hover:bg-accent focus:bg-accent"
                   >
                     <Download className="h-4 w-4 text-blue-500" />
                     <span className="font-medium">{t('documents.download')}</span>
                   </ContextMenuItem>
                   <ContextMenuItem 
                     onClick={() => onRename(file)} 
-                    className="gap-2 rounded-md transition-colors"
+                    className="gap-2 rounded-md transition-colors hover:bg-accent focus:bg-accent"
                   >
                     <Edit className="h-4 w-4 text-green-500" />
                     <span className="font-medium">{t('documents.rename')}</span>
                   </ContextMenuItem>
                   <ContextMenuItem 
                     onClick={() => onMove(file.id)} 
-                    className="gap-2 rounded-md transition-colors"
+                    className="gap-2 rounded-md transition-colors hover:bg-accent focus:bg-accent"
                   >
                     <FolderInput className="h-4 w-4 text-purple-500" />
                     <span className="font-medium">{t('documents.move')}</span>
                   </ContextMenuItem>
                   <ContextMenuItem 
                     onClick={() => onEditTags(file)} 
-                    className="gap-2 rounded-md transition-colors"
+                    className="gap-2 rounded-md transition-colors hover:bg-accent focus:bg-accent"
                   >
                     <TagsIcon className="h-4 w-4 text-orange-500" />
                     <span className="font-medium">{t('documents.editTags')}</span>
@@ -454,7 +454,7 @@ export const DocumentDetailsTable = ({
                   <div className="my-1 h-px bg-border" />
                   <ContextMenuItem
                     onClick={() => onDelete(file.id)}
-                    className="gap-2 text-destructive focus:text-destructive rounded-md transition-colors"
+                    className="gap-2 text-destructive focus:text-destructive hover:bg-destructive/10 focus:bg-destructive/10 rounded-md transition-colors"
                   >
                     <Trash2 className="h-4 w-4" />
                     <span className="font-medium">{t('documents.delete')}</span>
