@@ -97,7 +97,12 @@ serve(async (req) => {
       };
       
       folderStructureText = '\n\nEXISTING FOLDER STRUCTURE:\n' + buildFolderTree();
-      folderStructureText += '\nIMPORTANT: Prefer using existing folders when appropriate to maintain consistency. Only suggest new folders if the document type clearly doesn\'t fit existing structure.';
+      folderStructureText += '\n\nCRITICAL FOLDER RULES:\n';
+      folderStructureText += '1. ALWAYS reuse existing folders when they match the document content\n';
+      folderStructureText += '2. NEVER create duplicate or similar folder names (e.g., "Katze" and "Katzen" are duplicates - use only one)\n';
+      folderStructureText += '3. Use flexible folder depth (1-6 levels, ideally 3-4 levels)\n';
+      folderStructureText += '4. Only create new folders if content clearly doesn\'t fit existing structure\n';
+      folderStructureText += '5. Singular vs plural: be consistent with existing folder naming conventions';
     }
 
     // Check file type
@@ -220,7 +225,7 @@ serve(async (req) => {
         throw new Error('Failed to get signed URL for image');
       }
 
-      analysisPrompt = `Analyze this image/document and extract: document type (e.g., invoice, receipt, letter, contract, photo, diagram), a suggested descriptive title (max 60 chars), 3-5 relevant keywords, and suggest an appropriate folder structure path (e.g., "Invoices/2025/Supplier Name" or "Photos/Vacation/Italy"). The folder path should be logical and help organize this document. ${languageInstruction}${userContextInstruction}${folderStructureText}`;
+      analysisPrompt = `Analyze this image/document and extract: document type (e.g., invoice, receipt, letter, contract, photo, diagram), a suggested descriptive title (max 60 chars), 3-5 relevant keywords, and suggest an appropriate folder structure path with flexible depth (1-6 levels, ideally 3-4). AVOID duplicate or similar folder names (e.g., "Katze" and "Katzen"). REUSE existing folders whenever they match the content. ${languageInstruction}${userContextInstruction}${folderStructureText}`;
 
       contentPayload = [
         {
@@ -245,9 +250,7 @@ Extract:
 1. document_type: Type of document (invoice, receipt, letter, contract, report, presentation, spreadsheet, etc.)
 2. suggested_title: A descriptive title (max 60 chars) based on content
 3. keywords: 3-5 relevant keywords from the content
-4. suggested_path: A logical folder structure path to organize this document (e.g., "Invoices/2025/Company Name", "Reports/Annual/2025", "Presentations/Marketing/Q1")
-
-The folder path should be based on the content and help create an intelligent filing system.
+4. suggested_path: A logical folder structure path with flexible depth (1-6 levels, ideally 3-4). CRITICAL: AVOID duplicate or similar folder names (e.g., "Katze" and "Katzen" are duplicates). REUSE existing folders when they match the document content.
 
 ${languageInstruction}${userContextInstruction}${folderStructureText}`;
 
@@ -297,7 +300,7 @@ ${languageInstruction}${userContextInstruction}${folderStructureText}`;
                   },
                   suggested_path: {
                     type: 'string',
-                    description: 'Suggested folder path for organizing this document (e.g., "Invoices/2025/Supplier")',
+                    description: 'Suggested folder path with 1-6 levels (ideally 3-4). AVOID duplicates like "Katze" and "Katzen". REUSE existing folders when appropriate.',
                   },
                 },
                 required: ['document_type', 'suggested_title', 'keywords', 'suggested_path'],
