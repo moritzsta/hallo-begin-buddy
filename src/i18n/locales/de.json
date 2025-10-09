@@ -71,6 +71,22 @@
   },
   "common": {
     "unknownError": "Unbekannter Fehler",
-    "plan": "Plan"
+    "plan": "Plan",
+    "loading": "Lädt...",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "close": "Schließen",
+    "logout": "Abmelden",
+    "or": "oder"
+  },
+  "theme": {
+    "toggle": "Theme umschalten",
+    "light": "Hell",
+    "dark": "Dunkel",
+    "system": "System"
   }
 }

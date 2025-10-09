@@ -6,27 +6,34 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FileUpload } from '@/components/upload/FileUpload';
 import { DocumentList } from '@/components/documents/DocumentList';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { Upload, FileText } from 'lucide-react';
+import { ThemeSwitcher } from '@/components/ThemeSwitcher';
+import { Upload, FileText, LogOut } from 'lucide-react';
 
 const Index = () => {
   const { user, profile, signOut } = useAuth();
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('documents');
 
+  const handleLogout = async () => {
+    await signOut();
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="border-b border-border bg-card">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold">{t('app.title')}</h1>
             <p className="text-sm text-muted-foreground">
-              {user?.email} | {t('common.plan')}: {profile?.plan_tier || 'free'}
+              {user?.email}
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <ThemeSwitcher />
             <LanguageSwitcher />
-            <Button onClick={signOut} variant="outline">
-              {t('app.logout')}
+            <Button variant="outline" onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              {t('common.logout')}
             </Button>
           </div>
         </div>

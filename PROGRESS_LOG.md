@@ -18,7 +18,7 @@
 | T05 | Smart Upload UI | ✅ Done |
 | T06 | Document List Component | ✅ Done |
 | T07 | i18n Setup (German/English) | ✅ Done |
-| T08 | Dark Mode & Theme Switcher | Backlog |
+| T08 | Dark Mode & Theme Switcher | ✅ Done |
 | T05 | Create `user_roles` Table | Backlog |
 | T06 | RLS Policies – Owner-Only Access | Backlog |
 | T07 | Storage Bucket & RLS | Backlog |
@@ -57,6 +57,32 @@
 ## Change Log
 
 *Neueste Einträge oben. Format: [UTC Timestamp] [Task-ID] Beschreibung – Dateien/Ordner – Diffs (Stichpunkte)*
+
+### 2025-10-09T18:00:00Z – T08 Completed
+- **[T08]** Dark Mode & Theme Switcher implementiert
+- Dependencies bereits installiert:
+  - `next-themes` – Theme Management Library
+- Komponenten erstellt:
+  - `src/components/ThemeSwitcher.tsx` – Theme Switcher Dropdown (Light/Dark/System)
+- Features:
+  - ThemeProvider in App.tsx integriert mit System-Theme-Support
+  - Theme Switcher speichert Auswahl im Profil (profiles.theme)
+  - AuthContext lädt Theme beim Login aus Profil
+  - Light/Dark/System Theme Support
+  - Animierte Icon-Transitions (Sun/Moon)
+  - CSS Variables in index.css bereits vollständig für Dark Mode vorbereitet
+  - Alle Komponenten nutzen semantische Tokens → automatischer Dark Mode Support
+- Komponenten aktualisiert:
+  - `src/App.tsx` – ThemeProvider integriert
+  - `src/pages/Auth.tsx` – ThemeSwitcher im Header neben LanguageSwitcher
+  - `src/pages/Index.tsx` – ThemeSwitcher im Header
+  - `src/i18n/locales/de.json` – Theme-Übersetzungen hinzugefügt
+  - `src/i18n/locales/en.json` – Theme-Übersetzungen hinzugefügt
+- Design:
+  - Alle Komponenten verwenden bereits semantische Tokens aus index.css
+  - Dark Mode funktioniert out-of-the-box durch CSS Variable Switching
+  - Smooth Transitions zwischen Themes
+- Next Step: T05 – Create `user_roles` Table
 
 ### 2025-10-09T17:30:00Z – T07 Completed
 - **[T07]** i18n Setup (German/English) implementiert
@@ -268,16 +294,14 @@
 
 ## Next Step
 
-**Task ID:** T08 – Dark Mode & Theme Switcher  
+**Task ID:** T05 (aus Backlog) – Create `user_roles` Table  
 **Akzeptanzkriterien:**
-- next-themes Integration für Theme-Management
-- Light / Dark / System Theme Support
-- Theme Switcher in Header
-- Speicherung des Themes im Profil
-- CSS Variables für Light/Dark angepasst
-- Alle Komponenten unterstützen Dark Mode
+- Migration für `user_roles` Tabelle
+- RLS Owner-Only Policies
+- Security Definer Function für Admin-Checks
+- Auto-Trigger für Default-Role bei User-Signup
 
-**Aktion:** next-themes konfigurieren, Theme Switcher implementieren, Dark Mode CSS Variables, Profil-Integration.
+**Aktion:** Migration erstellen für Rollen-Management, RLS Policies, Admin-Gate Function.
 
 ---
 

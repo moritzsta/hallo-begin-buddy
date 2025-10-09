@@ -71,6 +71,22 @@
   },
   "common": {
     "unknownError": "Unknown error",
-    "plan": "Plan"
+    "plan": "Plan",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "logout": "Logout",
+    "or": "or"
+  },
+  "theme": {
+    "toggle": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
   }
 }
