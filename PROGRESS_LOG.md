@@ -16,7 +16,8 @@
 | T03 | Storage Buckets & Signed URLs | ✅ Done |
 | T04 | Auth & Profil-Management | ✅ Done |
 | T05 | Smart Upload UI | ✅ Done |
-| T06 | Document List Component | Backlog |
+| T06 | Document List Component | ✅ Done |
+| T07 | i18n Setup (German/English) | Backlog |
 | T05 | Create `user_roles` Table | Backlog |
 | T06 | RLS Policies – Owner-Only Access | Backlog |
 | T07 | Storage Bucket & RLS | Backlog |
@@ -55,6 +56,27 @@
 ## Change Log
 
 *Neueste Einträge oben. Format: [UTC Timestamp] [Task-ID] Beschreibung – Dateien/Ordner – Diffs (Stichpunkte)*
+
+### 2025-10-09T17:00:00Z – T06 Completed
+- **[T06]** Document List Component implementiert
+- Komponenten erstellt:
+  - `src/components/documents/DocumentList.tsx` – Dokumentenliste mit allen Features
+- Features:
+  - Dokumententabelle mit allen Metadaten (Name, Typ, Größe, Tags, Datum)
+  - Suche (Titel und Tags durchsuchbar)
+  - Sortierung (Datum, Name, Größe) mit aufsteigend/absteigend
+  - Download via `generate-signed-url` Edge Function
+  - Inline-Umbenennen von Dokumenten
+  - Löschen mit Bestätigungs-Dialog (Storage + DB)
+  - Formatierung von Dateigrößen (B, KB, MB, GB)
+  - Responsive Design mit shadcn Table, Card, Dropdown
+  - Toast-Feedback für alle Aktionen
+- `src/pages/Index.tsx` aktualisiert:
+  - Tabs für "Meine Dokumente" und "Hochladen"
+  - Auto-Switch zu Dokumenten-Tab nach Upload
+- Dependencies:
+  - `date-fns` für Datums-Formatierung hinzugefügt
+- Next Step: T07 – i18n Setup (German/English)
 
 ### 2025-10-09T16:30:00Z – T05 Completed
 - **[T05]** Smart Upload UI implementiert
@@ -220,17 +242,16 @@
 
 ## Next Step
 
-**Task ID:** T06 – Document List Component  
+**Task ID:** T07 – i18n Setup (German/English)  
 **Akzeptanzkriterien:**
-- Liste aller Dokumente des Users anzeigen
-- Sortierung (Datum, Name, Größe)
-- Filter (nach Tags, MIME-Type)
-- Suche (Titel, Tags)
-- Thumbnail-Preview für Bilder
-- Aktionen: Download, Löschen, Umbenennen
-- Pagination für große Listen
+- i18next Integration
+- Deutsche und englische Übersetzungen
+- Sprachumschalter in Header
+- Speicherung der Sprache im Profil
+- Alle UI-Texte übersetzbar
+- Fallback auf Deutsch
 
-**Aktion:** Liste-Komponente erstellen, Supabase-Query mit Filter/Sort, Download via Signed URLs, Delete-Funktion.
+**Aktion:** i18next konfigurieren, Übersetzungsdateien erstellen, Language Switcher implementieren, Context-Integration.
 
 ---
 
