@@ -2,31 +2,39 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
-  <div 
-    ref={ref} 
-    className={cn(
-      "rounded-lg border bg-card text-card-foreground shadow-sm transition-all",
-      "lifestyle:rounded-2xl lifestyle:shadow-md lifestyle:hover:shadow-lg lifestyle:hover:-translate-y-0.5",
-      className
-    )} 
-    {...props} 
-  />
-));
-Card.displayName = "Card";
-
-const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
+const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => {
+  const isLifestyle = typeof window !== 'undefined' && document.documentElement.classList.contains('lifestyle');
+  
+  return (
     <div 
       ref={ref} 
       className={cn(
-        "flex flex-col space-y-1.5 p-6",
-        "lifestyle:bg-gradient-to-r lifestyle:from-[hsl(var(--gradient-from)/0.08)] lifestyle:via-[hsl(var(--gradient-via)/0.05)] lifestyle:to-transparent",
+        "rounded-lg border bg-card text-card-foreground shadow-sm transition-all",
+        isLifestyle && "rounded-2xl shadow-md hover:shadow-lg hover:-translate-y-0.5",
         className
       )} 
       {...props} 
     />
-  ),
+  );
+});
+Card.displayName = "Card";
+
+const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => {
+    const isLifestyle = typeof window !== 'undefined' && document.documentElement.classList.contains('lifestyle');
+    
+    return (
+      <div 
+        ref={ref} 
+        className={cn(
+          "flex flex-col space-y-1.5 p-6",
+          isLifestyle && "bg-gradient-to-r from-[hsl(var(--gradient-from)/0.08)] via-[hsl(var(--gradient-via)/0.05)] to-transparent",
+          className
+        )} 
+        {...props} 
+      />
+    );
+  },
 );
 CardHeader.displayName = "CardHeader";
 

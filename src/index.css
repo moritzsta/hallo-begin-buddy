@@ -246,19 +246,24 @@ All colors MUST be HSL.
   }
 
   /* Lifestyle Theme Typography */
-  .lifestyle h1,
-  .lifestyle h2,
-  .lifestyle h3,
-  .lifestyle h4,
-  .lifestyle h5,
-  .lifestyle h6 {
+  html.lifestyle,
+  html.lifestyle body {
+    font-family: 'Inter', sans-serif;
+  }
+
+  html.lifestyle h1,
+  html.lifestyle h2,
+  html.lifestyle h3,
+  html.lifestyle h4,
+  html.lifestyle h5,
+  html.lifestyle h6 {
     font-family: 'Poppins', sans-serif;
     font-weight: 600;
     letter-spacing: -0.01em;
   }
 
-  .lifestyle button,
-  .lifestyle .btn {
+  html.lifestyle button,
+  html.lifestyle .btn {
     font-family: 'Outfit', sans-serif;
     font-weight: 500;
     letter-spacing: 0.01em;
@@ -322,15 +327,15 @@ All colors MUST be HSL.
   }
 
   /* Lifestyle Theme Gradients */
-  .lifestyle .gradient-lifestyle {
+  html.lifestyle .gradient-lifestyle {
     background: linear-gradient(135deg, hsl(var(--gradient-from)) 0%, hsl(var(--gradient-via)) 50%, hsl(var(--gradient-to)) 100%);
   }
 
-  .lifestyle .gradient-lifestyle-soft {
+  html.lifestyle .gradient-lifestyle-soft {
     background: linear-gradient(180deg, hsl(var(--gradient-from) / 0.1) 0%, hsl(var(--gradient-via) / 0.05) 100%);
   }
 
-  .lifestyle .gradient-header {
+  html.lifestyle .gradient-header {
     background: linear-gradient(90deg, hsl(var(--gradient-from)) 0%, hsl(var(--gradient-via)) 50%, hsl(var(--gradient-to)) 100%);
     height: 0.25rem;
   }
@@ -354,19 +359,19 @@ All colors MUST be HSL.
   }
 
   /* Lifestyle Hover Effects */
-  .lifestyle .hover-scale {
+  html.lifestyle .hover-scale {
     @apply transition-smooth;
   }
 
-  .lifestyle .hover-scale:hover {
+  html.lifestyle .hover-scale:hover {
     @apply scale-[1.02];
   }
 
-  .lifestyle .hover-bounce {
+  html.lifestyle .hover-bounce {
     @apply transition-bounce;
   }
 
-  .lifestyle .pulse-glow {
+  html.lifestyle .pulse-glow {
     animation: pulse-glow 150ms ease-out;
   }
 
