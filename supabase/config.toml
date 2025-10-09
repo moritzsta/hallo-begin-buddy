@@ -5,3 +5,6 @@ verify_jwt = true
 
 [functions.smart-upload]
 verify_jwt = true
+
+[functions.generate-preview]
+verify_jwt = true

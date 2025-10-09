@@ -41,6 +41,7 @@ import {
 import { Card } from '@/components/ui/card';
 import { MoreVertical, Download, Trash2, Edit, FileIcon, Loader2, Search, Folder as FolderIcon } from 'lucide-react';
 import { MoveFileDialog } from './MoveFileDialog';
+import { DocumentPreview } from './DocumentPreview';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 
@@ -306,8 +307,13 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
                         </Button>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-2">
-                        <FileIcon className="h-4 w-4 text-muted-foreground" />
+                      <div className="flex items-center gap-3">
+                        <DocumentPreview 
+                          fileId={file.id}
+                          fileName={file.title}
+                          mimeType={file.mime}
+                          size="sm"
+                        />
                         <span className="font-medium">{file.title}</span>
                       </div>
                     )}

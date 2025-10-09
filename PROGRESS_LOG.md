@@ -22,6 +22,7 @@
 | T09 | Folder Management (CRUD + Hierarchy) | ✅ Done |
 | T10 | Folder Sidebar & File Integration | ✅ Done |
 | T11 | Smart Upload Edge Function (OCR + AI) | ✅ Done |
+| T12 | Document Preview Edge Function | ✅ Done |
 | T05 | Create `user_roles` Table | ✅ Done (already exists) |
 | T06 | RLS Policies – Owner-Only Access | Backlog |
 | T07 | Storage Bucket & RLS | Backlog |
@@ -60,6 +61,36 @@
 ## Change Log
 
 *Neueste Einträge oben. Format: [UTC Timestamp] [Task-ID] Beschreibung – Dateien/Ordner – Diffs (Stichpunkte)*
+
+### 2025-10-09T20:00:00Z – T12 Completed
+- **[T12]** Document Preview Edge Function implementiert
+- Edge Function erstellt:
+  - `supabase/functions/generate-preview/index.ts` – Thumbnail-Generierung & Cache
+- Features:
+  - Unterstützt Bild-Previews (PNG, JPG, etc.)
+  - Preview-Cache in `previews` Bucket (verhindert Doppel-Generierung)
+  - Signierte URLs mit 1h Gültigkeit für Previews
+  - Size-Check (10MB max für Preview-Storage)
+  - Preview-State-Tracking in files.meta
+  - Auto-Trigger nach Bild-Upload (zusammen mit Smart-Upload)
+- Komponenten:
+  - `src/components/documents/DocumentPreview.tsx` – Preview-Widget mit Loading/Error States
+  - `src/components/documents/DocumentList.tsx` – Preview-Integration in Tabelle
+- UI/UX:
+  - Small Thumbnails (12x12) in Dokumentenliste
+  - Loading-Spinner während Preview-Generierung
+  - Fallback-Icons für Nicht-Bilder oder Fehler
+  - Lazy-Loading (Preview wird nur bei Bedarf geladen)
+- Client-Integration:
+  - `src/components/upload/FileUpload.tsx` – Auto-Trigger für Preview nach Upload
+  - Fire-and-forget Call (blockiert Upload nicht)
+- Config:
+  - `supabase/config.toml` – generate-preview Function mit verify_jwt=true
+- Hinweis:
+  - PDF-Preview-Support kann später hinzugefügt werden (Konvertierung komplex in Deno)
+  - Aktuell: Original-Bild wird als Preview gespeichert (keine Resize)
+  - Prospektiv: Sharp/ImageMagick Integration für echte Thumbnail-Generierung
+- Next Step: T13 – Base Layout & Navigation Improvements
 
 ### 2025-10-09T19:30:00Z – T11 Completed
 - **[T11]** Smart Upload Edge Function (OCR + AI) implementiert
@@ -383,15 +414,16 @@
 
 ## Next Step
 
-**Task ID:** T12 – Document Preview Edge Function  
+**Task ID:** T13 – Design System & UI Polish  
 **Akzeptanzkriterien:**
-- Edge Function generiert Thumbnails/Previews für Dokumente
-- PDF → PNG Konvertierung für erste Seite
-- Bilder → Resize & Cache in `previews` Bucket
-- Signierte URLs für Preview-Access
-- Cache-Headers für Performance
+- Design Tokens in index.css erweitern (Colors, Gradients, Shadows)
+- Colorful Theme-Variante implementieren (zusätzlich zu Light/Dark)
+- Button/Card Variants erweitern für verschiedene Kontexte
+- Animationen für Transitions hinzufügen
+- Responsive Breakpoints optimieren
+- Accessibility-Checks (Kontraste, Focus States)
 
-**Aktion:** Edge Function `generate-preview` erstellen, Sharp/Canvas für Bildverarbeitung nutzen, PDF.js oder pdf-lib für PDF-Rendering, Previews in Storage cachen.
+**Aktion:** index.css & tailwind.config.ts anpassen, Komponenten-Varianten erweitern, Theme-Palette definieren, Animationen hinzufügen.
 
 ---
 

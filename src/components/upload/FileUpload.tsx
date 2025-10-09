@@ -144,6 +144,7 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
             .single();
 
           if (fileData) {
+            // Trigger smart upload (fire and forget)
             supabase.functions.invoke('smart-upload', {
               body: { file_id: fileData.id },
             }).then(({ error: smartError }) => {
@@ -151,9 +152,18 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
                 console.warn('Smart upload failed:', smartError);
               }
             });
+            
+            // Trigger preview generation (fire and forget)
+            supabase.functions.invoke('generate-preview', {
+              body: { file_id: fileData.id },
+            }).then(({ error: previewError }) => {
+              if (previewError) {
+                console.warn('Preview generation failed:', previewError);
+              }
+            });
           }
         } catch (smartErr) {
-          console.warn('Smart upload trigger failed:', smartErr);
+          console.warn('Post-upload triggers failed:', smartErr);
         }
       }
 
