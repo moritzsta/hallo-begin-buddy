@@ -51,6 +51,7 @@
     "metadataConfirmedDesc": "File was saved with updated metadata.",
     "metadataUpdateError": "Update error",
     "aiSuggestedPath": "This path was suggested by AI based on the document content.",
+    "addPathElement": "Add new path element...",
     "userContext": "Optional hints for AI",
     "userContextPlaceholder": "e.g. Cat, Surgery, Paw",
     "userContextHelp": "This information helps the AI with naming and organization"

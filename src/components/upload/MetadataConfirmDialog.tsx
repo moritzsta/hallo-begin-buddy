@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, CheckCircle2, FolderPlus, Edit2 } from 'lucide-react';
+import { Loader2, CheckCircle2, FolderPlus, Edit2, Plus, Minus } from 'lucide-react';
 import { TagInput } from '@/components/documents/TagInput';
 
 interface MetadataConfirmDialogProps {
@@ -57,6 +57,11 @@ export const MetadataConfirmDialog = ({
   const [editedParty, setEditedParty] = useState(metadata.party || '');
   const [editedAmount, setEditedAmount] = useState(metadata.amount || '');
   const [tags, setTags] = useState<string[]>(metadata.keywords || []);
+  
+  // Path editing state
+  const initialPath = (suggestedPath || metadata.suggested_path || '').split('/').filter(Boolean);
+  const [pathElements, setPathElements] = useState<string[]>(initialPath);
+  const [newPathElement, setNewPathElement] = useState('');
 
   const handleConfirm = async () => {
     setIsConfirming(true);
@@ -67,10 +72,22 @@ export const MetadataConfirmDialog = ({
         date: editedDate || undefined,
         party: editedParty || undefined,
         amount: editedAmount || undefined,
+        suggested_path: pathElements.join('/'),
       };
       await onConfirm(updatedMetadata, tags);
     } finally {
       setIsConfirming(false);
+    }
+  };
+
+  const handleRemovePathElement = (index: number) => {
+    setPathElements(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleAddPathElement = () => {
+    if (newPathElement.trim() && pathElements.length < 6) {
+      setPathElements(prev => [...prev, newPathElement.trim()]);
+      setNewPathElement('');
     }
   };
 
@@ -79,37 +96,67 @@ export const MetadataConfirmDialog = ({
     onOpenChange(false);
   };
 
-  // Render path with badges for new folders
+  // Render editable path with plus/minus controls
   const renderPathPreview = () => {
-    const displayPath = suggestedPath || metadata.suggested_path;
-    if (!displayPath) return null;
-
-    const pathParts = displayPath.split('/').filter(Boolean);
-    
     return (
-      <div className="flex flex-wrap items-center gap-2 p-3 bg-muted/50 rounded-md">
-        <span className="text-sm text-muted-foreground">/</span>
-        {pathParts.map((part, index) => {
-          const isNew = newFolders?.includes(part);
-          return (
-            <div key={index} className="flex items-center gap-2">
-              <div className="flex items-center gap-1.5">
-                {isNew && <FolderPlus className="h-3.5 w-3.5 text-primary" />}
-                <span className={`text-sm font-medium ${isNew ? 'text-primary' : 'text-foreground'}`}>
-                  {part}
-                </span>
-                {isNew && (
-                  <Badge variant="outline" className="h-5 text-xs border-primary/50 text-primary">
-                    {t('common.new')}
-                  </Badge>
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-center gap-2 p-3 bg-muted/50 rounded-md">
+          <span className="text-sm text-muted-foreground">/</span>
+          {pathElements.map((part, index) => {
+            const isNew = newFolders?.includes(part);
+            return (
+              <div key={index} className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 bg-background rounded-md px-2 py-1 border">
+                  {isNew && <FolderPlus className="h-3.5 w-3.5 text-primary" />}
+                  <span className={`text-sm font-medium ${isNew ? 'text-primary' : 'text-foreground'}`}>
+                    {part}
+                  </span>
+                  {isNew && (
+                    <Badge variant="outline" className="h-5 text-xs border-primary/50 text-primary ml-1">
+                      {t('common.new')}
+                    </Badge>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-5 w-5 ml-1"
+                    onClick={() => handleRemovePathElement(index)}
+                  >
+                    <Minus className="h-3 w-3" />
+                  </Button>
+                </div>
+                {index < pathElements.length - 1 && (
+                  <span className="text-sm text-muted-foreground">/</span>
                 )}
               </div>
-              {index < pathParts.length - 1 && (
-                <span className="text-sm text-muted-foreground">/</span>
-              )}
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
+        
+        {pathElements.length < 6 && (
+          <div className="flex items-center gap-2">
+            <Input
+              value={newPathElement}
+              onChange={(e) => setNewPathElement(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAddPathElement();
+                }
+              }}
+              placeholder={t('upload.addPathElement', { defaultValue: 'Neues Pfadelement hinzufügen...' })}
+              className="flex-1"
+            />
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleAddPathElement}
+              disabled={!newPathElement.trim()}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </div>
     );
   };
@@ -132,27 +179,25 @@ export const MetadataConfirmDialog = ({
 
         <div className="space-y-4 py-4">
           {/* Path Preview */}
-          {(suggestedPath || metadata.suggested_path) && (
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">
-                {t('upload.suggestedPath', { defaultValue: 'Vorgeschlagener Ablageort' })}
-              </Label>
-              {renderPathPreview()}
-              {newFolders && newFolders.length > 0 && (
-                <p className="text-xs text-muted-foreground">
-                  {t('upload.newFoldersWillBeCreated', { 
-                    count: newFolders.length,
-                    defaultValue: '{{count}} neue(r) Ordner wird/werden erstellt' 
-                  })}
-                </p>
-              )}
-              <p className="text-xs text-muted-foreground italic">
-                {t('upload.aiSuggestedPath', { 
-                  defaultValue: 'Dieser Pfad wurde von der KI basierend auf dem Dokumentinhalt vorgeschlagen.' 
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">
+              {t('upload.suggestedPath', { defaultValue: 'Vorgeschlagener Ablageort' })}
+            </Label>
+            {renderPathPreview()}
+            {newFolders && newFolders.length > 0 && (
+              <p className="text-xs text-muted-foreground">
+                {t('upload.newFoldersWillBeCreated', { 
+                  count: newFolders.length,
+                  defaultValue: '{{count}} neue(r) Ordner wird/werden erstellt' 
                 })}
               </p>
-            </div>
-          )}
+            )}
+            <p className="text-xs text-muted-foreground italic">
+              {t('upload.aiSuggestedPath', { 
+                defaultValue: 'Dieser Pfad wurde von der KI basierend auf dem Dokumentinhalt vorgeschlagen.' 
+              })}
+            </p>
+          </div>
 
           {/* Edit Toggle */}
           <div className="flex items-center justify-between pt-2 border-t">
