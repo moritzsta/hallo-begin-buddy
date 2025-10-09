@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { PublicNavbar } from '@/components/public/PublicNavbar';
 import { PublicFooter } from '@/components/public/PublicFooter';
 import { LifestyleGradientBar } from '@/components/LifestyleGradientBar';
+import { SEOHead } from '@/components/SEOHead';
 import { 
   Sparkles, Lock, Zap, Eye, Tag, Upload, CheckCircle, 
   Shield, Globe, Palette, FolderOpen, FileText, Star
@@ -16,6 +17,10 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead 
+        title={t('public.hero.headline') + ' - Smart Docs'}
+        description={t('public.hero.subtitle')}
+      />
       <LifestyleGradientBar />
       <PublicNavbar />
       

@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { PublicNavbar } from '@/components/public/PublicNavbar';
 import { PublicFooter } from '@/components/public/PublicFooter';
 import { LifestyleGradientBar } from '@/components/LifestyleGradientBar';
+import { SEOHead } from '@/components/SEOHead';
 import { CheckCircle, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -55,6 +56,10 @@ export default function Pricing() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead 
+        title={t('public.pricing.headline') + ' - Smart Docs'}
+        description={t('public.pricing.subtitle')}
+      />
       <LifestyleGradientBar />
       <PublicNavbar />
       

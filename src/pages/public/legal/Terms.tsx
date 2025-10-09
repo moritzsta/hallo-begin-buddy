@@ -3,12 +3,17 @@ import { Card } from '@/components/ui/card';
 import { PublicNavbar } from '@/components/public/PublicNavbar';
 import { PublicFooter } from '@/components/public/PublicFooter';
 import { LifestyleGradientBar } from '@/components/LifestyleGradientBar';
+import { SEOHead } from '@/components/SEOHead';
 
 export default function Terms() {
   const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead 
+        title="AGB - Smart Docs"
+        description="Allgemeine Geschäftsbedingungen für die Nutzung von Smart Docs"
+      />
       <LifestyleGradientBar />
       <PublicNavbar />
       

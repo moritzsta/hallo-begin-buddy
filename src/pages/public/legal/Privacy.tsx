@@ -3,12 +3,17 @@ import { Card } from '@/components/ui/card';
 import { PublicNavbar } from '@/components/public/PublicNavbar';
 import { PublicFooter } from '@/components/public/PublicFooter';
 import { LifestyleGradientBar } from '@/components/LifestyleGradientBar';
+import { SEOHead } from '@/components/SEOHead';
 
 export default function Privacy() {
   const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead 
+        title="Datenschutzerklärung - Smart Docs"
+        description="Datenschutzerklärung gemäß DSGVO - So schützen wir Ihre Daten"
+      />
       <LifestyleGradientBar />
       <PublicNavbar />
       

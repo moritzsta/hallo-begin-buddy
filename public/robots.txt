@@ -1,14 +1,13 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
 User-agent: *
 Allow: /
+Allow: /pricing
+Allow: /use-cases
+Allow: /legal/impressum
+Allow: /legal/privacy
+Allow: /legal/terms
+Disallow: /app
+Disallow: /auth
+Disallow: /settings
+Disallow: /admin
+
+Sitemap: https://smartdocs.app/sitemap.xml
