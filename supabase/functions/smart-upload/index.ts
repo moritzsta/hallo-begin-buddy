@@ -59,6 +59,18 @@ serve(async (req) => {
       );
     }
 
+    // Get user's locale preference for language-specific metadata generation
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('locale')
+      .eq('id', file.owner_id)
+      .single();
+    
+    const userLocale = profile?.locale || 'de';
+    const languageInstruction = userLocale === 'de' 
+      ? 'Provide all metadata (title, keywords, folder path) in German.'
+      : 'Provide all metadata (title, keywords, folder path) in English.';
+
     // Check file type
     const isImage = file.mime.startsWith('image/');
     const isPdf = file.mime === 'application/pdf';
@@ -179,7 +191,7 @@ serve(async (req) => {
         throw new Error('Failed to get signed URL for image');
       }
 
-      analysisPrompt = 'Analyze this image/document and extract: document type (e.g., invoice, receipt, letter, contract, photo, diagram), a suggested descriptive title (max 60 chars), 3-5 relevant keywords, and suggest an appropriate folder structure path (e.g., "Invoices/2025/Supplier Name" or "Photos/Vacation/Italy"). The folder path should be logical and help organize this document.';
+      analysisPrompt = `Analyze this image/document and extract: document type (e.g., invoice, receipt, letter, contract, photo, diagram), a suggested descriptive title (max 60 chars), 3-5 relevant keywords, and suggest an appropriate folder structure path (e.g., "Invoices/2025/Supplier Name" or "Photos/Vacation/Italy"). The folder path should be logical and help organize this document. ${languageInstruction}`;
 
       contentPayload = [
         {
@@ -206,7 +218,9 @@ Extract:
 3. keywords: 3-5 relevant keywords from the content
 4. suggested_path: A logical folder structure path to organize this document (e.g., "Invoices/2025/Company Name", "Reports/Annual/2025", "Presentations/Marketing/Q1")
 
-The folder path should be based on the content and help create an intelligent filing system.`;
+The folder path should be based on the content and help create an intelligent filing system.
+
+${languageInstruction}`;
 
       contentPayload = analysisPrompt;
     }
