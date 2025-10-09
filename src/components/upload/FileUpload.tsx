@@ -24,7 +24,12 @@ const PLAN_LIMITS = {
   max: { maxSize: 2 * 1024 * 1024 * 1024, maxFiles: 1000 }, // 2GB
 };
 
-export const FileUpload = ({ onUploadComplete }: { onUploadComplete?: () => void }) => {
+interface FileUploadProps {
+  folderId: string | null;
+  onUploadComplete?: () => void;
+}
+
+export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
   const [uploadFiles, setUploadFiles] = useState<UploadFile[]>([]);
   const { toast } = useToast();
   const { user, profile } = useAuth();
@@ -75,6 +80,37 @@ export const FileUpload = ({ onUploadComplete }: { onUploadComplete?: () => void
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
+      // Get root folder if no folder selected
+      let targetFolderId = folderId;
+      if (!targetFolderId) {
+        // Get or create root folder
+        const { data: rootFolder } = await supabase
+          .from('folders')
+          .select('id')
+          .eq('owner_id', user!.id)
+          .is('parent_id', null)
+          .limit(1)
+          .single();
+
+        if (rootFolder) {
+          targetFolderId = rootFolder.id;
+        } else {
+          // Create root folder
+          const { data: newRoot, error: folderError } = await supabase
+            .from('folders')
+            .insert({
+              owner_id: user!.id,
+              name: 'Root',
+              parent_id: null,
+            })
+            .select('id')
+            .single();
+
+          if (folderError) throw folderError;
+          targetFolderId = newRoot.id;
+        }
+      }
+
       // Create file record in database
       const { error: dbError } = await supabase
         .from('files')
@@ -85,7 +121,7 @@ export const FileUpload = ({ onUploadComplete }: { onUploadComplete?: () => void
           mime: file.type || 'application/octet-stream',
           size: file.size,
           hash_sha256: hashHex,
-          folder_id: '00000000-0000-0000-0000-000000000000', // Root folder (placeholder)
+          folder_id: targetFolderId,
           meta: {
             original_name: file.name,
             uploaded_at: new Date().toISOString(),

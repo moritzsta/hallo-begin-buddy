@@ -54,6 +54,7 @@
     "actions": "Aktionen",
     "download": "Herunterladen",
     "rename": "Umbenennen",
+    "move": "Verschieben",
     "delete": "Löschen",
     "save": "Speichern",
     "downloadStarted": "Download gestartet",
@@ -67,7 +68,14 @@
     "deleteError": "Löschen fehlgeschlagen",
     "renameSuccess": "Datei umbenannt",
     "renameSuccessDesc": "Der Dateiname wurde erfolgreich geändert.",
-    "renameError": "Umbenennen fehlgeschlagen"
+    "renameError": "Umbenennen fehlgeschlagen",
+    "moveTitle": "Datei verschieben",
+    "moveDesc": "Wähle den Zielordner für diese Datei",
+    "moveFile": "Verschieben",
+    "moveSuccess": "Datei verschoben",
+    "moveSuccessDesc": "Die Datei wurde erfolgreich verschoben",
+    "moveError": "Fehler beim Verschieben",
+    "currentFolder": "aktueller Ordner"
   },
   "common": {
     "unknownError": "Unbekannter Fehler",

@@ -20,6 +20,7 @@
 | T07 | i18n Setup (German/English) | ✅ Done |
 | T08 | Dark Mode & Theme Switcher | ✅ Done |
 | T09 | Folder Management (CRUD + Hierarchy) | ✅ Done |
+| T10 | Folder Sidebar & File Integration | ✅ Done |
 | T05 | Create `user_roles` Table | ✅ Done (already exists) |
 | T06 | RLS Policies – Owner-Only Access | Backlog |
 | T07 | Storage Bucket & RLS | Backlog |
@@ -58,6 +59,32 @@
 ## Change Log
 
 *Neueste Einträge oben. Format: [UTC Timestamp] [Task-ID] Beschreibung – Dateien/Ordner – Diffs (Stichpunkte)*
+
+### 2025-10-09T19:00:00Z – T10 Completed
+- **[T10]** Folder Sidebar & File Integration implementiert
+- Komponenten erstellt/aktualisiert:
+  - `src/pages/Index.tsx` – Sidebar-Layout mit SidebarProvider, FolderTree integriert
+  - `src/components/folders/FolderTree.tsx` – selectedFolderId & onSelectFolder Props hinzugefügt
+  - `src/components/documents/DocumentList.tsx` – folderId Filter-Prop, Move-File-Aktion
+  - `src/components/upload/FileUpload.tsx` – folderId Prop für Ordner-Upload
+  - `src/components/documents/MoveFileDialog.tsx` – Dialog zum Verschieben zwischen Ordnern
+- Features:
+  - Sidebar mit FolderTree und collapsible Toggle
+  - "Alle Dateien" Root-Ansicht zeigt alle Dokumente
+  - Ordner-Auswahl filtert DocumentList
+  - FileUpload speichert in ausgewähltem Ordner (oder Root)
+  - Move-File-Dialog mit hierarchischer Ordnerauswahl
+  - Auto-Create Root-Ordner wenn keiner existiert
+  - Ordner-Baum mit Tiefenindent und Radio-Buttons
+- UI/UX:
+  - Aktiver Ordner hervorgehoben in Sidebar
+  - SidebarTrigger im Header für Collapse/Expand
+  - Move-Dialog verhindert Verschieben in aktuellen Ordner
+  - Responsive Layout mit Sidebar
+- Übersetzungen:
+  - `src/i18n/locales/de.json` – Move-Dialog, "Alle Dateien", "Meine Ordner"
+  - `src/i18n/locales/en.json` – Move-Dialog Translations
+- Next Step: T11 – Smart Upload Edge Function (OCR + AI)
 
 ### 2025-10-09T18:30:00Z – T09 Completed
 - **[T09]** Folder Management (CRUD + Hierarchy) implementiert
@@ -325,14 +352,15 @@
 
 ## Next Step
 
-**Task ID:** T10 – Folder Sidebar & File Integration  
+**Task ID:** T11 – Smart Upload Edge Function (OCR + AI)  
 **Akzeptanzkriterien:**
-- FolderTree in Index.tsx Sidebar integrieren
-- DocumentList filtert nach ausgewähltem Ordner
-- FileUpload speichert in ausgewähltem Ordner
-- Move-File-Dialog ermöglicht Verschieben zwischen Ordnern
+- Edge Function mit OCR für erste Seite (PDF/Bilder)
+- Lovable AI Gateway Integration für Metadaten-Extraktion
+- Kostenbremse für AI-Calls implementieren
+- Automatische Titel-Generierung aus Dokument-Inhalt
+- Plan-Tier-basierte Limits (Smart-Uploads/Monat)
 
-**Aktion:** Sidebar-Layout mit FolderTree erstellen, Index.tsx anpassen, DocumentList & FileUpload mit Ordner-Kontext verbinden.
+**Aktion:** Edge Function `smart-upload` erstellen, Tesseract.js OCR integrieren, Lovable AI Gateway für GPT-4 Vision nutzen, usage_tracking aktualisieren.
 
 ---
 

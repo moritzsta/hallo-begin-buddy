@@ -54,6 +54,7 @@
     "actions": "Actions",
     "download": "Download",
     "rename": "Rename",
+    "move": "Move",
     "delete": "Delete",
     "save": "Save",
     "downloadStarted": "Download started",
@@ -67,7 +68,14 @@
     "deleteError": "Delete failed",
     "renameSuccess": "File renamed",
     "renameSuccessDesc": "The filename has been successfully changed.",
-    "renameError": "Rename failed"
+    "renameError": "Rename failed",
+    "moveTitle": "Move File",
+    "moveDesc": "Select the destination folder for this file",
+    "moveFile": "Move",
+    "moveSuccess": "File moved",
+    "moveSuccessDesc": "The file was successfully moved",
+    "moveError": "Error moving file",
+    "currentFolder": "current folder"
   },
   "common": {
     "unknownError": "Unknown error",

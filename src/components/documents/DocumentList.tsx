@@ -39,7 +39,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Card } from '@/components/ui/card';
-import { MoreVertical, Download, Trash2, Edit, FileIcon, Loader2, Search } from 'lucide-react';
+import { MoreVertical, Download, Trash2, Edit, FileIcon, Loader2, Search, Folder as FolderIcon } from 'lucide-react';
+import { MoveFileDialog } from './MoveFileDialog';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 
@@ -58,7 +59,11 @@ interface FileRecord {
 type SortField = 'created_at' | 'title' | 'size';
 type SortOrder = 'asc' | 'desc';
 
-export const DocumentList = () => {
+interface DocumentListProps {
+  folderId: string | null;
+}
+
+export const DocumentList = ({ folderId }: DocumentListProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { t } = useTranslation();
@@ -70,15 +75,21 @@ export const DocumentList = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
+  const [moveFileId, setMoveFileId] = useState<string | null>(null);
 
   // Fetch documents
   const { data: files, isLoading } = useQuery({
-    queryKey: ['files', user?.id, sortField, sortOrder, searchQuery],
+    queryKey: ['files', user?.id, folderId, sortField, sortOrder, searchQuery],
     queryFn: async () => {
       let query = supabase
         .from('files')
         .select('*')
         .eq('owner_id', user!.id);
+
+      // Filter by folder
+      if (folderId) {
+        query = query.eq('folder_id', folderId);
+      }
 
       // Apply search
       if (searchQuery) {
@@ -339,6 +350,10 @@ export const DocumentList = () => {
                           <Edit className="h-4 w-4 mr-2" />
                           {t('documents.rename')}
                         </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setMoveFileId(file.id)}>
+                          <FolderIcon className="h-4 w-4 mr-2" />
+                          {t('documents.move')}
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => setDeleteId(file.id)}
                           className="text-destructive"
@@ -375,6 +390,13 @@ export const DocumentList = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <MoveFileDialog
+        open={!!moveFileId}
+        onOpenChange={(open) => !open && setMoveFileId(null)}
+        fileId={moveFileId}
+        currentFolderId={folderId}
+      />
     </div>
   );
 };
