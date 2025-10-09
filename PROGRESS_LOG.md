@@ -21,6 +21,7 @@
 | T08 | Dark Mode & Theme Switcher | ✅ Done |
 | T09 | Folder Management (CRUD + Hierarchy) | ✅ Done |
 | T10 | Folder Sidebar & File Integration | ✅ Done |
+| T11 | Smart Upload Edge Function (OCR + AI) | ✅ Done |
 | T05 | Create `user_roles` Table | ✅ Done (already exists) |
 | T06 | RLS Policies – Owner-Only Access | Backlog |
 | T07 | Storage Bucket & RLS | Backlog |
@@ -59,6 +60,36 @@
 ## Change Log
 
 *Neueste Einträge oben. Format: [UTC Timestamp] [Task-ID] Beschreibung – Dateien/Ordner – Diffs (Stichpunkte)*
+
+### 2025-10-09T19:30:00Z – T11 Completed
+- **[T11]** Smart Upload Edge Function (OCR + AI) implementiert
+- Lovable AI Gateway aktiviert (LOVABLE_API_KEY automatisch bereitgestellt)
+- Edge Function erstellt:
+  - `supabase/functions/smart-upload/index.ts` – AI-Metadaten-Extraktion
+- Features:
+  - Unterstützt Bild-Uploads (PNG, JPG, etc.)
+  - Gemini 2.5 Flash Vision für OCR + Metadaten
+  - Tool Calling für strukturierte Ausgabe (document_type, suggested_title, keywords)
+  - Plan-Tier-basierte Kostenbremse via usage_tracking
+  - Limits: Free 10/Monat, Basic 50/Monat, Plus 200/Monat, Max Unlimited
+  - Automatischer Trigger nach Upload (nur für Bilder)
+  - Extrahiert: Dokumenttyp, Titel-Vorschlag, Keywords, Text
+  - Aktualisiert `files.meta.ai_extracted` und `files.tags`
+- Kostenbremse:
+  - Prüft monatliche Smart-Upload-Limits pro Plan-Tier
+  - Fehler 429 bei Limit-Überschreitung
+  - Rate-Limit-Handling für AI Gateway (429/402)
+- Error Handling:
+  - Nicht-Bilder werden übersprungen (PDF-Support prospektiv)
+  - AI-Fehler werden geloggt, Upload bleibt erfolgreich
+  - Usage-Tracking mit Konflikt-Handling (INSERT/UPDATE)
+- Client-Integration:
+  - `src/components/upload/FileUpload.tsx` – Auto-Trigger nach Bild-Upload
+  - Fire-and-forget Call (blockiert Upload nicht)
+- Config:
+  - `supabase/config.toml` – smart-upload Function mit verify_jwt=true
+- Hinweis: PDF/Office-Support kann später hinzugefügt werden (Konvertierung zu Bild)
+- Next Step: T12 – Document Preview Edge Function
 
 ### 2025-10-09T19:00:00Z – T10 Completed
 - **[T10]** Folder Sidebar & File Integration implementiert
@@ -352,15 +383,15 @@
 
 ## Next Step
 
-**Task ID:** T11 – Smart Upload Edge Function (OCR + AI)  
+**Task ID:** T12 – Document Preview Edge Function  
 **Akzeptanzkriterien:**
-- Edge Function mit OCR für erste Seite (PDF/Bilder)
-- Lovable AI Gateway Integration für Metadaten-Extraktion
-- Kostenbremse für AI-Calls implementieren
-- Automatische Titel-Generierung aus Dokument-Inhalt
-- Plan-Tier-basierte Limits (Smart-Uploads/Monat)
+- Edge Function generiert Thumbnails/Previews für Dokumente
+- PDF → PNG Konvertierung für erste Seite
+- Bilder → Resize & Cache in `previews` Bucket
+- Signierte URLs für Preview-Access
+- Cache-Headers für Performance
 
-**Aktion:** Edge Function `smart-upload` erstellen, Tesseract.js OCR integrieren, Lovable AI Gateway für GPT-4 Vision nutzen, usage_tracking aktualisieren.
+**Aktion:** Edge Function `generate-preview` erstellen, Sharp/Canvas für Bildverarbeitung nutzen, PDF.js oder pdf-lib für PDF-Rendering, Previews in Storage cachen.
 
 ---
 

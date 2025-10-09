@@ -2,3 +2,6 @@ project_id = "bzyohsokcfjlmbguijow"
 
 [functions.generate-signed-url]
 verify_jwt = true
+
+[functions.smart-upload]
+verify_jwt = true

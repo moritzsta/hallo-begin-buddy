@@ -134,6 +134,29 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
         prev.map(f => f.id === id ? { ...f, status: 'success' as const, progress: 100 } : f)
       );
 
+      // Trigger smart upload for image files
+      if (file.type.startsWith('image/')) {
+        try {
+          const { data: fileData } = await supabase
+            .from('files')
+            .select('id')
+            .eq('storage_path', storagePath)
+            .single();
+
+          if (fileData) {
+            supabase.functions.invoke('smart-upload', {
+              body: { file_id: fileData.id },
+            }).then(({ error: smartError }) => {
+              if (smartError) {
+                console.warn('Smart upload failed:', smartError);
+              }
+            });
+          }
+        } catch (smartErr) {
+          console.warn('Smart upload trigger failed:', smartErr);
+        }
+      }
+
       toast({
         title: t('upload.uploadSuccess'),
         description: t('upload.uploadSuccessDesc', { filename: file.name }),
