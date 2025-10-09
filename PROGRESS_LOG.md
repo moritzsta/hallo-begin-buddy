@@ -14,8 +14,9 @@
 | T01 | Enable Lovable Cloud | ✅ Done |
 | T02 | Database Schema & RLS | ✅ Done |
 | T03 | Storage Buckets & Signed URLs | ✅ Done |
-| T03 | Create `document_fields` Table | Backlog |
-| T04 | Create `document_types` Table | Backlog |
+| T04 | Auth & Profil-Management | ✅ Done |
+| T05 | Create `document_fields` Table | Backlog |
+| T06 | Create `document_types` Table | Backlog |
 | T05 | Create `user_roles` Table | Backlog |
 | T06 | RLS Policies – Owner-Only Access | Backlog |
 | T07 | Storage Bucket & RLS | Backlog |
@@ -54,6 +55,25 @@
 ## Change Log
 
 *Neueste Einträge oben. Format: [UTC Timestamp] [Task-ID] Beschreibung – Dateien/Ordner – Diffs (Stichpunkte)*
+
+### 2025-10-09T16:00:00Z – T04 Completed
+- **[T04]** Auth & Profil-Management implementiert
+- Supabase Auth konfiguriert:
+  - Email/Password aktiviert
+  - Auto-Confirm aktiviert (kein Email-Bestätigung erforderlich)
+  - Anonymous Sign-Ups deaktiviert
+- Komponenten erstellt:
+  - `src/contexts/AuthContext.tsx` – Auth State Management mit User, Session & Profile
+  - `src/components/auth/ProtectedRoute.tsx` – Route Guard für authentifizierte Bereiche
+  - `src/pages/Auth.tsx` – Login/Signup UI mit Tabs
+- `src/App.tsx` aktualisiert:
+  - AuthProvider integriert
+  - Protected Routes für Index-Seite
+  - Auth-Route hinzugefügt
+- `src/pages/Index.tsx` aktualisiert:
+  - Zeigt User-Email und Profil-Daten
+  - Logout-Button implementiert
+- Next Step: T05 – Smart Upload UI
 
 ### 2025-10-09T15:30:00Z – T03 Completed
 - **[T03]** Storage-Buckets & Signed URLs erstellt
@@ -180,16 +200,16 @@
 
 ## Next Step
 
-**Task ID:** T04 – Auth & Profil-Management  
+**Task ID:** T05 – Smart Upload UI  
 **Akzeptanzkriterien:**
-- Supabase Auth aktiviert (Email/Password, auto-confirm)
-- Profile-Trigger erstellt (auto-create bei Signup)
-- Login/Signup UI-Components implementiert
-- AuthContext mit Profile-Daten
-- Protected Routes funktionieren
-- Logout löscht Auth-Token
+- Upload-Komponente mit Drag & Drop
+- Dateivalidierung (MIME-Type, Größe nach Plan-Tier)
+- Multi-File Upload mit Progress
+- Datei-Preview (Thumbnails)
+- Integration mit Smart Upload Edge Function
+- Toast-Feedback bei Erfolg/Fehler
 
-**Aktion:** Auth konfigurieren, UI-Components für Login/Signup erstellen, AuthContext implementieren, Protected Routes einrichten.
+**Aktion:** Upload-Komponente erstellen, Dateivalidierung implementieren, Progress-Anzeige, Smart Upload Integration.
 
 ---
 
