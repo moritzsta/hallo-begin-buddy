@@ -26,6 +26,7 @@ interface UploadFile {
   smartMetadata?: any; // AI-extracted metadata
   userContext?: string; // Optional user-provided context for AI
   skipAiAnalysis?: boolean; // Skip AI analysis, use only metadata and title
+  initialFolderId?: string; // Track original folder for decrement on move
 }
 
 const PLAN_LIMITS = {
@@ -170,6 +171,7 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
       if (dbError) throw dbError;
 
       // Increment unread count for the target folder and all parent folders
+      // This will be adjusted later if the file is moved via Smart Upload
       if (targetFolderId) {
         const { error: incrementError } = await supabase.rpc('increment_folder_unread_count', {
           p_user_id: user!.id,
@@ -184,7 +186,7 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
       }
 
       setUploadFiles(prev => 
-        prev.map(f => f.id === id ? { ...f, status: 'success' as const, progress: 100 } : f)
+        prev.map(f => f.id === id ? { ...f, status: 'success' as const, progress: 100, initialFolderId: targetFolderId || undefined } : f)
       );
 
       // Get file ID for smart upload processing
@@ -429,19 +431,36 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
 
       if (updateError) throw updateError;
 
-      // Increment unread count for the target folder and all parent folders
-      if (targetFolderId) {
-        const { error: incrementError } = await supabase.rpc('increment_folder_unread_count', {
+      // Handle unread count changes if folder was moved
+      const oldFolderId = uploadFile.initialFolderId;
+      const folderChanged = oldFolderId && targetFolderId && oldFolderId !== targetFolderId;
+
+      if (folderChanged) {
+        // Decrement old folder (file was moved away)
+        const { error: decrementError } = await supabase.rpc('increment_folder_unread_count', {
           p_user_id: user!.id,
-          p_folder_id: targetFolderId,
-          p_increment: 1,
+          p_folder_id: oldFolderId,
+          p_increment: -1,
         });
 
-        if (incrementError) {
-          console.error('Failed to increment unread count:', incrementError);
-          // Don't fail the upload, just log the error
+        if (decrementError) {
+          console.error('Failed to decrement old folder unread count:', decrementError);
+        }
+
+        // Increment new folder (file was moved here)
+        if (targetFolderId) {
+          const { error: incrementError } = await supabase.rpc('increment_folder_unread_count', {
+            p_user_id: user!.id,
+            p_folder_id: targetFolderId,
+            p_increment: 1,
+          });
+
+          if (incrementError) {
+            console.error('Failed to increment new folder unread count:', incrementError);
+          }
         }
       }
+      // If folder didn't change, the count was already incremented during upload
 
       setUploadFiles(prev =>
         prev.map(f => (f.id === uploadFileId ? { ...f, status: 'success' as const, tags } : f))
