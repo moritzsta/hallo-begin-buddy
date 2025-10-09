@@ -1,4 +1,7 @@
 import { useTranslation } from 'react-i18next';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +17,14 @@ import { Link } from 'react-router-dom';
 
 export default function Landing() {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/app');
+    }
+  }, [user, navigate]);
 
   return (
     <div className="min-h-screen bg-background">
