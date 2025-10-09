@@ -8,9 +8,16 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from '@/components/ui/context-menu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Download, Trash2, Edit, FolderInput, Tags as TagsIcon, Eye } from 'lucide-react';
+import { Download, Trash2, Edit, FolderInput, Tags as TagsIcon, Eye, MoreVertical } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface FileRecord {
@@ -66,12 +73,12 @@ export const DocumentDetailsTable = ({
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
 
   const [columns, setColumns] = useState<ColumnConfig[]>([
-    { key: 'name', label: t('documents.name'), width: 300, minWidth: 150, resizable: true },
-    { key: 'type', label: t('documents.type'), width: 180, minWidth: 120, resizable: true },
-    { key: 'size', label: t('documents.size'), width: 100, minWidth: 80, resizable: true },
+    { key: 'name', label: t('documents.name'), width: 400, minWidth: 200, resizable: true },
+    { key: 'type', label: t('documents.type'), width: 150, minWidth: 100, resizable: true },
+    { key: 'size', label: t('documents.size'), width: 120, minWidth: 80, resizable: true },
     { key: 'tags', label: t('documents.tags'), width: 250, minWidth: 150, resizable: true },
     { key: 'date', label: t('documents.date'), width: 180, minWidth: 120, resizable: true },
-    { key: 'actions', label: t('documents.actions'), width: 80, minWidth: 80, resizable: false },
+    { key: 'actions', label: '', width: 60, minWidth: 60, resizable: false },
   ]);
 
   const [resizing, setResizing] = useState<{ columnKey: string; startX: number; startWidth: number } | null>(null);
@@ -405,13 +412,66 @@ export const DocumentDetailsTable = ({
 
                     {/* Actions */}
                     <div
-                      className="px-4 py-3 flex items-center justify-center"
+                      className="px-3 py-3 flex items-center justify-center"
                       style={{ width: columns[5].width, minWidth: columns[5].minWidth }}
                       role="gridcell"
                     >
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                        <span className="text-muted-foreground text-lg">⋮</span>
-                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8 rounded-md hover:bg-accent"
+                          >
+                            <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-56 rounded-lg bg-popover border-2 border-border shadow-2xl backdrop-blur-md">
+                          <DropdownMenuItem 
+                            onClick={(e) => { e.stopPropagation(); onPreview(file); }} 
+                            className="gap-2 rounded-md transition-colors hover:bg-accent focus:bg-accent"
+                          >
+                            <Eye className="h-4 w-4 text-primary" />
+                            <span className="font-medium">{t('documents.preview')}</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={(e) => { e.stopPropagation(); onDownload(file); }} 
+                            className="gap-2 rounded-md transition-colors hover:bg-accent focus:bg-accent"
+                          >
+                            <Download className="h-4 w-4 text-blue-500" />
+                            <span className="font-medium">{t('documents.download')}</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={(e) => { e.stopPropagation(); onRename(file); }} 
+                            className="gap-2 rounded-md transition-colors hover:bg-accent focus:bg-accent"
+                          >
+                            <Edit className="h-4 w-4 text-green-500" />
+                            <span className="font-medium">{t('documents.rename')}</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={(e) => { e.stopPropagation(); onMove(file.id); }} 
+                            className="gap-2 rounded-md transition-colors hover:bg-accent focus:bg-accent"
+                          >
+                            <FolderInput className="h-4 w-4 text-purple-500" />
+                            <span className="font-medium">{t('documents.move')}</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={(e) => { e.stopPropagation(); onEditTags(file); }} 
+                            className="gap-2 rounded-md transition-colors hover:bg-accent focus:bg-accent"
+                          >
+                            <TagsIcon className="h-4 w-4 text-orange-500" />
+                            <span className="font-medium">{t('documents.editTags')}</span>
+                          </DropdownMenuItem>
+                          <div className="my-1 h-px bg-border" />
+                          <DropdownMenuItem
+                            onClick={(e) => { e.stopPropagation(); onDelete(file.id); }}
+                            className="gap-2 text-destructive focus:text-destructive hover:bg-destructive/10 focus:bg-destructive/10 rounded-md transition-colors"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            <span className="font-medium">{t('documents.delete')}</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </div>
                 </ContextMenuTrigger>
