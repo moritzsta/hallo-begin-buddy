@@ -29,6 +29,7 @@
 | T16 | Search & Filter (no AI) | ✅ Done |
 | T17 | Badges & Neue Dateien-Indikator | ✅ Done |
 | T18 | Manuelles Tag-System | ✅ Done |
+| T19 | Feature-Gating & Pläne | ✅ Done |
 | T05 | Create `user_roles` Table | ✅ Done (already exists) |
 | T06 | RLS Policies – Owner-Only Access | Backlog |
 | T07 | Storage Bucket & RLS | Backlog |
@@ -209,6 +210,63 @@
   - Client-seitige Tag-Normalisierung (keine DB-Calls für Validierung)
   - Debounced Input für Suggestion-Filtering (optional erweiterbar)
 - Next Step: T19 – Prospektives Ablageschema oder weitere Features
+
+### 2025-10-09T23:30:00Z – T19 Completed
+- **[T19]** Feature-Gating & Pläne (Client-Side) implementiert
+- Core Files erstellt:
+  - `src/lib/plans.ts` – Plan-Konfiguration & Utility-Functions
+  - `src/components/plans/FeatureGate.tsx` – Conditional Rendering Component
+  - `src/components/plans/UpgradePrompt.tsx` – Upgrade-Aufforderung (Card & Inline Variants)
+  - `src/components/plans/PlanBadge.tsx` – Plan-Badge mit Icons
+- Features:
+  - **Plan-Konfiguration**:
+    - 4 Tiers: Free, Basic (3,99€), Plus (7,99€), Max (12,99€)
+    - Limits pro Tier:
+      - Smart-Uploads/Monat (10/50/200/1000)
+      - Storage in GB (1/10/50/200)
+      - Max. Dateigröße in MB (5/25/100/2048)
+      - Max. Dateien (100/500/2000/10000)
+    - Features pro Tier:
+      - advancedSearch (Basic+)
+      - bulkOperations (Plus+)
+      - apiAccess (Plus+)
+      - prioritySupport (Max only)
+  - **FeatureGate Component**:
+    - Props: feature, children, fallback, showUpgradePrompt
+    - Liest User-Plan aus AuthContext (profile.plan_tier)
+    - Rendert children nur bei Feature-Zugriff
+    - Optional: Custom Fallback oder UpgradePrompt
+  - **UpgradePrompt Component**:
+    - 2 Variants: 'card' (große Prompt-Card) & 'inline' (kompakte Inline-Version)
+    - Dynamische Message basierend auf Feature & Current Tier
+    - Navigation zu Settings mit ?tab=plan Query-Param
+    - Gradient-Design mit Primary-Color
+    - Icons: Sparkles für Premium-Features
+  - **PlanBadge Component**:
+    - Zeigt Plan-Tier mit optionalem Icon
+    - Icons: Zap (Basic), Star (Plus), Crown (Max)
+    - Variant-Support: default/outline/secondary
+    - Verwendet semantic Badge-Component
+- Utility Functions:
+  - `getPlanConfig(tier)` – Gibt Plan-Config für Tier zurück
+  - `canUseFeature(tier, feature)` – Prüft Feature-Zugriff
+  - `getUpgradeMessage(feature, currentTier)` – Generiert Upgrade-Message
+  - `getNextTierForFeature(tier, feature)` – Findet nächsten Tier mit Feature
+- Übersetzungen:
+  - `src/i18n/locales/de.json`:
+    - plans.upgrade, upgradeTitle, viewPlans, currentPlan, upgradeTo
+    - plans.perMonth, smartUploads, storage, maxFileSize
+    - plans.advancedSearch, bulkOperations, apiAccess, prioritySupport, popular
+  - `src/i18n/locales/en.json` – Englische Entsprechungen
+- Integration:
+  - FileUpload.tsx nutzt bereits PLAN_LIMITS (migrierbar zu src/lib/plans.ts)
+  - Settings.tsx zeigt bereits Plan-Info an (erweiterbar mit PlanBadge)
+  - Prospektiv: FeatureGate für Bulk-Operations, Advanced-Search, API-Access
+- Hinweis:
+  - **Keine Server-Side-Checks** in diesem Task (kommt in späterem Task)
+  - Clientseitige Checks sind nur UX – Server MUSS prüfen
+  - Stripe-Integration folgt in nächstem Task (T20)
+- Next Step: T20 – Stripe-Integration (Checkout, Portal, Webhooks)
 
 ### 2025-10-09T21:30:00Z – T15 Completed
 - **[T15]** Security Scan & RLS Verification abgeschlossen

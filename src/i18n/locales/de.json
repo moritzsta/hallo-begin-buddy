@@ -84,6 +84,22 @@
     "markAsSeenSuccessDesc": "Alle Dateien wurden als gesehen markiert.",
     "editTags": "Tags bearbeiten"
   },
+  "plans": {
+    "upgrade": "Upgraden",
+    "upgradeTitle": "Premium-Feature",
+    "viewPlans": "Pläne ansehen",
+    "currentPlan": "Aktueller Plan",
+    "upgradeTo": "Upgraden zu {{plan}}",
+    "perMonth": "pro Monat",
+    "smartUploads": "Smart-Uploads",
+    "storage": "Speicher",
+    "maxFileSize": "Max. Dateigröße",
+    "advancedSearch": "Erweiterte Suche",
+    "bulkOperations": "Stapeloperationen",
+    "apiAccess": "API-Zugriff",
+    "prioritySupport": "Prioritäts-Support",
+    "popular": "Beliebt"
+  },
   "tags": {
     "inputPlaceholder": "Tag hinzufügen...",
     "addTags": "Tags hinzufügen (optional)",
