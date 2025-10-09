@@ -76,9 +76,9 @@ export const DocumentDetailsTable = ({
     { key: 'name', label: t('documents.name'), width: 400, minWidth: 200, resizable: true },
     { key: 'type', label: t('documents.type'), width: 150, minWidth: 100, resizable: true },
     { key: 'size', label: t('documents.size'), width: 120, minWidth: 80, resizable: true },
-    { key: 'tags', label: t('documents.tags'), width: 250, minWidth: 150, resizable: true },
+    { key: 'tags', label: t('documents.tags'), width: 300, minWidth: 150, resizable: true },
     { key: 'date', label: t('documents.date'), width: 180, minWidth: 120, resizable: true },
-    { key: 'actions', label: '', width: 60, minWidth: 60, resizable: false },
+    { key: 'actions', label: '', width: 50, minWidth: 50, resizable: false },
   ]);
 
   const [resizing, setResizing] = useState<{ columnKey: string; startX: number; startWidth: number } | null>(null);
@@ -412,7 +412,7 @@ export const DocumentDetailsTable = ({
 
                     {/* Actions */}
                     <div
-                      className="px-3 py-3 flex items-center justify-center"
+                      className="px-2 py-3 flex items-center justify-end"
                       style={{ width: columns[5].width, minWidth: columns[5].minWidth }}
                       role="gridcell"
                     >
