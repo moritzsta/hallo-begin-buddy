@@ -176,7 +176,14 @@
     "or": "oder",
     "view": "Ansehen",
     "new": "Neu",
-    "resize": "Größe ändern"
+    "resize": "Größe ändern",
+    "retry": "Erneut versuchen"
+  },
+  "viewer": {
+    "zoomIn": "Vergrößern",
+    "zoomOut": "Verkleinern",
+    "fitToWidth": "An Breite anpassen",
+    "zoom100": "100%"
   },
   "theme": {
     "toggle": "Theme umschalten",

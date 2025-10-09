@@ -176,7 +176,14 @@
     "or": "or",
     "view": "View",
     "new": "New",
-    "resize": "Resize"
+    "resize": "Resize",
+    "retry": "Retry"
+  },
+  "viewer": {
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
+    "fitToWidth": "Fit to Width",
+    "zoom100": "100%"
   },
   "theme": {
     "toggle": "Toggle theme",

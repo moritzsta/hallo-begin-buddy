@@ -48,6 +48,7 @@ import { DocumentPreview } from './DocumentPreview';
 import { FilterPanel, FileFilters } from './FilterPanel';
 import { EditTagsDialog } from './EditTagsDialog';
 import { DocumentDetailsTable } from './DocumentDetailsTable';
+import { DocumentViewer } from '../viewer/DocumentViewer';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -675,24 +676,12 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
 
       {/* Preview Dialog for Details View */}
       {previewFile && (
-        <AlertDialog open={!!previewFile} onOpenChange={() => setPreviewFile(null)}>
-          <AlertDialogContent className="max-w-4xl">
-            <AlertDialogHeader>
-              <AlertDialogTitle>{previewFile.title}</AlertDialogTitle>
-            </AlertDialogHeader>
-            <div className="py-4">
-              <DocumentPreview 
-                fileId={previewFile.id}
-                fileName={previewFile.title}
-                mimeType={previewFile.mime}
-                size="lg"
-              />
-            </div>
-            <AlertDialogFooter>
-              <AlertDialogCancel>{t('common.close')}</AlertDialogCancel>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <DocumentViewer
+          fileId={previewFile.id}
+          fileName={previewFile.title}
+          mimeType={previewFile.mime}
+          onClose={() => setPreviewFile(null)}
+        />
       )}
     </div>
   );
