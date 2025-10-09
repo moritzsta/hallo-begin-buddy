@@ -263,5 +263,389 @@
     "maxSize": "Maximalgröße",
     "tags": "Tags",
     "unlimited": "Unbegrenzt"
+  },
+  "public": {
+    "nav": {
+      "brand": "Smart Docs",
+      "home": "Start",
+      "pricing": "Preise",
+      "useCases": "Anwendungsfälle",
+      "legal": "Rechtliches",
+      "impressum": "Impressum",
+      "privacy": "Datenschutz",
+      "terms": "AGB",
+      "cta": "Kostenlos starten"
+    },
+    "footer": {
+      "tagline": "Deine Dokumente. Automatisch sortiert.",
+      "product": "Produkt",
+      "legal": "Rechtliches",
+      "contact": "Kontakt",
+      "copyright": "Smart Docs. Alle Rechte vorbehalten."
+    },
+    "hero": {
+      "badge": "🎉 Neu: Automatische Dokumenten-Sortierung mit KI",
+      "headline": "Deine Dokumente. Automatisch sortiert.",
+      "subtitle": "Hochladen, smarte Metadaten, perfekte Ablage. Schluss mit Ordner-Chaos.",
+      "ctaPrimary": "Kostenlos starten",
+      "ctaSecondary": "Live-Demo ansehen",
+      "dsgvo": "DSGVO-konform",
+      "eu": "EU-Server"
+    },
+    "benefits": {
+      "smart": {
+        "title": "Smart Upload (OCR Seite 1)",
+        "desc": "KI erkennt Titel & Metadaten automatisch"
+      },
+      "auto": {
+        "title": "Automatische Ablage",
+        "desc": "Ordner-Vorschau, neue Ordner markiert"
+      },
+      "secure": {
+        "title": "Sicher & privat",
+        "desc": "Owner-Only, RLS, signierte Links"
+      },
+      "preview": {
+        "title": "Schnelle Vorschau",
+        "desc": "PDF/Office/Bilder, ohne Drittanbieter-Viewer"
+      }
+    },
+    "features": {
+      "headline": "Alles, was du brauchst",
+      "subtitle": "Leistungsstarke Features für eine perfekte Dokumentenverwaltung",
+      "tags": {
+        "title": "Manuelle Tags",
+        "desc": "Organisiere Dokumente mit eigenen Schlagwörtern"
+      },
+      "bulk": {
+        "title": "Massenupload",
+        "desc": "Lade mehrere Dateien gleichzeitig hoch"
+      },
+      "i18n": {
+        "title": "DE/EN Unterstützung",
+        "desc": "Vollständig mehrsprachig"
+      },
+      "theme": {
+        "title": "Buntes Theme",
+        "desc": "Farbenfroher Lifestyle-Look"
+      },
+      "badges": {
+        "title": "Neue Dateien",
+        "desc": "Badges zeigen dir neue Uploads"
+      },
+      "fast": {
+        "title": "Blitzschnell",
+        "desc": "Optimierte Performance für schnelle Zugriffe"
+      }
+    },
+    "howItWorks": {
+      "headline": "So funktioniert's",
+      "step1": {
+        "title": "Upload",
+        "desc": "Dateien hochladen - einzeln oder in Massen"
+      },
+      "step2": {
+        "title": "Vorschau & Bestätigung",
+        "desc": "KI schlägt Metadaten vor, du bestätigst"
+      },
+      "step3": {
+        "title": "Einsortiert",
+        "desc": "Perfekt organisiert in deiner Ablage"
+      }
+    },
+    "pricingTeaser": {
+      "headline": "Transparente Preise",
+      "subtitle": "Wähle den Plan, der zu dir passt",
+      "popular": "Beliebt",
+      "cta": "Jetzt starten",
+      "allPlans": "Alle Pläne ansehen"
+    },
+    "testimonials": {
+      "headline": "Das sagen unsere Nutzer",
+      "t1": {
+        "role": "Freiberuflerin",
+        "text": "Endlich habe ich Ordnung in meinen Rechnungen. Die automatische Sortierung spart mir Stunden!"
+      },
+      "t2": {
+        "role": "Student",
+        "text": "Perfekt für Uni-Unterlagen. Die Vorschau-Funktion ist genial."
+      },
+      "t3": {
+        "role": "Familienmanagerin",
+        "text": "Alle Verträge und Dokumente an einem Ort. Sicher und übersichtlich."
+      }
+    },
+    "faq": {
+      "headline": "Häufige Fragen",
+      "q1": {
+        "question": "Wie sicher sind meine Daten?",
+        "answer": "Alle Daten werden verschlüsselt auf EU-Servern gespeichert. Row Level Security (RLS) sorgt dafür, dass nur du Zugriff hast."
+      },
+      "q2": {
+        "question": "Was passiert, wenn ich mein Limit erreiche?",
+        "answer": "Du kannst jederzeit upgraden oder einzelne Zusatzpakete buchen (100 Smart-Uploads für 0,99€ oder extra Speicher)."
+      },
+      "q3": {
+        "question": "Welche Dateiformate werden unterstützt?",
+        "answer": "PDF, Word, Excel, PowerPoint, Bilder (JPG, PNG) und viele mehr. Vorschau ohne externe Viewer."
+      },
+      "q4": {
+        "question": "Kann ich Dokumente teilen?",
+        "answer": "Read-Only-Links sind in Planung. Aktuell sind alle Dokumente Owner-Only."
+      },
+      "q5": {
+        "question": "Wie funktioniert die Kündigung?",
+        "answer": "Jederzeit kündbar. Deine Daten bleiben 30 Tage erhalten."
+      },
+      "q6": {
+        "question": "Gibt es eine App?",
+        "answer": "Die Web-App ist vollständig responsiv und funktioniert auf allen Geräten."
+      }
+    },
+    "finalCta": {
+      "headline": "Bereit für Ordnung?",
+      "subtitle": "Starte jetzt kostenlos und erlebe automatische Dokumentenverwaltung",
+      "cta": "Jetzt kostenlos starten"
+    },
+    "pricing": {
+      "headline": "Finde deinen perfekten Plan",
+      "subtitle": "Monatlich kündbar. Alle Preise inkl. MwSt.",
+      "popular": "Beliebt",
+      "smartUploads": "Smart Uploads/Mon",
+      "storage": "Speicher",
+      "maxFileSize": "Max. Dateigröße",
+      "allFeatures": "Alle Features inklusive",
+      "getStarted": "Jetzt starten",
+      "upgrade": "Upgraden",
+      "vat": "Alle Preise inkl. MwSt. | Monatlich kündbar",
+      "addons": {
+        "headline": "Zusatzpakete",
+        "uploads": {
+          "title": "Extra Smart-Uploads",
+          "desc": "100 Smart-Uploads pro Paket"
+        },
+        "storage": {
+          "title": "Extra Speicher",
+          "desc": "pro GB/Monat"
+        }
+      },
+      "comparison": {
+        "headline": "Feature-Vergleich",
+        "feature": "Feature",
+        "features": {
+          "smartUpload": "Smart Upload (OCR + KI)",
+          "preview": "Dokumenten-Vorschau",
+          "rls": "Row Level Security",
+          "signedUrls": "Signierte Download-URLs",
+          "badges": "Neue-Dateien-Badges",
+          "tags": "Manuelle Tags",
+          "bulk": "Massenupload",
+          "i18n": "DE/EN Unterstützung",
+          "themes": "3 Design-Themes"
+        }
+      },
+      "tooltips": {
+        "smartUpload": "Automatische OCR auf Seite 1 + KI-basierte Metadaten-Extraktion für intelligente Ablage",
+        "preview": "PDF, Office-Dokumente und Bilder direkt im Browser ansehen - ohne externe Tools",
+        "rls": "Row Level Security stellt sicher, dass nur du Zugriff auf deine Dokumente hast",
+        "signedUrls": "Kurzlebige, sichere Download-Links für maximalen Schutz"
+      }
+    },
+    "useCases": {
+      "headline": "Perfekt für jeden Anwendungsfall",
+      "subtitle": "Entdecke, wie Smart Docs deinen Alltag erleichtert",
+      "howItHelps": "So hilft's:",
+      "cases": {
+        "finance": {
+          "title": "Rechnungen & Finanzen",
+          "desc": "Alle Belege, Rechnungen und Finanzunterlagen automatisch nach Jahr und Monat sortiert.",
+          "help1": "Automatische Sortierung nach Datum",
+          "help2": "OCR erkennt Beträge und Rechnungsnummern",
+          "help3": "Steuer-Vorbereitung wird zum Kinderspiel"
+        },
+        "contracts": {
+          "title": "Verträge & Policen",
+          "desc": "Versicherungen, Mietverträge und wichtige Dokumente sicher ablegen.",
+          "help1": "Übersichtliche Ablage aller Verträge",
+          "help2": "Verfallsdaten im Blick behalten",
+          "help3": "Schneller Zugriff im Bedarfsfall"
+        },
+        "official": {
+          "title": "Behörden & Dokumente",
+          "desc": "Bescheide, Zeugnisse, Urkunden - alles griffbereit.",
+          "help1": "Wichtige Dokumente sicher verwahrt",
+          "help2": "Schnelle Suche nach Schlagwörtern",
+          "help3": "Digitale Kopien immer dabei"
+        },
+        "work": {
+          "title": "Arbeit & Projekte",
+          "desc": "Projektunterlagen, Präsentationen und Arbeitsdokumente organisiert.",
+          "help1": "Massenupload für Projektordner",
+          "help2": "Schnelle Vorschau für Meetings",
+          "help3": "Team-Ablage (Read-Only bald verfügbar)"
+        },
+        "health": {
+          "title": "Gesundheit",
+          "desc": "Arztbriefe, Befunde, Impfausweise - sensible Daten sicher aufbewahrt.",
+          "help1": "Maximale Sicherheit durch RLS",
+          "help2": "Wichtige Gesundheitsdaten griffbereit",
+          "help3": "Privat und verschlüsselt"
+        },
+        "travel": {
+          "title": "Reisen & Fotos",
+          "desc": "Tickets, Buchungsbestätigungen und Urlaubserinnerungen.",
+          "help1": "EXIF-Datum für Foto-Sortierung",
+          "help2": "Reisedokumente an einem Ort",
+          "help3": "Galerie-Ansicht für Bilder"
+        }
+      },
+      "cta": {
+        "headline": "Bereit durchzustarten?",
+        "subtitle": "Wähle deinen Anwendungsfall und starte kostenlos",
+        "primary": "Kostenlos starten",
+        "secondary": "Preise ansehen"
+      }
+    },
+    "legal": {
+      "impressum": {
+        "title": "Impressum",
+        "provider": "Anbieter",
+        "contact": "Kontakt",
+        "representative": "Vertretungsberechtigt",
+        "vatId": "Umsatzsteuer-ID",
+        "register": "Handelsregister",
+        "responsible": "Verantwortlich gemäß § 5 TMG",
+        "responsibleText": "Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV",
+        "phone": "Telefon"
+      },
+      "privacy": {
+        "title": "Datenschutzerklärung",
+        "lastUpdated": "Stand",
+        "sections": {
+          "intro": {
+            "title": "1. Datenschutz auf einen Blick",
+            "text": "Diese Datenschutzerklärung klärt Sie über die Art, den Umfang und Zweck der Verarbeitung von personenbezogenen Daten im Rahmen unserer Web-App auf."
+          },
+          "controller": {
+            "title": "2. Verantwortlicher",
+            "dpo": "Datenschutzbeauftragter"
+          },
+          "purpose": {
+            "title": "3. Zweck der Datenverarbeitung",
+            "text": "Wir verarbeiten Ihre Daten ausschließlich zum Betrieb der Web-App:",
+            "item1": "Bereitstellung der Dokumentenablage",
+            "item2": "Smart Upload mit OCR und KI-Metadaten-Extraktion",
+            "item3": "Speicherung und Verwaltung Ihrer Dateien",
+            "item4": "Authentifizierung und Zugriffskontrolle"
+          },
+          "legal": {
+            "title": "4. Rechtsgrundlagen",
+            "text": "Die Verarbeitung erfolgt auf Grundlage folgender Rechtsgrundlagen:",
+            "art6a": "Art. 6 Abs. 1 lit. a DSGVO (Einwilligung)",
+            "art6b": "Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung)",
+            "art6f": "Art. 6 Abs. 1 lit. f DSGVO (Berechtigtes Interesse)"
+          },
+          "data": {
+            "title": "5. Welche Daten werden erhoben?",
+            "text": "Wir erheben und verarbeiten folgende Daten:",
+            "email": "E-Mail-Adresse (für Account-Erstellung)",
+            "files": "Hochgeladene Dateien und deren Metadaten",
+            "metadata": "Automatisch extrahierte Informationen (OCR, KI-Analyse)",
+            "usage": "Nutzungsstatistiken (Smart-Upload-Anzahl, Speicherverbrauch)"
+          },
+          "storage": {
+            "title": "6. Speicherort und Aufbewahrung",
+            "text": "Alle Daten werden auf EU-Servern gespeichert. Aufbewahrungsdauer: Solange Ihr Account aktiv ist. Nach Löschung werden Daten innerhalb von 30 Tagen entfernt."
+          },
+          "security": {
+            "title": "7. Sicherheitsmaßnahmen",
+            "text": "Wir setzen modernste Sicherheitstechnologien ein:",
+            "rls": "Row Level Security (RLS) - nur Sie haben Zugriff auf Ihre Daten",
+            "signed": "Signierte, kurzlebige Download-URLs",
+            "encryption": "Verschlüsselte Datenübertragung (HTTPS)",
+            "noThirdParty": "Keine Drittanbieter-Viewer für Dokumente"
+          },
+          "rights": {
+            "title": "8. Ihre Rechte",
+            "text": "Sie haben folgende Rechte:",
+            "access": "Auskunft über Ihre gespeicherten Daten",
+            "rectification": "Berichtigung falscher Daten",
+            "erasure": "Löschung Ihrer Daten",
+            "restriction": "Einschränkung der Verarbeitung",
+            "portability": "Datenübertragbarkeit",
+            "objection": "Widerspruch gegen die Verarbeitung"
+          },
+          "cookies": {
+            "title": "9. Cookies und Tracking",
+            "text": "Wir verwenden nur technisch notwendige Cookies für die Funktionalität der App. Analytics-Cookies werden nur mit Ihrer Zustimmung gesetzt."
+          },
+          "changes": {
+            "title": "10. Änderungen",
+            "text": "Wir behalten uns vor, diese Datenschutzerklärung anzupassen. Die aktuelle Version finden Sie stets auf dieser Seite."
+          }
+        }
+      },
+      "terms": {
+        "title": "Allgemeine Geschäftsbedingungen (AGB)",
+        "lastUpdated": "Stand",
+        "sections": {
+          "scope": {
+            "title": "1. Geltungsbereich",
+            "text": "Diese AGB gelten für die Nutzung der Web-App Smart Docs zur Dokumentenverwaltung."
+          },
+          "services": {
+            "title": "2. Leistungsbeschreibung",
+            "text": "Smart Docs bietet folgende Leistungen:",
+            "smart": "Smart Upload mit OCR (Seite 1) und KI-Metadaten-Extraktion",
+            "storage": "Sichere Speicherung von Dokumenten",
+            "preview": "Vorschau von PDF, Office-Dokumenten und Bildern",
+            "organization": "Automatische und manuelle Organisation mit Ordnern und Tags"
+          },
+          "plans": {
+            "title": "3. Pläne und Limits",
+            "text": "Es stehen verschiedene Pläne zur Verfügung:"
+          },
+          "payment": {
+            "title": "4. Zahlungsbedingungen",
+            "text": "Zahlungen werden über Stripe abgewickelt:",
+            "monthly": "Monatliche Abrechnung",
+            "stripe": "Sichere Zahlungsabwicklung über Stripe",
+            "vat": "Alle Preise inkl. gesetzlicher Mehrwertsteuer",
+            "renew": "Automatische Verlängerung bis zur Kündigung"
+          },
+          "cancellation": {
+            "title": "5. Kündigung",
+            "text": "Sie können Ihr Abonnement jederzeit über das Kundenportal kündigen. Die Kündigung wird zum Ende des aktuellen Abrechnungszeitraums wirksam. Ihre Daten bleiben 30 Tage nach Kündigung erhalten."
+          },
+          "upgrade": {
+            "title": "6. Upgrade und Downgrade",
+            "text": "Plan-Änderungen sind jederzeit möglich. Bei Upgrades wird anteilig abgerechnet, bei Downgrades gilt die Änderung ab dem nächsten Abrechnungszeitraum."
+          },
+          "userContent": {
+            "title": "7. Nutzerinhalte",
+            "text": "Sie sind für die hochgeladenen Inhalte verantwortlich:",
+            "responsible": "Sie garantieren, dass Sie die Rechte an allen hochgeladenen Dateien besitzen",
+            "legal": "Keine illegalen, verleumderischen oder urheberrechtsverletzenden Inhalte",
+            "rights": "Sie behalten alle Rechte an Ihren Daten"
+          },
+          "liability": {
+            "title": "8. Haftung",
+            "text": "Wir haften nicht für Datenverlust durch höhere Gewalt, Nutzer-Verschulden oder technische Defekte. Regelmäßige Backups werden empfohlen."
+          },
+          "availability": {
+            "title": "9. Verfügbarkeit",
+            "text": "Wir streben eine Verfügbarkeit von 99% an. Wartungsarbeiten werden angekündigt. Ein Anspruch auf ständige Verfügbarkeit besteht nicht."
+          },
+          "law": {
+            "title": "10. Anwendbares Recht",
+            "text": "Es gilt das Recht der Bundesrepublik Deutschland. Gerichtsstand ist {{City}}."
+          },
+          "changes": {
+            "title": "11. Änderungen der AGB",
+            "text": "Wir behalten uns vor, diese AGB anzupassen. Änderungen werden per E-Mail mitgeteilt und gelten als akzeptiert, wenn nicht binnen 14 Tagen widersprochen wird."
+          }
+        }
+      }
+    }
   }
 }

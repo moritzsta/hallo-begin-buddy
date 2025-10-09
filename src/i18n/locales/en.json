@@ -263,5 +263,290 @@
     "maxSize": "Maximum Size",
     "tags": "Tags",
     "unlimited": "Unlimited"
+  },
+  "public": {
+    "nav": {
+      "brand": "Smart Docs",
+      "home": "Home",
+      "pricing": "Pricing",
+      "useCases": "Use Cases",
+      "legal": "Legal",
+      "impressum": "Imprint",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "cta": "Get Started Free"
+    },
+    "footer": {
+      "tagline": "Your documents. Automatically sorted.",
+      "product": "Product",
+      "legal": "Legal",
+      "contact": "Contact",
+      "copyright": "Smart Docs. All rights reserved."
+    },
+    "hero": {
+      "badge": "🎉 New: Automatic Document Sorting with AI",
+      "headline": "Your documents. Automatically sorted.",
+      "subtitle": "Upload, smart metadata, perfect filing. Say goodbye to folder chaos.",
+      "ctaPrimary": "Get Started Free",
+      "ctaSecondary": "Watch Live Demo",
+      "dsgvo": "GDPR Compliant",
+      "eu": "EU Servers"
+    },
+    "benefits": {
+      "smart": {
+        "title": "Smart Upload (OCR Page 1)",
+        "desc": "AI recognizes title & metadata automatically"
+      },
+      "auto": {
+        "title": "Automatic Filing",
+        "desc": "Folder preview, new folders marked"
+      },
+      "secure": {
+        "title": "Secure & Private",
+        "desc": "Owner-Only, RLS, signed links"
+      },
+      "preview": {
+        "title": "Fast Preview",
+        "desc": "PDF/Office/Images, without third-party viewers"
+      }
+    },
+    "features": {
+      "headline": "Everything you need",
+      "subtitle": "Powerful features for perfect document management",
+      "tags": { "title": "Manual Tags", "desc": "Organize documents with your own keywords" },
+      "bulk": { "title": "Bulk Upload", "desc": "Upload multiple files at once" },
+      "i18n": { "title": "DE/EN Support", "desc": "Fully multilingual" },
+      "theme": { "title": "Colorful Theme", "desc": "Vibrant lifestyle look" },
+      "badges": { "title": "New Files", "desc": "Badges show you new uploads" },
+      "fast": { "title": "Lightning Fast", "desc": "Optimized performance" }
+    },
+    "howItWorks": {
+      "headline": "How it works",
+      "step1": { "title": "Upload", "desc": "Upload files - single or bulk" },
+      "step2": { "title": "Preview & Confirm", "desc": "AI suggests metadata, you confirm" },
+      "step3": { "title": "Filed", "desc": "Perfectly organized in your storage" }
+    },
+    "pricingTeaser": {
+      "headline": "Transparent Pricing",
+      "subtitle": "Choose the plan that fits you",
+      "popular": "Popular",
+      "cta": "Get Started",
+      "allPlans": "View All Plans"
+    },
+    "testimonials": {
+      "headline": "What our users say",
+      "t1": { "role": "Freelancer", "text": "Finally order in my invoices. Automatic sorting saves me hours!" },
+      "t2": { "role": "Student", "text": "Perfect for university documents. The preview function is brilliant." },
+      "t3": { "role": "Family Manager", "text": "All contracts and documents in one place. Safe and clear." }
+    },
+    "faq": {
+      "headline": "Frequently Asked Questions",
+      "q1": { "question": "How secure is my data?", "answer": "All data is encrypted on EU servers. Row Level Security (RLS) ensures only you have access." },
+      "q2": { "question": "What if I reach my limit?", "answer": "You can upgrade anytime or purchase add-ons (100 Smart Uploads for €0.99 or extra storage)." },
+      "q3": { "question": "Which file formats are supported?", "answer": "PDF, Word, Excel, PowerPoint, Images (JPG, PNG) and many more. Preview without external viewers." },
+      "q4": { "question": "Can I share documents?", "answer": "Read-only links are planned. Currently all documents are owner-only." },
+      "q5": { "question": "How does cancellation work?", "answer": "Cancel anytime. Your data remains for 30 days." },
+      "q6": { "question": "Is there an app?", "answer": "The web app is fully responsive and works on all devices." }
+    },
+    "finalCta": {
+      "headline": "Ready for order?",
+      "subtitle": "Start free now and experience automatic document management",
+      "cta": "Get Started Free"
+    },
+    "pricing": {
+      "headline": "Find your perfect plan",
+      "subtitle": "Monthly cancellation. All prices incl. VAT.",
+      "popular": "Popular",
+      "smartUploads": "Smart Uploads/mon",
+      "storage": "Storage",
+      "maxFileSize": "Max File Size",
+      "allFeatures": "All features included",
+      "getStarted": "Get Started",
+      "upgrade": "Upgrade",
+      "vat": "All prices incl. VAT | Cancel monthly",
+      "addons": {
+        "headline": "Add-ons",
+        "uploads": { "title": "Extra Smart Uploads", "desc": "100 Smart Uploads per package" },
+        "storage": { "title": "Extra Storage", "desc": "per GB/month" }
+      },
+      "comparison": {
+        "headline": "Feature Comparison",
+        "feature": "Feature",
+        "features": {
+          "smartUpload": "Smart Upload (OCR + AI)",
+          "preview": "Document Preview",
+          "rls": "Row Level Security",
+          "signedUrls": "Signed Download URLs",
+          "badges": "New Files Badges",
+          "tags": "Manual Tags",
+          "bulk": "Bulk Upload",
+          "i18n": "DE/EN Support",
+          "themes": "3 Design Themes"
+        }
+      },
+      "tooltips": {
+        "smartUpload": "Automatic OCR on page 1 + AI-based metadata extraction for smart filing",
+        "preview": "View PDF, Office documents and images directly in browser - no external tools",
+        "rls": "Row Level Security ensures only you have access to your documents",
+        "signedUrls": "Short-lived, secure download links for maximum protection"
+      }
+    },
+    "useCases": {
+      "headline": "Perfect for every use case",
+      "subtitle": "Discover how Smart Docs makes your life easier",
+      "howItHelps": "How it helps:",
+      "cases": {
+        "finance": {
+          "title": "Invoices & Finance",
+          "desc": "All receipts, invoices and financial documents automatically sorted by year and month.",
+          "help1": "Automatic sorting by date",
+          "help2": "OCR recognizes amounts and invoice numbers",
+          "help3": "Tax preparation becomes child's play"
+        },
+        "contracts": {
+          "title": "Contracts & Policies",
+          "desc": "Store insurance, rental agreements and important documents securely.",
+          "help1": "Clear filing of all contracts",
+          "help2": "Keep track of expiration dates",
+          "help3": "Quick access when needed"
+        },
+        "official": {
+          "title": "Official Documents",
+          "desc": "Notices, certificates, documents - everything at hand.",
+          "help1": "Important documents securely stored",
+          "help2": "Quick search by keywords",
+          "help3": "Digital copies always with you"
+        },
+        "work": {
+          "title": "Work & Projects",
+          "desc": "Project documents, presentations and work files organized.",
+          "help1": "Bulk upload for project folders",
+          "help2": "Quick preview for meetings",
+          "help3": "Team storage (read-only coming soon)"
+        },
+        "health": {
+          "title": "Health",
+          "desc": "Medical letters, findings, vaccination records - sensitive data securely stored.",
+          "help1": "Maximum security through RLS",
+          "help2": "Important health data at hand",
+          "help3": "Private and encrypted"
+        },
+        "travel": {
+          "title": "Travel & Photos",
+          "desc": "Tickets, booking confirmations and vacation memories.",
+          "help1": "EXIF date for photo sorting",
+          "help2": "Travel documents in one place",
+          "help3": "Gallery view for images"
+        }
+      },
+      "cta": {
+        "headline": "Ready to get started?",
+        "subtitle": "Choose your use case and start free",
+        "primary": "Get Started Free",
+        "secondary": "View Pricing"
+      }
+    },
+    "legal": {
+      "impressum": {
+        "title": "Imprint",
+        "provider": "Provider",
+        "contact": "Contact",
+        "representative": "Authorized Representative",
+        "vatId": "VAT ID",
+        "register": "Commercial Register",
+        "responsible": "Responsible according to § 5 TMG",
+        "responsibleText": "Responsible for content according to § 55 Para. 2 RStV",
+        "phone": "Phone"
+      },
+      "privacy": {
+        "title": "Privacy Policy",
+        "lastUpdated": "Last updated",
+        "sections": {
+          "intro": { "title": "1. Privacy at a glance", "text": "This privacy policy explains the type, scope and purpose of processing personal data within our web app." },
+          "controller": { "title": "2. Controller", "dpo": "Data Protection Officer" },
+          "purpose": {
+            "title": "3. Purpose of data processing",
+            "text": "We process your data exclusively for operating the web app:",
+            "item1": "Providing document storage",
+            "item2": "Smart Upload with OCR and AI metadata extraction",
+            "item3": "Storage and management of your files",
+            "item4": "Authentication and access control"
+          },
+          "legal": {
+            "title": "4. Legal basis",
+            "text": "Processing is based on:",
+            "art6a": "Art. 6 para. 1 lit. a GDPR (consent)",
+            "art6b": "Art. 6 para. 1 lit. b GDPR (contract performance)",
+            "art6f": "Art. 6 para. 1 lit. f GDPR (legitimate interest)"
+          },
+          "data": {
+            "title": "5. What data is collected?",
+            "text": "We collect and process:",
+            "email": "Email address (for account creation)",
+            "files": "Uploaded files and their metadata",
+            "metadata": "Automatically extracted information (OCR, AI analysis)",
+            "usage": "Usage statistics (smart upload count, storage usage)"
+          },
+          "storage": { "title": "6. Storage location and retention", "text": "All data is stored on EU servers. Retention: As long as your account is active. After deletion, data is removed within 30 days." },
+          "security": {
+            "title": "7. Security measures",
+            "text": "We use state-of-the-art security technologies:",
+            "rls": "Row Level Security (RLS) - only you have access to your data",
+            "signed": "Signed, short-lived download URLs",
+            "encryption": "Encrypted data transmission (HTTPS)",
+            "noThirdParty": "No third-party viewers for documents"
+          },
+          "rights": {
+            "title": "8. Your rights",
+            "text": "You have the following rights:",
+            "access": "Access to your stored data",
+            "rectification": "Rectification of incorrect data",
+            "erasure": "Deletion of your data",
+            "restriction": "Restriction of processing",
+            "portability": "Data portability",
+            "objection": "Objection to processing"
+          },
+          "cookies": { "title": "9. Cookies and tracking", "text": "We only use technically necessary cookies for app functionality. Analytics cookies are only set with your consent." },
+          "changes": { "title": "10. Changes", "text": "We reserve the right to update this privacy policy. The current version can always be found on this page." }
+        }
+      },
+      "terms": {
+        "title": "Terms and Conditions",
+        "lastUpdated": "Last updated",
+        "sections": {
+          "scope": { "title": "1. Scope", "text": "These terms apply to the use of Smart Docs web app for document management." },
+          "services": {
+            "title": "2. Service description",
+            "text": "Smart Docs offers:",
+            "smart": "Smart Upload with OCR (page 1) and AI metadata extraction",
+            "storage": "Secure document storage",
+            "preview": "Preview of PDF, Office documents and images",
+            "organization": "Automatic and manual organization with folders and tags"
+          },
+          "plans": { "title": "3. Plans and limits", "text": "Various plans are available:" },
+          "payment": {
+            "title": "4. Payment terms",
+            "text": "Payments are processed via Stripe:",
+            "monthly": "Monthly billing",
+            "stripe": "Secure payment processing via Stripe",
+            "vat": "All prices incl. statutory VAT",
+            "renew": "Automatic renewal until cancellation"
+          },
+          "cancellation": { "title": "5. Cancellation", "text": "You can cancel your subscription at any time via the customer portal. Cancellation takes effect at the end of the current billing period. Your data remains for 30 days after cancellation." },
+          "upgrade": { "title": "6. Upgrade and downgrade", "text": "Plan changes are possible at any time. Upgrades are prorated, downgrades take effect from the next billing period." },
+          "userContent": {
+            "title": "7. User content",
+            "text": "You are responsible for uploaded content:",
+            "responsible": "You guarantee that you own the rights to all uploaded files",
+            "legal": "No illegal, defamatory or copyright-infringing content",
+            "rights": "You retain all rights to your data"
+          },
+          "liability": { "title": "8. Liability", "text": "We are not liable for data loss due to force majeure, user fault or technical defects. Regular backups are recommended." },
+          "availability": { "title": "9. Availability", "text": "We aim for 99% availability. Maintenance is announced. There is no entitlement to constant availability." },
+          "law": { "title": "10. Applicable law", "text": "German law applies. Place of jurisdiction is {{City}}." },
+          "changes": { "title": "11. Changes to terms", "text": "We reserve the right to adjust these terms. Changes are communicated by email and are deemed accepted if not objected to within 14 days." }
+        }
+      }
+    }
   }
 }

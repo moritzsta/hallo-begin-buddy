@@ -11,6 +11,12 @@ import Auth from "./pages/Auth";
 import Settings from "./pages/Settings";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import Landing from "./pages/public/Landing";
+import Pricing from "./pages/public/Pricing";
+import UseCases from "./pages/public/UseCases";
+import Impressum from "./pages/public/legal/Impressum";
+import Privacy from "./pages/public/legal/Privacy";
+import Terms from "./pages/public/legal/Terms";
 import '@/i18n/config';
 
 const queryClient = new QueryClient();
@@ -29,8 +35,17 @@ const App = () => (
         <BrowserRouter>
           <AuthProvider>
             <Routes>
+              {/* Public Marketing Routes */}
+              <Route path="/" element={<Landing />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/use-cases" element={<UseCases />} />
+              <Route path="/legal/impressum" element={<Impressum />} />
+              <Route path="/legal/privacy" element={<Privacy />} />
+              <Route path="/legal/terms" element={<Terms />} />
+              
+              {/* App Routes */}
               <Route path="/auth" element={<Auth />} />
-              <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+              <Route path="/app" element={<ProtectedRoute><Index /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
