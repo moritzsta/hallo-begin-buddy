@@ -271,11 +271,18 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
       if (error) throw error;
 
       if (data?.extracted) {
+        // Transform AI response to expected metadata format
+        const transformedMetadata = {
+          title: data.extracted.suggested_title || uploadFile.file.name,
+          doc_type: data.extracted.document_type || undefined,
+          keywords: data.extracted.keywords || [],
+        };
+        
         // Update upload file with metadata and show confirmation dialog
         setUploadFiles(prev =>
           prev.map(f =>
             f.id === uploadFileId
-              ? { ...f, status: 'awaiting-confirmation' as const, smartMetadata: data.extracted }
+              ? { ...f, status: 'awaiting-confirmation' as const, smartMetadata: transformedMetadata }
               : f
           )
         );

@@ -49,8 +49,8 @@ export const MetadataConfirmDialog = ({
   const [isConfirming, setIsConfirming] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  // Editable metadata state
-  const [editedTitle, setEditedTitle] = useState(metadata.title);
+  // Editable metadata state with safe defaults
+  const [editedTitle, setEditedTitle] = useState(metadata.title || fileName || '');
   const [editedDocType, setEditedDocType] = useState(metadata.doc_type || '');
   const [editedDate, setEditedDate] = useState(metadata.date || '');
   const [editedParty, setEditedParty] = useState(metadata.party || '');
