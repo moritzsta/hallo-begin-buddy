@@ -32,6 +32,7 @@
 | T19 | Feature-Gating & Pläne | ✅ Done |
 | T20 | Stripe-Integration (Subscriptions) | ✅ Done |
 | T21 | Server-Side Plan-Gating in Edge Functions | ✅ Done |
+| T22 | Smart Upload Confirmation Dialog | ✅ Done |
 | T05 | Create `user_roles` Table | ✅ Done (already exists) |
 | T06 | RLS Policies – Owner-Only Access | Backlog |
 | T07 | Storage Bucket & RLS | Backlog |
@@ -269,6 +270,68 @@
   - Clientseitige Checks sind nur UX – Server MUSS prüfen
   - Stripe-Integration folgt in nächstem Task (T20)
 - Next Step: T20 – Stripe-Integration (Checkout, Portal, Webhooks)
+
+### 2025-10-10T01:00:00Z – T22 Completed
+- **[T22]** Smart Upload Confirmation Dialog implementiert
+- Components erstellt:
+  - `src/components/upload/MetadataConfirmDialog.tsx` – Bestätigungs-Dialog mit Metadaten-Editor
+- Features:
+  - **User-Controlled Smart Upload**:
+    - Manueller Smart Upload Button (nur für Bilder)
+    - Zeigt "Smart Upload"-Button nach erfolgreichem Upload
+    - User entscheidet, ob KI-Extraktion gewünscht
+  - **Metadaten-Bestätigungs-Dialog**:
+    - Zeigt extrahierte Metadaten (title, doc_type, date, party, amount, keywords)
+    - View/Edit Toggle für Metadaten
+    - Inline-Editing aller Felder
+    - Tag-Management mit Suggestions
+    - Path Preview (prospektiv für zukünftige Folder-Placement-Features)
+  - **Dialog-Features**:
+    - Read-only View: Grid-Layout mit Label/Value-Paaren
+    - Edit Mode: Vollständige Input-Felder für alle Metadaten
+    - Tag-Input integriert (mit Auto-Suggest)
+    - Confirm & Save Button (nur aktiv wenn Titel vorhanden)
+    - Cancel Button (speichert ohne Smart-Metadaten)
+  - **Upload-Flow**:
+    - Status "awaiting-confirmation" während Dialog offen
+    - Sparkles-Icon für Smart Upload Features
+    - Toast-Feedback bei allen Aktionen
+    - Graceful Fallback bei fehlender Metadaten-Extraktion
+- Components aktualisiert:
+  - `src/components/upload/FileUpload.tsx`:
+    - Neuer Upload-Status: "awaiting-confirmation"
+    - triggerSmartUpload() – Ruft smart-upload Edge Function auf
+    - handleConfirmMetadata() – Speichert bestätigte Metadaten
+    - handleCancelConfirmation() – Schließt Dialog ohne Smart-Metadaten
+    - Smart Upload Button pro erfolgreicher Image-Upload
+    - Conditional Rendering basierend auf File-Typ & Status
+    - Dialog-State-Management
+  - UploadFile Interface erweitert:
+    - fileId: string (DB File ID)
+    - smartMetadata: any (KI-extrahierte Metadaten)
+- Übersetzungen:
+  - `src/i18n/locales/de.json`:
+    - upload.smartUpload, smartUploadSkipped, smartUploadError
+    - upload.awaitingConfirmation, confirmMetadata, confirmMetadataDesc
+    - upload.suggestedPath, newFoldersWillBeCreated, extractedMetadata
+    - upload.confirmAndSave, metadataConfirmed, metadataConfirmedDesc
+    - documents.docType, party, amount
+  - `src/i18n/locales/en.json` – Englische Entsprechungen
+- UX Details:
+  - Smart Upload ist opt-in (User muss Button klicken)
+  - Dialog zeigt nur wenn Metadaten extrahiert wurden
+  - Alle Felder editierbar (kein Force-Accept)
+  - Tags aus vorherigen Uploads als Suggestions
+  - Keine automatische Ordner-Erstellung (kommt in späterem Task)
+  - Path Preview vorbereitet für zukünftiges Folder-Placement
+- Performance:
+  - Smart Upload on-demand (kein "fire and forget")
+  - Preview Generation weiterhin automatisch
+  - Dialog lädt nur bei tatsächlicher Nutzung
+- Security:
+  - Metadaten-Update nur für eigene Dateien (RLS)
+  - File ID Validierung vor Update
+- Next Step: T23 – UI-Polish & Animations oder T24 – Admin Dashboard
 
 ### 2025-10-10T00:00:00Z – T21 Completed
 - **[T21]** Server-Side Plan-Gating in Edge Functions implementiert

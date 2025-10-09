@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
-import { Upload, X, FileIcon, Loader2 } from 'lucide-react';
+import { Upload, X, FileIcon, Loader2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -10,14 +10,17 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { TagInput } from '@/components/documents/TagInput';
 import { useQuery } from '@tanstack/react-query';
+import { MetadataConfirmDialog } from './MetadataConfirmDialog';
 
 interface UploadFile {
   file: File;
   id: string;
   progress: number;
-  status: 'pending' | 'uploading' | 'success' | 'error';
+  status: 'pending' | 'uploading' | 'success' | 'error' | 'awaiting-confirmation';
   error?: string;
   tags?: string[];
+  fileId?: string; // Database file ID for smart upload
+  smartMetadata?: any; // AI-extracted metadata
 }
 
 const PLAN_LIMITS = {
@@ -34,6 +37,11 @@ interface FileUploadProps {
 
 export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
   const [uploadFiles, setUploadFiles] = useState<UploadFile[]>([]);
+  const [confirmDialogState, setConfirmDialogState] = useState<{
+    open: boolean;
+    uploadFileId: string | null;
+  }>({ open: false, uploadFileId: null });
+  
   const { toast } = useToast();
   const { user, profile } = useAuth();
   const { t } = useTranslation();
@@ -159,36 +167,28 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
         prev.map(f => f.id === id ? { ...f, status: 'success' as const, progress: 100 } : f)
       );
 
-      // Trigger smart upload for image files
-      if (file.type.startsWith('image/')) {
-        try {
-          const { data: fileData } = await supabase
-            .from('files')
-            .select('id')
-            .eq('storage_path', storagePath)
-            .single();
+      // Get file ID for smart upload processing
+      const { data: fileData } = await supabase
+        .from('files')
+        .select('id')
+        .eq('storage_path', storagePath)
+        .single();
 
-          if (fileData) {
-            // Trigger smart upload (fire and forget)
-            supabase.functions.invoke('smart-upload', {
-              body: { file_id: fileData.id },
-            }).then(({ error: smartError }) => {
-              if (smartError) {
-                console.warn('Smart upload failed:', smartError);
-              }
-            });
-            
-            // Trigger preview generation (fire and forget)
-            supabase.functions.invoke('generate-preview', {
-              body: { file_id: fileData.id },
-            }).then(({ error: previewError }) => {
-              if (previewError) {
-                console.warn('Preview generation failed:', previewError);
-              }
-            });
-          }
-        } catch (smartErr) {
-          console.warn('Post-upload triggers failed:', smartErr);
+      if (fileData) {
+        // Store file_id in upload state for later smart upload
+        setUploadFiles(prev => 
+          prev.map(f => f.id === id ? { ...f, fileId: fileData.id } : f)
+        );
+
+        // Trigger preview generation (fire and forget)
+        if (file.type.startsWith('image/')) {
+          supabase.functions.invoke('generate-preview', {
+            body: { file_id: fileData.id },
+          }).then(({ error: previewError }) => {
+            if (previewError) {
+              console.warn('Preview generation failed:', previewError);
+            }
+          });
         }
       }
 
@@ -252,6 +252,112 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
     setUploadFiles(prev => prev.filter(f => f.status === 'uploading'));
     if (onUploadComplete) onUploadComplete();
   };
+
+  const triggerSmartUpload = async (uploadFileId: string) => {
+    const uploadFile = uploadFiles.find(f => f.id === uploadFileId);
+    if (!uploadFile?.fileId) return;
+
+    try {
+      // Call smart-upload edge function
+      const { data, error } = await supabase.functions.invoke('smart-upload', {
+        body: { file_id: uploadFile.fileId },
+      });
+
+      if (error) throw error;
+
+      if (data?.metadata) {
+        // Update upload file with metadata and show confirmation dialog
+        setUploadFiles(prev =>
+          prev.map(f =>
+            f.id === uploadFileId
+              ? { ...f, status: 'awaiting-confirmation' as const, smartMetadata: data.metadata }
+              : f
+          )
+        );
+        setConfirmDialogState({ open: true, uploadFileId });
+      } else {
+        // No metadata extracted, just mark as success
+        toast({
+          title: t('upload.smartUploadSkipped', { defaultValue: 'Smart Upload übersprungen' }),
+          description: t('upload.smartUploadSkippedDesc', { 
+            defaultValue: 'Keine Metadaten extrahiert. Datei wurde normal abgelegt.' 
+          }),
+        });
+      }
+    } catch (error) {
+      console.error('Smart upload error:', error);
+      toast({
+        title: t('upload.smartUploadError', { defaultValue: 'Smart Upload fehlgeschlagen' }),
+        description: error instanceof Error ? error.message : t('common.unknownError'),
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleConfirmMetadata = async (updatedMetadata: any, tags: string[]) => {
+    const uploadFileId = confirmDialogState.uploadFileId;
+    if (!uploadFileId) return;
+
+    const uploadFile = uploadFiles.find(f => f.id === uploadFileId);
+    if (!uploadFile?.fileId) return;
+
+    try {
+      // Update file with confirmed metadata and tags
+      const { error: updateError } = await supabase
+        .from('files')
+        .update({
+          title: updatedMetadata.title,
+          tags,
+          meta: {
+            ...(uploadFile.file ? { original_name: uploadFile.file.name } : {}),
+            doc_type: updatedMetadata.doc_type,
+            date: updatedMetadata.date,
+            party: updatedMetadata.party,
+            amount: updatedMetadata.amount,
+            smart_upload: true,
+          },
+        })
+        .eq('id', uploadFile.fileId);
+
+      if (updateError) throw updateError;
+
+      setUploadFiles(prev =>
+        prev.map(f => (f.id === uploadFileId ? { ...f, status: 'success' as const, tags } : f))
+      );
+
+      toast({
+        title: t('upload.metadataConfirmed', { defaultValue: 'Metadaten bestätigt' }),
+        description: t('upload.metadataConfirmedDesc', { 
+          defaultValue: 'Datei wurde mit aktualisierten Metadaten abgelegt.' 
+        }),
+      });
+
+      setConfirmDialogState({ open: false, uploadFileId: null });
+      if (onUploadComplete) onUploadComplete();
+    } catch (error) {
+      console.error('Metadata update error:', error);
+      toast({
+        title: t('upload.metadataUpdateError', { defaultValue: 'Fehler beim Aktualisieren' }),
+        description: error instanceof Error ? error.message : t('common.unknownError'),
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleCancelConfirmation = () => {
+    const uploadFileId = confirmDialogState.uploadFileId;
+    if (uploadFileId) {
+      // Mark as success without smart metadata
+      setUploadFiles(prev =>
+        prev.map(f => (f.id === uploadFileId ? { ...f, status: 'success' as const } : f))
+      );
+    }
+    setConfirmDialogState({ open: false, uploadFileId: null });
+  };
+
+  const currentConfirmUploadFile = uploadFiles.find(
+    f => f.id === confirmDialogState.uploadFileId
+  );
 
   return (
     <div className="space-y-4">
@@ -338,11 +444,53 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
                       />
                     </div>
                   )}
+
+                  {/* Smart Upload Button for image files */}
+                  {uploadFile.status === 'success' && 
+                   uploadFile.file.type.startsWith('image/') && 
+                   uploadFile.fileId && (
+                    <div className="mt-3 pt-3 border-t">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => triggerSmartUpload(uploadFile.id)}
+                        className="w-full"
+                      >
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        {t('upload.smartUpload', { defaultValue: 'Smart Upload' })}
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* Awaiting Confirmation State */}
+                  {uploadFile.status === 'awaiting-confirmation' && (
+                    <div className="mt-3 pt-3 border-t">
+                      <p className="text-xs text-primary flex items-center gap-1">
+                        <Sparkles className="h-3 w-3 animate-pulse" />
+                        {t('upload.awaitingConfirmation', { 
+                          defaultValue: 'Warte auf Bestätigung der Metadaten...' 
+                        })}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </Card>
           ))}
         </div>
+      )}
+
+      {/* Metadata Confirmation Dialog */}
+      {currentConfirmUploadFile && (
+        <MetadataConfirmDialog
+          open={confirmDialogState.open}
+          onOpenChange={(open) => setConfirmDialogState({ open, uploadFileId: null })}
+          metadata={currentConfirmUploadFile.smartMetadata || {}}
+          fileName={currentConfirmUploadFile.file.name}
+          onConfirm={handleConfirmMetadata}
+          onCancel={handleCancelConfirmation}
+          availableTags={availableTags}
+        />
       )}
     </div>
   );

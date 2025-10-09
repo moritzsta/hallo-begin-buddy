@@ -35,7 +35,21 @@
     "uploadSuccess": "Upload successful",
     "uploadSuccessDesc": "{{filename}} has been uploaded.",
     "uploadError": "Upload failed",
-    "fileTooLarge": "File too large (max. {{size}}MB for {{tier}} plan)"
+    "fileTooLarge": "File too large (max. {{size}}MB for {{tier}} plan)",
+    "smartUpload": "Smart Upload",
+    "smartUploadSkipped": "Smart Upload skipped",
+    "smartUploadSkippedDesc": "No metadata extracted. File was saved normally.",
+    "smartUploadError": "Smart Upload failed",
+    "awaitingConfirmation": "Awaiting confirmation...",
+    "confirmMetadata": "Confirm Metadata",
+    "confirmMetadataDesc": "Review the extracted metadata for {{fileName}} and adjust if needed.",
+    "suggestedPath": "Suggested Location",
+    "newFoldersWillBeCreated": "{{count}} new folder(s) will be created",
+    "extractedMetadata": "Extracted Metadata",
+    "confirmAndSave": "Confirm & Save",
+    "metadataConfirmed": "Metadata confirmed",
+    "metadataConfirmedDesc": "File was saved with updated metadata.",
+    "metadataUpdateError": "Update error"
   },
   "documents": {
     "title": "My Documents",
@@ -82,7 +96,10 @@
     "markAsSeenButton": "Mark all as seen",
     "markAsSeenSuccess": "Marked",
     "markAsSeenSuccessDesc": "All files have been marked as seen.",
-    "editTags": "Edit tags"
+    "editTags": "Edit tags",
+    "docType": "Document Type",
+    "party": "Party/Sender",
+    "amount": "Amount"
   },
   "plans": {
     "upgrade": "Upgrade",
@@ -136,7 +153,9 @@
     "close": "Close",
     "logout": "Logout",
     "back": "Back",
-    "or": "or"
+    "or": "or",
+    "view": "View",
+    "new": "New"
   },
   "theme": {
     "toggle": "Toggle theme",

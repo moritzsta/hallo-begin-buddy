@@ -35,7 +35,21 @@
     "uploadSuccess": "Upload erfolgreich",
     "uploadSuccessDesc": "{{filename}} wurde hochgeladen.",
     "uploadError": "Upload fehlgeschlagen",
-    "fileTooLarge": "Datei zu groß (max. {{size}}MB für {{tier}}-Plan)"
+    "fileTooLarge": "Datei zu groß (max. {{size}}MB für {{tier}}-Plan)",
+    "smartUpload": "Smart Upload",
+    "smartUploadSkipped": "Smart Upload übersprungen",
+    "smartUploadSkippedDesc": "Keine Metadaten extrahiert. Datei wurde normal abgelegt.",
+    "smartUploadError": "Smart Upload fehlgeschlagen",
+    "awaitingConfirmation": "Warte auf Bestätigung...",
+    "confirmMetadata": "Metadaten bestätigen",
+    "confirmMetadataDesc": "Überprüfen Sie die extrahierten Metadaten für {{fileName}} und passen Sie sie bei Bedarf an.",
+    "suggestedPath": "Vorgeschlagener Ablageort",
+    "newFoldersWillBeCreated": "{{count}} neue(r) Ordner wird/werden erstellt",
+    "extractedMetadata": "Extrahierte Metadaten",
+    "confirmAndSave": "Bestätigen & Ablegen",
+    "metadataConfirmed": "Metadaten bestätigt",
+    "metadataConfirmedDesc": "Datei wurde mit aktualisierten Metadaten abgelegt.",
+    "metadataUpdateError": "Fehler beim Aktualisieren"
   },
   "documents": {
     "title": "Meine Dokumente",
@@ -82,7 +96,10 @@
     "markAsSeenButton": "Alle als gesehen markieren",
     "markAsSeenSuccess": "Markiert",
     "markAsSeenSuccessDesc": "Alle Dateien wurden als gesehen markiert.",
-    "editTags": "Tags bearbeiten"
+    "editTags": "Tags bearbeiten",
+    "docType": "Dokumenttyp",
+    "party": "Partei/Absender",
+    "amount": "Betrag"
   },
   "plans": {
     "upgrade": "Upgraden",
@@ -136,7 +153,9 @@
     "close": "Schließen",
     "logout": "Abmelden",
     "back": "Zurück",
-    "or": "oder"
+    "or": "oder",
+    "view": "Ansehen",
+    "new": "Neu"
   },
   "theme": {
     "toggle": "Theme umschalten",
