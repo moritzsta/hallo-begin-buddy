@@ -84,8 +84,8 @@ export const DocumentDetailsTable = ({
           >
             <Card className="p-3 transition-all duration-200 hover:shadow-md border border-border/50">
               <div className="flex items-center gap-3">
-                {/* File Name - Flexible width */}
-                <div className="flex-1 min-w-0">
+                {/* File Name - Reduced width */}
+                <div className="flex-[0.75] min-w-0">
                   <div className="flex items-center gap-2">
                     <span className={cn(
                       "font-medium truncate",
@@ -121,15 +121,15 @@ export const DocumentDetailsTable = ({
                   </span>
                 </div>
 
-                {/* Tags */}
-                <div className="shrink-0 w-48">
+                {/* Tags - Increased width */}
+                <div className="flex-[0.5] min-w-0">
                   {file.tags && file.tags.length > 0 ? (
-                    <div className="flex gap-1 overflow-hidden">
+                    <div className="flex gap-1.5 overflow-hidden flex-wrap">
                       {file.tags.slice(0, 3).map((tag) => (
                         <Badge 
                           key={tag} 
                           variant={isLifestyle ? "lifestyle-secondary" : "secondary"}
-                          className="text-sm truncate max-w-[70px] px-2 py-0.5"
+                          className="text-sm truncate max-w-[120px] px-2 py-0.5"
                         >
                           {tag}
                         </Badge>
