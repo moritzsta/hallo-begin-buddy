@@ -227,6 +227,20 @@
     "saveSuccessDesc": "Your settings have been updated",
     "saveError": "Error saving"
   },
+  "admin": {
+    "title": "Admin Dashboard",
+    "subtitle": "Usage Tracking & System Overview",
+    "totalSmartUploads": "Smart Uploads",
+    "totalStorage": "Storage",
+    "totalUsers": "Users",
+    "totalFiles": "Files",
+    "smartUploadsTrend": "Smart Uploads (30 Days)",
+    "planDistribution": "Plan Distribution",
+    "storageByUser": "Storage Usage (Top 10 Users)",
+    "warningLimitsReached": "Warning: Limits Reached",
+    "storageExceeds": "Storage usage exceeds 10 GB",
+    "smartUploadsExceed": "Smart Uploads exceed 1000"
+  },
   "filters": {
     "title": "Filters",
     "clear": "Clear",

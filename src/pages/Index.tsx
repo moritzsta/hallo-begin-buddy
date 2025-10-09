@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +10,8 @@ import { DocumentList } from '@/components/documents/DocumentList';
 import { FolderTree } from '@/components/folders/FolderTree';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
-import { Upload, FileText, LogOut, Settings as SettingsIcon } from 'lucide-react';
+import { Upload, FileText, LogOut, Settings as SettingsIcon, Shield } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const { user, signOut } = useAuth();
@@ -18,6 +19,25 @@ const Index = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('documents');
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  // Check if user is admin
+  useEffect(() => {
+    const checkAdmin = async () => {
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+
+      setIsAdmin(!error && data !== null);
+    };
+
+    checkAdmin();
+  }, [user]);
 
   const handleLogout = async () => {
     await signOut();
@@ -57,6 +77,11 @@ const Index = () => {
               <div className="flex items-center gap-2">
                 <ThemeSwitcher />
                 <LanguageSwitcher />
+                {isAdmin && (
+                  <Button variant="outline" size="icon" onClick={() => navigate('/admin')} title="Admin Dashboard">
+                    <Shield className="h-4 w-4" />
+                  </Button>
+                )}
                 <Button variant="outline" size="icon" onClick={() => navigate('/settings')}>
                   <SettingsIcon className="h-4 w-4" />
                 </Button>

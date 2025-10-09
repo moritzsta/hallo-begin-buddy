@@ -227,6 +227,20 @@
     "saveSuccessDesc": "Ihre Einstellungen wurden aktualisiert",
     "saveError": "Fehler beim Speichern"
   },
+  "admin": {
+    "title": "Admin Dashboard",
+    "subtitle": "Usage-Tracking & System-Übersicht",
+    "totalSmartUploads": "Smart Uploads",
+    "totalStorage": "Speicher",
+    "totalUsers": "Nutzer",
+    "totalFiles": "Dateien",
+    "smartUploadsTrend": "Smart Uploads (30 Tage)",
+    "planDistribution": "Plan-Verteilung",
+    "storageByUser": "Speicher-Nutzung (Top 10 Nutzer)",
+    "warningLimitsReached": "Warnung: Limits erreicht",
+    "storageExceeds": "Speicher-Nutzung überschreitet 10 GB",
+    "smartUploadsExceed": "Smart-Uploads überschreiten 1000"
+  },
   "filters": {
     "title": "Filter",
     "clear": "Löschen",

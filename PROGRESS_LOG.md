@@ -34,6 +34,7 @@
 | T21 | Server-Side Plan-Gating in Edge Functions | ✅ Done |
 | T22 | Smart Upload Confirmation Dialog | ✅ Done |
 | T23 | UI-Polish & Animations (Framer Motion) | ✅ Done |
+| T24 | Admin Dashboard (Usage-Tracking) | ✅ Done |
 | T05 | Create `user_roles` Table | ✅ Done (already exists) |
 | T06 | RLS Policies – Owner-Only Access | Backlog |
 | T07 | Storage Bucket & RLS | Backlog |
@@ -271,6 +272,77 @@
   - Clientseitige Checks sind nur UX – Server MUSS prüfen
   - Stripe-Integration folgt in nächstem Task (T20)
 - Next Step: T20 – Stripe-Integration (Checkout, Portal, Webhooks)
+
+### 2025-10-10T03:00:00Z – T24 Completed
+- **[T24]** Admin Dashboard (Usage-Tracking) implementiert
+- Core Files erstellt:
+  - `src/pages/Admin.tsx` – Admin Dashboard mit Usage-Statistiken
+- Features:
+  - **Admin-Only Access**:
+    - Server-seitige Admin-Prüfung via user_roles Tabelle
+    - Automatischer Redirect zu "/" bei nicht-Admin Users
+    - Admin Badge in UI
+    - Loading-State während Permission-Check
+  - **Usage-Statistiken**:
+    - **Smart Uploads**: Gesamtzahl + Trend (30 Tage)
+    - **Speicher**: Gesamtnutzung + Top 10 Users
+    - **Nutzer**: Gesamtzahl + Plan-Verteilung
+    - **Dateien**: Gesamtzahl
+  - **Dashboard-Cards**:
+    - 4 Stat-Cards mit Icons (Zap, HardDrive, Users, Database)
+    - Real-time Daten aus Supabase
+    - Hover-Effekte & Shadow-Transitions
+    - Skeleton-Loading-States
+  - **Charts & Visualisierungen**:
+    - **Line Chart**: Smart Uploads Trend (30 Tage)
+    - **Pie Chart**: Plan-Verteilung (Free/Basic/Plus/Max)
+    - **Bar Chart**: Storage-Nutzung pro User (Top 10)
+    - Recharts Library (bereits installiert)
+    - Responsive Charts mit Tooltips
+    - Theme-aware Colors (hsl(var(--primary)))
+  - **Warnungen & Alerts**:
+    - Alert bei Storage > 10 GB
+    - Alert bei Smart Uploads > 1000
+    - AlertTriangle Icon für Warnungen
+    - Destructive Alert Variant
+  - **Queries & Aggregation**:
+    - usage_tracking Query mit date-Filter (30 Tage)
+    - files Query für Storage-Aggregation
+    - profiles Query für Plan-Distribution
+    - Client-seitige Aggregation & Sorting
+    - useMemo für Performance-Optimierung
+  - **UI/UX**:
+    - Framer Motion Animationen (fadeInUp, staggerContainer)
+    - Grid-Layout (1/2/4 Spalten responsive)
+    - Card-basiertes Design
+    - Icon-basierte Navigation
+    - formatBytes() Helper für Größen-Darstellung
+- Security:
+  - Server-seitige Admin-Check via user_roles
+  - Keine Client-Side Storage Checks
+  - RLS respektiert bei allen Queries
+  - Navigate zu "/" bei nicht-Admin
+- Performance:
+  - React Query für Caching
+  - useMemo für Chart-Data
+  - Skeleton-Loading während Fetch
+  - Conditional Queries (enabled bei isAdmin)
+- Routing:
+  - `/admin` Route hinzugefügt in App.tsx
+  - Protected Route Wrapper
+  - Admin-Check innerhalb Component
+- Translations:
+  - `src/i18n/locales/de.json`:
+    - admin.title, subtitle, totalSmartUploads, totalStorage, totalUsers, totalFiles
+    - admin.smartUploadsTrend, planDistribution, storageByUser
+    - admin.warningLimitsReached, storageExceeds, smartUploadsExceed
+  - `src/i18n/locales/en.json` – Englische Entsprechungen
+- Hinweis:
+  - **Keine Email-Alarme** in diesem Task (prospektiv via Edge Function + Cron)
+  - **Keine OpenAI-Token-Tracking** (würde separate Logging-Logic benötigen)
+  - **Keine Stripe-Revenue-Tracking** (prospektiv via Stripe API)
+  - Focus auf Core Usage-Metriken aus existierenden Tables
+- Next Step: T25 – Tests & Dokumentation oder Deployment
 
 ### 2025-10-10T02:00:00Z – T23 Completed
 - **[T23]** UI-Polish & Animations (Framer Motion) implementiert
