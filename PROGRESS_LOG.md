@@ -36,6 +36,9 @@
 | T23 | UI-Polish & Animations (Framer Motion) | ✅ Done |
 | T24 | Admin Dashboard (Usage-Tracking) | ✅ Done |
 | T25 | Tests & Dokumentation (E2E + README) | ✅ Done |
+| T26 | Profilmenü-Refactoring | ✅ Done |
+| T27 | Pfadbearbeitung im Metadaten-Dialog | ✅ Done |
+| T28 | "Ohne Dokumentenanalyse"-Option | ✅ Done |
 | T05 | Create `user_roles` Table | ✅ Done (already exists) |
 | T06 | RLS Policies – Owner-Only Access | Backlog |
 | T07 | Storage Bucket & RLS | Backlog |
@@ -74,6 +77,191 @@
 ## Change Log
 
 *Neueste Einträge oben. Format: [UTC Timestamp] [Task-ID] Beschreibung – Dateien/Ordner – Diffs (Stichpunkte)*
+
+### 2025-10-09T23:45:00Z – T28 Completed
+- **[T28]** "Ohne Dokumentenanalyse"-Option beim Smart Upload implementiert
+- Features:
+  - **Dokumentenanalyse überspringen**:
+    - Neue Checkbox "Ohne Dokumentenanalyse (nutzt nur Metadaten und Titel)"
+    - User kann OCR/Dokumenteninhalt-Analyse überspringen
+    - KI generiert trotzdem optimale Ordnerstruktur aus Metadaten + Titel
+    - Reduziert Kosten & Verarbeitungszeit für Dokumente, die User nicht analysieren möchte
+  - **Backend-Integration**:
+    - Neuer Parameter `skip_document_analysis` in smart-upload Edge Function
+    - Wenn aktiviert: Überspringt Text-Extraktion & OCR
+    - KI-Analyse basiert nur auf Dateiname + User-Context
+    - Generiert trotzdem suggested_path, title, keywords via AI
+  - **UI-Integration**:
+    - Checkbox in FileUpload.tsx unter User-Context-Input
+    - Verwendet Shadcn Checkbox Component
+    - State: `uploadFile.skipAiAnalysis` boolean flag
+    - Label-Text präzisiert: "Ohne Dokumentenanalyse" statt "Ohne KI-Analyse"
+- Komponenten aktualisiert:
+  - `src/components/upload/FileUpload.tsx`:
+    - UploadFile Interface erweitert um `skipAiAnalysis?: boolean`
+    - `updateSkipAiAnalysis()` Funktion hinzugefügt
+    - Checkbox-UI mit onCheckedChange Handler
+    - `triggerSmartUpload()` sendet `skip_document_analysis` an Backend
+  - `supabase/functions/smart-upload/index.ts`:
+    - Request-Body erweitert um `skip_document_analysis`
+    - Neue Logik: Bei skip → AI-Analyse nur mit Filename + User-Context
+    - Überspringt OCR, Text-Extraktion, Signed-URL-Download
+    - Verwendet separaten Prompt für Metadaten-basierte Analyse
+    - Tool-Call `extract_document_metadata` mit angepassten Parametern
+- Übersetzungen:
+  - `src/i18n/locales/de.json`:
+    - `upload.skipAiAnalysis`: "Ohne Dokumentenanalyse (nutzt nur Metadaten und Titel)"
+  - `src/i18n/locales/en.json`:
+    - `upload.skipAiAnalysis`: "Without document analysis (uses only metadata and title)"
+- UX Details:
+  - Checkbox deaktiviert nicht den Smart-Upload-Button
+  - User kann weiterhin optionale Metadaten eingeben
+  - KI nutzt diese Metadaten als primäre Grundlage für Organisation
+  - Ordnerstruktur-Generierung bleibt aktiv (nutzt existierende Folder-Struktur)
+  - Toast-Feedback identisch zu normalem Smart Upload
+- Performance & Cost:
+  - Reduziert AI-Token-Verbrauch erheblich (kein OCR-Content)
+  - Schnellere Verarbeitung (keine Text-Extraktion)
+  - Ideal für Dokumente ohne textuelle Inhalte oder wenn User Content nicht analysieren möchte
+- Next Step: Weitere UX-Verbesserungen oder Deployment-Vorbereitung
+
+### 2025-10-09T23:30:00Z – T27 Completed
+- **[T27]** Pfadbearbeitung im Metadaten-Dialog implementiert
+- Features:
+  - **Inline-Pfadbearbeitung**:
+    - Plus-Icon am Ende des Pfades zum Hinzufügen neuer Elemente
+    - Minus-Icon bei jedem Pfadelement zum Entfernen
+    - Tooltips mit Funktionsbeschreibungen (Hover)
+    - Popover-Eingabe für neue Pfadelemente (statt separate Zeile)
+  - **Plus-Icon-Funktionalität**:
+    - Klickbarer Button mit Plus-Icon
+    - Border-Dashed für visuelle Differenzierung
+    - Öffnet Popover mit Input-Feld
+    - Max. 6 Ebenen-Validierung (Button disabled bei Limit)
+    - Tooltip: "Neues Pfadelement hinzufügen (max. 6 Ebenen)"
+  - **Minus-Icon-Funktionalität**:
+    - Icon bei jedem Pfadelement (auch bei "Neu"-Badges)
+    - Hover-Effekt: Destructive-Farben (rot)
+    - Tooltip: "Pfadelement entfernen"
+    - Entfernt Element aus pathElements State
+  - **Popover-Eingabe**:
+    - Input-Feld mit Placeholder "Ordnername..."
+    - Plus-Button zum Bestätigen (disabled bei leerem Input)
+    - Enter-Taste zum Hinzufügen
+    - Escape-Taste zum Abbrechen
+    - AutoFocus auf Input beim Öffnen
+    - Schließt automatisch nach Hinzufügen
+  - **State-Management**:
+    - `pathElements` Array State (Split von suggested_path)
+    - `isAddingPath` boolean für Popover-Kontrolle
+    - `newPathElement` String für Input-Wert
+    - `handleAddPathElement()` fügt Element hinzu
+    - `handleRemovePathElement(index)` entfernt Element
+  - **Metadaten-Update**:
+    - `handleConfirm()` sendet aktualisierte `suggested_path` (pathElements.join('/'))
+    - Ordner-Erstellung basiert auf aktualisierten Pfad
+    - Neue Ordner werden korrekt erkannt und mit Badge markiert
+- Komponenten aktualisiert:
+  - `src/components/upload/MetadataConfirmDialog.tsx`:
+    - Imports: Plus, Minus Icons, Popover, Tooltip Components
+    - State: pathElements, isAddingPath, newPathElement
+    - `renderPathPreview()` komplett überarbeitet
+    - TooltipProvider Wrapper um Pfad-Vorschau
+    - Popover-Integration für Plus-Icon
+  - UI-Improvements:
+    - Pfadelemente in Border-Boxen (bg-background)
+    - Minus-Button mit Hover-Effekt
+    - Plus-Button mit Dashed-Border
+    - Tooltips für Accessibility
+    - Responsive Layout (flex-wrap)
+- Übersetzungen:
+  - `src/i18n/locales/de.json`:
+    - `upload.addPathElementTooltip`: "Neues Pfadelement hinzufügen (max. 6 Ebenen)"
+    - `upload.removePathElement`: "Pfadelement entfernen"
+    - `upload.pathElementName`: "Ordnername..."
+  - `src/i18n/locales/en.json`:
+    - Englische Entsprechungen für alle neuen Keys
+- UX Details:
+  - Keine separate Zeile für Pfad-Input (Inline-Design)
+  - Kein Syntax-Risiko durch User (nur Plus/Minus Buttons)
+  - Max. 6 Ebenen-Limit visuell kommuniziert (disabled Button)
+  - Popover verhindert ungewollte Eingaben
+  - Enter/Escape Keyboard-Support für Power-User
+- Validation:
+  - newPathElement.trim() verhindert leere Ordner
+  - pathElements.length < 6 Check vor Hinzufügen
+  - Keine Duplikate-Prävention (User kann gleiche Namen vergeben)
+- Next Step: T28 – "Ohne Dokumentenanalyse"-Option
+
+### 2025-10-09T23:15:00Z – T26 Completed
+- **[T26]** Profilmenü-Refactoring implementiert
+- Core Files erstellt:
+  - `src/components/ProfileMenu.tsx` – Dropdown-Profilmenü mit allen Funktionen
+- Features:
+  - **Avatar-basiertes Menü**:
+    - Runder Avatar-Button mit Initialen (basierend auf User-Email)
+    - Dropdown-Menu mit DropdownMenu Component
+    - User-Email als Label im Menü
+    - Hover-Effekt auf Avatar
+  - **Theme-Submenu**:
+    - Nested Submenu mit RadioGroup
+    - Optionen: Light, Dark, System
+    - Icon: Palette
+    - Direktes Umschalten ohne Seiten-Reload
+  - **Sprach-Submenu**:
+    - Nested Submenu mit RadioGroup
+    - Optionen: Deutsch, English
+    - Icon: Globe
+    - i18n.changeLanguage() Integration
+  - **Einstellungen-Link**:
+    - Navigation zu /settings
+    - Icon: Settings
+  - **Admin-Link** (conditional):
+    - Nur sichtbar für Admin-User (isAdmin prop)
+    - Navigation zu /admin
+    - Icon: Shield
+  - **Abmelden-Funktion**:
+    - onLogout Callback
+    - Icon: LogOut
+    - Separator vor Abmelden (visuelle Trennung)
+- Komponenten aktualisiert:
+  - `src/pages/Index.tsx`:
+    - Alle Header-Buttons (Theme, Sprache, Einstellungen, Admin, Abmelden) entfernt
+    - ProfileMenu Component integriert
+    - Props: userEmail, isAdmin, onLogout
+    - Imports reduziert (kein LanguageSwitcher, ThemeSwitcher, Settings-Button mehr)
+  - UI-Struktur vereinfacht:
+    - Nur noch SidebarTrigger + Titel + ProfileMenu im Header
+    - Kompakteres Layout (mehr Platz für Content)
+    - Konsistentes Dropdown-Pattern (kein Button-Mix mehr)
+- Übersetzungen:
+  - Verwendet existierende Keys aus de.json/en.json
+  - `settings.profile`, `settings.language`, `theme.toggle`, etc.
+  - `settings.title` für Einstellungen-Link
+  - `common.logout` für Abmelden
+- UX Details:
+  - DropdownMenuContent align="end" (rechtsbündig)
+  - DropdownMenuLabel mit User-Email als Identifier
+  - DropdownMenuSeparator zwischen Sections
+  - RadioGroup für Theme/Sprache (Single-Select UX)
+  - Conditional Rendering für Admin-Link
+  - forceMount auf DropdownMenuContent (bessere Animation)
+- Icons:
+  - Palette (Theme)
+  - Globe (Sprache)
+  - Settings (Einstellungen)
+  - Shield (Admin)
+  - LogOut (Abmelden)
+- Integration:
+  - useTheme() Hook für Theme-Management
+  - i18n.changeLanguage() für Sprache
+  - navigate() für Routing
+  - isAdmin-Check aus Index.tsx (user_roles Query)
+- Performance:
+  - Lazy Rendering (Submenu nur bei Öffnen)
+  - Keine zusätzlichen Queries (nutzt existierende User-Daten)
+  - Avatar-Initialen clientseitig berechnet
+- Next Step: T27 – Pfadbearbeitung im Metadaten-Dialog
 
 ### 2025-10-09T22:00:00Z – T15 Completed
 - **[T15]** Suche & Filter (ohne KI) implementiert
