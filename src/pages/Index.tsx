@@ -7,6 +7,7 @@ import { FileUpload } from '@/components/upload/FileUpload';
 import { DocumentList } from '@/components/documents/DocumentList';
 import { FolderTree } from '@/components/folders/FolderTree';
 import { ProfileMenu } from '@/components/ProfileMenu';
+import { LifestyleGradientBar } from '@/components/LifestyleGradientBar';
 import { Upload, FileText } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -41,6 +42,7 @@ const Index = () => {
 
   return (
     <SidebarProvider>
+      <LifestyleGradientBar />
       <div className="min-h-screen w-full flex bg-background">
         {/* Sidebar with Folder Tree */}
         <Sidebar className="border-r">

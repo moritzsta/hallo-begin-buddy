@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTheme } from 'next-themes';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -73,7 +74,9 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { t } = useTranslation();
+  const { theme } = useTheme();
   const queryClient = useQueryClient();
+  const isLifestyle = theme === 'lifestyle';
 
   const [searchQuery, setSearchQuery] = useState('');
   const [sortField, setSortField] = useState<SortField>('created_at');
@@ -387,7 +390,7 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
             <Card className="p-4 bg-primary/5 border-primary/20">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Badge variant="default" className="text-sm">
+                  <Badge variant={isLifestyle ? "lifestyle" : "default"} className="text-sm">
                     {t('documents.newFiles', { count: newFilesCount })}
                   </Badge>
                   <span className="text-sm text-muted-foreground">
@@ -523,7 +526,7 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
                         />
                         <span className="font-medium">{file.title}</span>
                         {isNewFile(file) && (
-                          <Badge variant="default" className="text-xs">
+                          <Badge variant={isLifestyle ? "lifestyle" : "default"} className="text-xs">
                             {t('documents.new')}
                           </Badge>
                         )}
@@ -531,7 +534,7 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
                     )}
                   </TableCell>
                   <TableCell>
-                    <Badge variant="secondary">{file.mime.split('/')[1]?.toUpperCase() || 'FILE'}</Badge>
+                    <Badge variant={isLifestyle ? "lifestyle-secondary" : "secondary"}>{file.mime.split('/')[1]?.toUpperCase() || 'FILE'}</Badge>
                   </TableCell>
                   <TableCell className="text-muted-foreground">
                     {formatFileSize(file.size)}

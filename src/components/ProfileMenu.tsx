@@ -74,8 +74,8 @@ export const ProfileMenu = ({ userEmail, isAdmin, onLogout }: ProfileMenuProps) 
               <DropdownMenuRadioItem value="dark">
                 {t('theme.dark')}
               </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="system">
-                {t('theme.system')}
+              <DropdownMenuRadioItem value="lifestyle">
+                {t('theme.lifestyle')}
               </DropdownMenuRadioItem>
             </DropdownMenuRadioGroup>
           </DropdownMenuSubContent>

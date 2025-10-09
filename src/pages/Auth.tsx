@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
+import { LifestyleGradientBar } from '@/components/LifestyleGradientBar';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -16,7 +18,9 @@ const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp, user } = useAuth();
   const { t } = useTranslation();
+  const { theme } = useTheme();
   const navigate = useNavigate();
+  const isLifestyle = theme === 'lifestyle';
 
   useEffect(() => {
     if (user) {
@@ -39,7 +43,9 @@ const Auth = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
+    <>
+      <LifestyleGradientBar />
+      <div className="flex items-center justify-center min-h-screen bg-background">
       <div className="absolute top-4 right-4 flex gap-2">
         <ThemeSwitcher />
         <LanguageSwitcher />
@@ -81,7 +87,12 @@ const Auth = () => {
                     required
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button 
+                  type="submit" 
+                  className="w-full" 
+                  disabled={isLoading}
+                  variant={isLifestyle ? "lifestyle" : "default"}
+                >
                   {isLoading ? t('auth.signingIn') : t('auth.signin')}
                 </Button>
               </form>
@@ -111,7 +122,12 @@ const Auth = () => {
                     minLength={6}
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button 
+                  type="submit" 
+                  className="w-full" 
+                  disabled={isLoading}
+                  variant={isLifestyle ? "lifestyle" : "default"}
+                >
                   {isLoading ? t('auth.signingUp') : t('auth.createAccount')}
                 </Button>
               </form>
@@ -120,6 +136,7 @@ const Auth = () => {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 };
 
