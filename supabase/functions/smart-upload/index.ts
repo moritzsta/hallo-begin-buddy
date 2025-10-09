@@ -71,6 +71,30 @@ serve(async (req) => {
       ? 'Provide all metadata (title, keywords, folder path) in German.'
       : 'Provide all metadata (title, keywords, folder path) in English.';
 
+    // Get existing folder structure to ensure consistent organization
+    const { data: existingFolders } = await supabase
+      .from('folders')
+      .select('id, name, parent_id, meta')
+      .eq('owner_id', file.owner_id);
+
+    // Build a hierarchical representation of existing folders
+    let folderStructureText = '';
+    if (existingFolders && existingFolders.length > 0) {
+      const buildFolderTree = (parentId: string | null = null, depth: number = 0): string => {
+        const children = existingFolders.filter(f => f.parent_id === parentId);
+        return children.map(folder => {
+          const indent = '  '.repeat(depth);
+          const metaInfo = folder.meta && Object.keys(folder.meta).length > 0 
+            ? ` (${JSON.stringify(folder.meta)})` 
+            : '';
+          return indent + folder.name + metaInfo + '\n' + buildFolderTree(folder.id, depth + 1);
+        }).join('');
+      };
+      
+      folderStructureText = '\n\nEXISTING FOLDER STRUCTURE:\n' + buildFolderTree();
+      folderStructureText += '\nIMPORTANT: Prefer using existing folders when appropriate to maintain consistency. Only suggest new folders if the document type clearly doesn\'t fit existing structure.';
+    }
+
     // Check file type
     const isImage = file.mime.startsWith('image/');
     const isPdf = file.mime === 'application/pdf';
@@ -191,7 +215,7 @@ serve(async (req) => {
         throw new Error('Failed to get signed URL for image');
       }
 
-      analysisPrompt = `Analyze this image/document and extract: document type (e.g., invoice, receipt, letter, contract, photo, diagram), a suggested descriptive title (max 60 chars), 3-5 relevant keywords, and suggest an appropriate folder structure path (e.g., "Invoices/2025/Supplier Name" or "Photos/Vacation/Italy"). The folder path should be logical and help organize this document. ${languageInstruction}`;
+      analysisPrompt = `Analyze this image/document and extract: document type (e.g., invoice, receipt, letter, contract, photo, diagram), a suggested descriptive title (max 60 chars), 3-5 relevant keywords, and suggest an appropriate folder structure path (e.g., "Invoices/2025/Supplier Name" or "Photos/Vacation/Italy"). The folder path should be logical and help organize this document. ${languageInstruction}${folderStructureText}`;
 
       contentPayload = [
         {
@@ -220,7 +244,7 @@ Extract:
 
 The folder path should be based on the content and help create an intelligent filing system.
 
-${languageInstruction}`;
+${languageInstruction}${folderStructureText}`;
 
       contentPayload = analysisPrompt;
     }
