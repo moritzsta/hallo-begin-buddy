@@ -1,16 +1,14 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.74.0';
+import {
+  getUserPlanTier,
+  checkSmartUploadLimit,
+  incrementUsageTracking,
+} from '../_shared/plan-utils.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-
-const PLAN_LIMITS = {
-  free: 10,
-  basic: 50,
-  plus: 200,
-  max: 999999,
 };
 
 serve(async (req) => {
@@ -41,32 +39,18 @@ serve(async (req) => {
       throw new Error('File not found');
     }
 
-    // Get user profile for plan tier
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('plan_tier')
-      .eq('id', file.owner_id)
-      .single();
+    // Get user's plan tier and check smart upload limit
+    const planTier = await getUserPlanTier(supabase, file.owner_id);
+    const limitCheck = await checkSmartUploadLimit(supabase, file.owner_id, planTier);
 
-    const planTier = (profile?.plan_tier || 'free') as keyof typeof PLAN_LIMITS;
-
-    // Check usage limit for this month
-    const today = new Date().toISOString().split('T')[0];
-    const { data: usage } = await supabase
-      .from('usage_tracking')
-      .select('count')
-      .eq('user_id', file.owner_id)
-      .eq('feature', 'smart_upload')
-      .eq('date', today)
-      .single();
-
-    const currentCount = usage?.count || 0;
-    if (currentCount >= PLAN_LIMITS[planTier]) {
+    if (!limitCheck.allowed) {
+      console.log(`Smart upload limit reached for user ${file.owner_id}: ${limitCheck.current}/${limitCheck.limit}`);
       return new Response(
         JSON.stringify({
-          error: 'Smart upload limit reached for your plan',
-          limit: PLAN_LIMITS[planTier],
-          current: currentCount,
+          error: limitCheck.error,
+          plan_tier: limitCheck.planTier,
+          limit: limitCheck.limit,
+          current: limitCheck.current,
         }),
         {
           status: 429,
@@ -228,23 +212,7 @@ serve(async (req) => {
     }
 
     // Track usage
-    await supabase.from('usage_tracking').insert({
-      user_id: file.owner_id,
-      feature: 'smart_upload',
-      date: today,
-      count: 1,
-    }).then(({ error }) => {
-      if (error && error.code === '23505') {
-        // Unique constraint violation - update instead
-        return supabase
-          .from('usage_tracking')
-          .update({ count: currentCount + 1 })
-          .eq('user_id', file.owner_id)
-          .eq('feature', 'smart_upload')
-          .eq('date', today);
-      }
-      return { error };
-    });
+    await incrementUsageTracking(supabase, file.owner_id, 'smart_upload');
 
     console.log(`Smart upload completed for file ${file_id}:`, extracted);
 

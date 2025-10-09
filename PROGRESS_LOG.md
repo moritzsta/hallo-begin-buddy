@@ -31,6 +31,7 @@
 | T18 | Manuelles Tag-System | ✅ Done |
 | T19 | Feature-Gating & Pläne | ✅ Done |
 | T20 | Stripe-Integration (Subscriptions) | ✅ Done |
+| T21 | Server-Side Plan-Gating in Edge Functions | ✅ Done |
 | T05 | Create `user_roles` Table | ✅ Done (already exists) |
 | T06 | RLS Policies – Owner-Only Access | Backlog |
 | T07 | Storage Bucket & RLS | Backlog |
@@ -268,6 +269,52 @@
   - Clientseitige Checks sind nur UX – Server MUSS prüfen
   - Stripe-Integration folgt in nächstem Task (T20)
 - Next Step: T20 – Stripe-Integration (Checkout, Portal, Webhooks)
+
+### 2025-10-10T00:00:00Z – T21 Completed
+- **[T21]** Server-Side Plan-Gating in Edge Functions implementiert
+- Shared Utility erstellt:
+  - `supabase/functions/_shared/plan-utils.ts` – Gemeinsame Plan-Check-Funktionen
+- Features:
+  - **Plan-Limit-Definitionen**:
+    - PLAN_LIMITS Object mit allen Tier-Limits
+    - smartUploadsPerMonth, storageGB, maxFileSizeMB, maxFiles
+  - **Check-Funktionen**:
+    - `checkSmartUploadLimit()` – Prüft Smart-Upload-Limit pro Monat
+    - `checkStorageLimit()` – Prüft Speicher-Limit (GB)
+    - `checkFileSizeLimit()` – Prüft Dateigröße (MB)
+    - `checkMaxFilesLimit()` – Prüft Max. Anzahl Dateien
+  - **Utility-Funktionen**:
+    - `getUserPlanTier()` – Holt Plan-Tier aus Profil
+    - `incrementUsageTracking()` – Inkrementiert Usage-Counter (mit Upsert-Logik)
+  - **PlanCheckResult Interface**:
+    - allowed: boolean
+    - planTier: string
+    - limit: number
+    - current: number
+    - error?: string
+- Edge Function Updates:
+  - `supabase/functions/smart-upload/index.ts`:
+    - Refactored zur Nutzung von plan-utils
+    - Import von getUserPlanTier, checkSmartUploadLimit, incrementUsageTracking
+    - Entfernt PLAN_LIMITS Duplicate (nutzt jetzt _shared)
+    - Vereinfachter Usage-Tracking (1 Zeile statt 15)
+    - Bessere Error-Messages mit Plan-Context
+  - `generate-signed-url` & `generate-preview`:
+    - Keine Plan-Checks nötig (Downloads/Previews nicht limitiert)
+    - RLS-Checks bleiben bestehen (Owner-Only)
+- Security:
+  - Alle Checks auf Server-Side (Edge Functions)
+  - Client-Side Checks sind nur UX (bereits in T19 implementiert)
+  - RLS verhindert Cross-Tenant-Zugriff
+- Performance:
+  - Wiederverwendbare Plan-Check-Funktionen (DRY)
+  - Single Query für Plan-Tier (statt Duplicate)
+  - Optimierte Usage-Tracking (Upsert statt Try/Catch)
+- Hinweis:
+  - Storage-Limit-Check kann prospektiv in Upload-Flow integriert werden
+  - File-Size-Check bereits clientseitig in FileUpload.tsx
+  - Max-Files-Check kann prospektiv vor Upload durchgeführt werden
+- Next Step: T22 – UI-Polishing & Missing Features (optional) oder Deployment
 
 ### 2025-10-09T23:45:00Z – T20 Completed
 - **[T20]** Stripe-Integration (Subscriptions) implementiert
