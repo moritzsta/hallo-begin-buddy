@@ -81,8 +81,24 @@ serve(async (req) => {
 
     if (hasActiveSub) {
       const subscription = subscriptions.data[0];
-      subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
-      logStep("Active subscription found", { subscriptionId: subscription.id, endDate: subscriptionEnd });
+      logStep("Raw subscription data", { 
+        subscriptionId: subscription.id,
+        current_period_end: subscription.current_period_end,
+        status: subscription.status
+      });
+      
+      // Safely convert timestamp
+      try {
+        if (subscription.current_period_end) {
+          subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
+          logStep("Subscription end date parsed", { endDate: subscriptionEnd });
+        }
+      } catch (dateError) {
+        logStep("Error parsing subscription end date", { 
+          error: dateError instanceof Error ? dateError.message : String(dateError),
+          raw_value: subscription.current_period_end
+        });
+      }
       
       productId = subscription.items.data[0].price.product as string;
       logStep("Determined product ID", { productId });
@@ -104,6 +120,8 @@ serve(async (req) => {
       
       if (updateError) {
         logStep("Warning: Could not update profile", { error: updateError.message });
+      } else {
+        logStep("Successfully updated profile with plan tier", { planTier });
       }
     } else {
       logStep("No active subscription found");
