@@ -39,26 +39,14 @@
 | T26 | Profilmenü-Refactoring | ✅ Done |
 | T27 | Pfadbearbeitung im Metadaten-Dialog | ✅ Done |
 | T28 | "Ohne Dokumentenanalyse"-Option | ✅ Done |
-| T05 | Create `user_roles` Table | ✅ Done (already exists) |
-| T06 | RLS Policies – Owner-Only Access | Backlog |
-| T07 | Storage Bucket & RLS | Backlog |
-| T08 | Admin-Gate Verification Function | Backlog |
-| T09 | Free-Tier Upload Limit Function | Backlog |
-| T10 | Smart Upload Edge Function (OCR + AI) | Backlog |
-| T11 | Cost Guard Function | Backlog |
-| T12 | Document Preview Edge Function | Backlog |
-| T13 | Base Layout & Navigation | Backlog |
-| T14 | Design System Tokens (index.css / tailwind.config.ts) | Backlog |
-| T15 | Upload UI Component | Backlog |
-| T16 | Document List Component | Backlog |
-| T17 | Document Detail & Field Editor | Backlog |
-| T18 | Admin Panel (Type & Field Config) | Backlog |
-| T19 | i18n Setup (German/English) | Backlog |
-| T20 | Dark Mode & Theme Switcher | Backlog |
-| T21 | Stripe Subscription Gating (Premium Tier) | Backlog |
-| T22 | Settings Page (Profile, Plan, API Keys) | Backlog |
-| T23 | Integration Tests (Auth, Upload, RLS) | Backlog |
-| T24 | Deployment & Observability | Backlog |
+
+**Noch nicht implementiert (Backlog):**
+| Task ID | Title | Status |
+|---------|-------|--------|
+| T29 | Document Detail & Field Editor | 📋 Backlog |
+| T30 | Admin Panel (Schema-Konfiguration) | 📋 Backlog |
+| T31 | Cost Guard Function (AI-Kostenbremse) | 📋 Backlog |
+| T32 | Deployment & Observability (Monitoring/Logging) | 📋 Backlog |
 
 ---
 
