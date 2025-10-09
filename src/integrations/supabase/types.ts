@@ -14,16 +14,294 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      audit_log: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          entity: string
+          entity_id: string | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          entity: string
+          entity_id?: string | null
+          id?: number
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          entity?: string
+          entity_id?: string | null
+          id?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_log_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      files: {
+        Row: {
+          created_at: string
+          folder_id: string
+          hash_sha256: string
+          id: string
+          meta: Json | null
+          mime: string
+          owner_id: string
+          preview_state: string
+          size: number
+          storage_path: string
+          tags: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          folder_id: string
+          hash_sha256: string
+          id?: string
+          meta?: Json | null
+          mime: string
+          owner_id: string
+          preview_state?: string
+          size: number
+          storage_path: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          folder_id?: string
+          hash_sha256?: string
+          id?: string
+          meta?: Json | null
+          mime?: string
+          owner_id?: string
+          preview_state?: string
+          size?: number
+          storage_path?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "files_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "files_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      folders: {
+        Row: {
+          created_at: string
+          id: string
+          inherited_meta: Json | null
+          meta: Json | null
+          name: string
+          owner_id: string
+          parent_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          inherited_meta?: Json | null
+          meta?: Json | null
+          name: string
+          owner_id: string
+          parent_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          inherited_meta?: Json | null
+          meta?: Json | null
+          name?: string
+          owner_id?: string
+          parent_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "folders_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "folders_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          id: string
+          locale: string
+          plan_tier: string
+          theme: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          locale?: string
+          plan_tier?: string
+          theme?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          locale?: string
+          plan_tier?: string
+          theme?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      schema_config: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          rules: Json
+          updated_at: string
+          user_id: string
+          version: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          rules?: Json
+          updated_at?: string
+          user_id: string
+          version?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          rules?: Json
+          updated_at?: string
+          user_id?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schema_config_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      usage_tracking: {
+        Row: {
+          count: number
+          created_at: string
+          date: string
+          feature: string
+          id: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          count?: number
+          created_at?: string
+          date?: string
+          feature: string
+          id?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          count?: number
+          created_at?: string
+          date?: string
+          feature?: string
+          id?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usage_tracking_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +428,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const

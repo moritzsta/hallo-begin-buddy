@@ -12,7 +12,7 @@
 | Task ID | Title | Status |
 |---------|-------|--------|
 | T01 | Enable Lovable Cloud | ✅ Done |
-| T02 | Create `documents` Table | Backlog |
+| T02 | Database Schema & RLS | ✅ Done |
 | T03 | Create `document_fields` Table | Backlog |
 | T04 | Create `document_types` Table | Backlog |
 | T05 | Create `user_roles` Table | Backlog |
@@ -53,6 +53,18 @@
 ## Change Log
 
 *Neueste Einträge oben. Format: [UTC Timestamp] [Task-ID] Beschreibung – Dateien/Ordner – Diffs (Stichpunkte)*
+
+### 2025-10-09T15:00:00Z – T02 Completed
+- **[T02]** Datenbank-Schema & RLS erstellt
+- Migration `001_initial_schema.sql` deployed:
+  - Tabellen: `profiles`, `user_roles`, `folders`, `files`, `usage_tracking`, `schema_config`, `audit_log`
+  - RLS Owner-Only Policies für alle Tabellen aktiv
+  - Indexes: hash_sha256, tags (GIN), user_id/feature/date
+  - Trigger: `updated_at` auto-update für alle Tabellen
+  - Security Definer Function: `has_role()` für Admin-Checks
+  - Auto-Trigger: Profile & user_role bei Signup
+- Foreign Keys mit CASCADE konfiguriert
+- Next Step: T03 – Storage-Buckets & Signed URLs
 
 ### 2025-10-09T14:30:00Z – T01 Completed
 - **[T01]** Lovable Cloud aktiviert
@@ -153,14 +165,14 @@
 
 ## Next Step
 
-**Task ID:** T02 – Create `documents` Table  
+**Task ID:** T03 – Storage-Buckets & Signed URLs  
 **Akzeptanzkriterien:**
-- Table `documents` mit allen Feldern aus Doku erstellt
-- RLS Owner-Only Policies aktiv
-- Indexes für user_id, folder_id, created_at
-- Trigger für updated_at Timestamp
+- Buckets `documents` und `previews` erstellt (private)
+- RLS-Policies für storage.objects aktiv (Owner-Only)
+- Edge Function `generate-signed-url` implementiert
+- Auth-Check + signierte URLs mit Ablaufzeit funktionieren
 
-**Aktion:** Migration schreiben mit vollständigem Schema inkl. Metadatenfelder, RLS-Policies, Indexes & Trigger.
+**Aktion:** Migration für Storage-Buckets erstellen und Edge Function für signierte URLs implementieren.
 
 ---
 
