@@ -15,8 +15,8 @@
 | T02 | Database Schema & RLS | ✅ Done |
 | T03 | Storage Buckets & Signed URLs | ✅ Done |
 | T04 | Auth & Profil-Management | ✅ Done |
-| T05 | Create `document_fields` Table | Backlog |
-| T06 | Create `document_types` Table | Backlog |
+| T05 | Smart Upload UI | ✅ Done |
+| T06 | Document List Component | Backlog |
 | T05 | Create `user_roles` Table | Backlog |
 | T06 | RLS Policies – Owner-Only Access | Backlog |
 | T07 | Storage Bucket & RLS | Backlog |
@@ -55,6 +55,26 @@
 ## Change Log
 
 *Neueste Einträge oben. Format: [UTC Timestamp] [Task-ID] Beschreibung – Dateien/Ordner – Diffs (Stichpunkte)*
+
+### 2025-10-09T16:30:00Z – T05 Completed
+- **[T05]** Smart Upload UI implementiert
+- Komponenten erstellt:
+  - `src/components/upload/FileUpload.tsx` – Upload-Komponente mit Drag & Drop
+- Features:
+  - Drag & Drop Upload (react-dropzone)
+  - Multi-File Upload mit Progress-Anzeige
+  - Plan-Tier-basierte Validierung (Free: 5MB, Basic: 25MB, Plus: 100MB, Max: 2GB)
+  - SHA256 Hash-Berechnung für Duplikatserkennung
+  - Upload zu `documents` storage bucket
+  - Automatische Erstellung von file-Records in DB
+  - Toast-Feedback bei Erfolg/Fehler
+  - Datei-Liste mit Status (pending/uploading/success/error)
+- `src/pages/Index.tsx` aktualisiert:
+  - Header mit User-Info und Logout
+  - Upload-Komponente integriert
+- Dependencies:
+  - `react-dropzone` hinzugefügt
+- Next Step: T06 – Document List Component
 
 ### 2025-10-09T16:00:00Z – T04 Completed
 - **[T04]** Auth & Profil-Management implementiert
@@ -200,16 +220,17 @@
 
 ## Next Step
 
-**Task ID:** T05 – Smart Upload UI  
+**Task ID:** T06 – Document List Component  
 **Akzeptanzkriterien:**
-- Upload-Komponente mit Drag & Drop
-- Dateivalidierung (MIME-Type, Größe nach Plan-Tier)
-- Multi-File Upload mit Progress
-- Datei-Preview (Thumbnails)
-- Integration mit Smart Upload Edge Function
-- Toast-Feedback bei Erfolg/Fehler
+- Liste aller Dokumente des Users anzeigen
+- Sortierung (Datum, Name, Größe)
+- Filter (nach Tags, MIME-Type)
+- Suche (Titel, Tags)
+- Thumbnail-Preview für Bilder
+- Aktionen: Download, Löschen, Umbenennen
+- Pagination für große Listen
 
-**Aktion:** Upload-Komponente erstellen, Dateivalidierung implementieren, Progress-Anzeige, Smart Upload Integration.
+**Aktion:** Liste-Komponente erstellen, Supabase-Query mit Filter/Sort, Download via Signed URLs, Delete-Funktion.
 
 ---
 

@@ -1,27 +1,32 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import { FileUpload } from '@/components/upload/FileUpload';
 
 const Index = () => {
   const { user, profile, signOut } = useAuth();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center space-y-6 p-8">
-        <h1 className="text-4xl font-bold">
-          Smart Document Storage
-        </h1>
-        <p className="text-muted-foreground">
-          Willkommen, {user?.email}
-        </p>
-        {profile && (
-          <div className="text-sm text-muted-foreground">
-            Plan: {profile.plan_tier} | Theme: {profile.theme} | Sprache: {profile.locale}
+    <div className="min-h-screen bg-background">
+      <header className="border-b">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Smart Document Storage</h1>
+            <p className="text-sm text-muted-foreground">
+              {user?.email} | Plan: {profile?.plan_tier || 'free'}
+            </p>
           </div>
-        )}
-        <Button onClick={signOut} variant="outline">
-          Abmelden
-        </Button>
-      </div>
+          <Button onClick={signOut} variant="outline">
+            Abmelden
+          </Button>
+        </div>
+      </header>
+
+      <main className="container mx-auto px-4 py-8">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-xl font-semibold mb-4">Dokumente hochladen</h2>
+          <FileUpload />
+        </div>
+      </main>
     </div>
   );
 };
