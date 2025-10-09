@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
@@ -39,11 +39,13 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Card } from '@/components/ui/card';
-import { MoreVertical, Download, Trash2, Edit, FileIcon, Loader2, Search, Folder as FolderIcon } from 'lucide-react';
+import { MoreVertical, Download, Trash2, Edit, FileIcon, Loader2, Search, Folder as FolderIcon, SlidersHorizontal } from 'lucide-react';
 import { MoveFileDialog } from './MoveFileDialog';
 import { DocumentPreview } from './DocumentPreview';
+import { FilterPanel, FileFilters } from './FilterPanel';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 interface FileRecord {
   id: string;
@@ -77,10 +79,27 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [moveFileId, setMoveFileId] = useState<string | null>(null);
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [filters, setFilters] = useState<FileFilters>({
+    mimeTypes: [],
+    dateFrom: '',
+    dateTo: '',
+    sizeMin: 0,
+    sizeMax: Infinity,
+    tags: [],
+  });
+
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   // Fetch documents
-  const { data: files, isLoading } = useQuery({
-    queryKey: ['files', user?.id, folderId, sortField, sortOrder, searchQuery],
+  const { data: allFiles, isLoading } = useQuery({
+    queryKey: ['files', user?.id, folderId, sortField, sortOrder, debouncedSearch],
     queryFn: async () => {
       let query = supabase
         .from('files')
@@ -93,8 +112,8 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
       }
 
       // Apply search
-      if (searchQuery) {
-        query = query.or(`title.ilike.%${searchQuery}%,tags.cs.{${searchQuery}}`);
+      if (debouncedSearch) {
+        query = query.or(`title.ilike.%${debouncedSearch}%,tags.cs.{${debouncedSearch}}`);
       }
 
       // Apply sorting
@@ -107,6 +126,71 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
     },
     enabled: !!user,
   });
+
+  // Apply client-side filters
+  const files = useMemo(() => {
+    if (!allFiles) return [];
+
+    return allFiles.filter((file) => {
+      // MIME type filter
+      if (filters.mimeTypes.length > 0) {
+        const matchesMime = filters.mimeTypes.some((mimeType) =>
+          file.mime.startsWith(mimeType.replace('/', '')) || file.mime === mimeType
+        );
+        if (!matchesMime) return false;
+      }
+
+      // Date range filter
+      if (filters.dateFrom) {
+        const fileDate = new Date(file.created_at);
+        const fromDate = new Date(filters.dateFrom);
+        if (fileDate < fromDate) return false;
+      }
+      if (filters.dateTo) {
+        const fileDate = new Date(file.created_at);
+        const toDate = new Date(filters.dateTo);
+        toDate.setHours(23, 59, 59, 999);
+        if (fileDate > toDate) return false;
+      }
+
+      // Size range filter
+      if (file.size < filters.sizeMin || file.size > filters.sizeMax) {
+        return false;
+      }
+
+      // Tags filter
+      if (filters.tags.length > 0) {
+        if (!file.tags || file.tags.length === 0) return false;
+        const hasMatchingTag = filters.tags.some((tag) => file.tags?.includes(tag));
+        if (!hasMatchingTag) return false;
+      }
+
+      return true;
+    });
+  }, [allFiles, filters]);
+
+  // Extract all unique tags from files
+  const availableTags = useMemo(() => {
+    if (!allFiles) return [];
+    const tagSet = new Set<string>();
+    allFiles.forEach((file) => {
+      if (file.tags) {
+        file.tags.forEach((tag) => tagSet.add(tag));
+      }
+    });
+    return Array.from(tagSet).sort();
+  }, [allFiles]);
+
+  const handleClearFilters = () => {
+    setFilters({
+      mimeTypes: [],
+      dateFrom: '',
+      dateTo: '',
+      sizeMin: 0,
+      sizeMax: Infinity,
+      tags: [],
+    });
+  };
 
   // Download file
   const downloadFile = async (file: FileRecord) => {
@@ -261,6 +345,22 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
             >
               {sortOrder === 'asc' ? '↑' : '↓'}
             </Button>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" className="gap-2">
+                  <SlidersHorizontal className="h-4 w-4" />
+                  {t('filters.title')}
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[350px] sm:w-[400px] overflow-y-auto">
+                <FilterPanel
+                  filters={filters}
+                  onFiltersChange={setFilters}
+                  availableTags={availableTags}
+                  onClearFilters={handleClearFilters}
+                />
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </Card>
@@ -270,7 +370,9 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
         <Card className="p-12 text-center">
           <FileIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
           <p className="text-muted-foreground">
-            {searchQuery ? t('documents.noResults') : t('documents.noDocuments')}
+            {searchQuery || filters.mimeTypes.length > 0 || filters.tags.length > 0 || filters.dateFrom || filters.dateTo 
+              ? t('documents.noResults') 
+              : t('documents.noDocuments')}
           </p>
         </Card>
       ) : (

@@ -1,0 +1,212 @@
+import { useTranslation } from 'react-i18next';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@/components/ui/badge';
+import { X, Filter } from 'lucide-react';
+
+export interface FileFilters {
+  mimeTypes: string[];
+  dateFrom: string;
+  dateTo: string;
+  sizeMin: number;
+  sizeMax: number;
+  tags: string[];
+}
+
+interface FilterPanelProps {
+  filters: FileFilters;
+  onFiltersChange: (filters: FileFilters) => void;
+  availableTags: string[];
+  onClearFilters: () => void;
+}
+
+const COMMON_MIME_TYPES = [
+  { value: 'application/pdf', label: 'PDF' },
+  { value: 'image/', label: 'Images' },
+  { value: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', label: 'Word' },
+  { value: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', label: 'Excel' },
+  { value: 'application/vnd.openxmlformats-officedocument.presentationml.presentation', label: 'PowerPoint' },
+  { value: 'text/', label: 'Text Files' },
+];
+
+export const FilterPanel = ({
+  filters,
+  onFiltersChange,
+  availableTags,
+  onClearFilters,
+}: FilterPanelProps) => {
+  const { t } = useTranslation();
+
+  const handleMimeTypeToggle = (mimeType: string) => {
+    const newMimeTypes = filters.mimeTypes.includes(mimeType)
+      ? filters.mimeTypes.filter(m => m !== mimeType)
+      : [...filters.mimeTypes, mimeType];
+    onFiltersChange({ ...filters, mimeTypes: newMimeTypes });
+  };
+
+  const handleTagToggle = (tag: string) => {
+    const newTags = filters.tags.includes(tag)
+      ? filters.tags.filter(t => t !== tag)
+      : [...filters.tags, tag];
+    onFiltersChange({ ...filters, tags: newTags });
+  };
+
+  const hasActiveFilters =
+    filters.mimeTypes.length > 0 ||
+    filters.tags.length > 0 ||
+    filters.dateFrom ||
+    filters.dateTo ||
+    filters.sizeMin > 0 ||
+    filters.sizeMax < Infinity;
+
+  return (
+    <Card className="h-full">
+      <CardHeader className="flex flex-row items-center justify-between pb-3">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Filter className="h-4 w-4" />
+          {t('filters.title')}
+        </CardTitle>
+        {hasActiveFilters && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClearFilters}
+            className="h-7 text-xs"
+          >
+            <X className="h-3 w-3 mr-1" />
+            {t('filters.clear')}
+          </Button>
+        )}
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* File Type Filter */}
+        <div className="space-y-3">
+          <Label className="text-sm font-semibold">{t('filters.fileType')}</Label>
+          <div className="space-y-2">
+            {COMMON_MIME_TYPES.map(({ value, label }) => (
+              <div key={value} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`mime-${value}`}
+                  checked={filters.mimeTypes.includes(value)}
+                  onCheckedChange={() => handleMimeTypeToggle(value)}
+                />
+                <label
+                  htmlFor={`mime-${value}`}
+                  className="text-sm cursor-pointer select-none"
+                >
+                  {label}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Date Range Filter */}
+        <div className="space-y-3">
+          <Label className="text-sm font-semibold">{t('filters.dateRange')}</Label>
+          <div className="space-y-2">
+            <div>
+              <Label htmlFor="date-from" className="text-xs text-muted-foreground">
+                {t('filters.from')}
+              </Label>
+              <Input
+                id="date-from"
+                type="date"
+                value={filters.dateFrom}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, dateFrom: e.target.value })
+                }
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="date-to" className="text-xs text-muted-foreground">
+                {t('filters.to')}
+              </Label>
+              <Input
+                id="date-to"
+                type="date"
+                value={filters.dateTo}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, dateTo: e.target.value })
+                }
+                className="mt-1"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Size Range Filter */}
+        <div className="space-y-3">
+          <Label className="text-sm font-semibold">{t('filters.sizeRange')}</Label>
+          <div className="space-y-2">
+            <div>
+              <Label htmlFor="size-min" className="text-xs text-muted-foreground">
+                {t('filters.minSize')} (KB)
+              </Label>
+              <Input
+                id="size-min"
+                type="number"
+                min="0"
+                value={filters.sizeMin === 0 ? '' : filters.sizeMin / 1024}
+                onChange={(e) =>
+                  onFiltersChange({
+                    ...filters,
+                    sizeMin: e.target.value ? parseFloat(e.target.value) * 1024 : 0,
+                  })
+                }
+                placeholder="0"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="size-max" className="text-xs text-muted-foreground">
+                {t('filters.maxSize')} (MB)
+              </Label>
+              <Input
+                id="size-max"
+                type="number"
+                min="0"
+                value={
+                  filters.sizeMax === Infinity ? '' : filters.sizeMax / (1024 * 1024)
+                }
+                onChange={(e) =>
+                  onFiltersChange({
+                    ...filters,
+                    sizeMax: e.target.value
+                      ? parseFloat(e.target.value) * 1024 * 1024
+                      : Infinity,
+                  })
+                }
+                placeholder={t('filters.unlimited')}
+                className="mt-1"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Tags Filter */}
+        {availableTags.length > 0 && (
+          <div className="space-y-3">
+            <Label className="text-sm font-semibold">{t('filters.tags')}</Label>
+            <div className="flex flex-wrap gap-2">
+              {availableTags.map((tag) => (
+                <Badge
+                  key={tag}
+                  variant={filters.tags.includes(tag) ? 'default' : 'outline'}
+                  className="cursor-pointer hover:bg-primary/90 transition-colors"
+                  onClick={() => handleTagToggle(tag)}
+                >
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};

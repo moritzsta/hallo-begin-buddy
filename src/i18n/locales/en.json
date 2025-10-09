@@ -161,5 +161,18 @@
     "saveSuccess": "Successfully saved",
     "saveSuccessDesc": "Your settings have been updated",
     "saveError": "Error saving"
+  },
+  "filters": {
+    "title": "Filters",
+    "clear": "Clear",
+    "fileType": "File Type",
+    "dateRange": "Date Range",
+    "from": "From",
+    "to": "To",
+    "sizeRange": "Size",
+    "minSize": "Minimum Size",
+    "maxSize": "Maximum Size",
+    "tags": "Tags",
+    "unlimited": "Unlimited"
   }
 }

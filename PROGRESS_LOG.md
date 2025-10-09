@@ -26,6 +26,7 @@
 | T13 | Design System & UI Polish | ✅ Done |
 | T14 | Settings Page (Profile, Plan, Usage) | ✅ Done |
 | T15 | Security Scan & RLS Verification | ✅ Done |
+| T16 | Search & Filter (no AI) | ✅ Done |
 | T05 | Create `user_roles` Table | ✅ Done (already exists) |
 | T06 | RLS Policies – Owner-Only Access | Backlog |
 | T07 | Storage Bucket & RLS | Backlog |
@@ -64,6 +65,48 @@
 ## Change Log
 
 *Neueste Einträge oben. Format: [UTC Timestamp] [Task-ID] Beschreibung – Dateien/Ordner – Diffs (Stichpunkte)*
+
+### 2025-10-09T22:00:00Z – T15 Completed
+- **[T15]** Suche & Filter (ohne KI) implementiert
+- Komponenten erstellt:
+  - `src/components/documents/FilterPanel.tsx` – Umfassendes Filter-Panel
+- Features:
+  - **Erweiterte Suche**:
+    - Titel-Suche (ILIKE, bereits vorhanden)
+    - Tag-Suche (cs-Operator, bereits vorhanden)
+    - Debounce 300ms für performante Suche
+  - **Filter-Panel** (in Sheet/Sidebar):
+    - **Dateityp-Filter**: PDF, Images, Word, Excel, PowerPoint, Text Files
+    - **Datum-Bereich**: Von/Bis mit Date-Picker
+    - **Größen-Bereich**: Min/Max in KB/MB
+    - **Tag-Filter**: Klickbare Badges mit allen verfügbaren Tags
+  - Filter-Logik:
+    - Client-seitige Filterung via useMemo (performant)
+    - MIME-Type-Matching mit Prefix-Support (z.B. "image/" matched alle Bilder)
+    - Datum-Bereich mit Zeitanpassung (Ende des Tages)
+    - Größen-Filter in Bytes (Min: KB, Max: MB Eingabe)
+    - Tag-Filter mit AND-Logik (alle ausgewählten Tags müssen vorhanden sein)
+  - UI/UX:
+    - Filter-Button mit SlidersHorizontal-Icon
+    - Sheet (Drawer) von rechts mit FilterPanel
+    - "Filter löschen"-Button bei aktiven Filtern
+    - Badge-basierte Tag-Auswahl (Primary/Outline Variants)
+    - Active-State-Anzeige für alle Filter
+    - Responsive Layout (350px auf Mobile, 400px auf Desktop)
+  - Performance:
+    - Debounced Search für weniger DB-Queries
+    - Client-seitige Filter-Anwendung (keine zusätzlichen Queries)
+    - useMemo für berechnete Filter-Ergebnisse
+    - Automatisches Tag-Extraction aus allen Dateien
+- Komponenten aktualisiert:
+  - `src/components/documents/DocumentList.tsx` – Filter-Integration, Sheet-UI
+- Übersetzungen:
+  - `src/i18n/locales/de.json` – Filter-Übersetzungen hinzugefügt
+  - `src/i18n/locales/en.json` – Filter-Übersetzungen hinzugefügt
+- RLS:
+  - Filter respektieren Owner-Isolation (nur eigene Dateien durchsuchbar)
+  - Alle Queries laufen durch existierende RLS-Policies
+- Next Step: T16 – Badges & "Neue Dateien"-Indikator
 
 ### 2025-10-09T21:30:00Z – T15 Completed
 - **[T15]** Security Scan & RLS Verification abgeschlossen

@@ -161,5 +161,18 @@
     "saveSuccess": "Erfolgreich gespeichert",
     "saveSuccessDesc": "Ihre Einstellungen wurden aktualisiert",
     "saveError": "Fehler beim Speichern"
+  },
+  "filters": {
+    "title": "Filter",
+    "clear": "Löschen",
+    "fileType": "Dateityp",
+    "dateRange": "Zeitraum",
+    "from": "Von",
+    "to": "Bis",
+    "sizeRange": "Größe",
+    "minSize": "Minimalgröße",
+    "maxSize": "Maximalgröße",
+    "tags": "Tags",
+    "unlimited": "Unbegrenzt"
   }
 }
