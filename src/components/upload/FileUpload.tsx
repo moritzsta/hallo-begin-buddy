@@ -182,8 +182,8 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
           prev.map(f => f.id === id ? { ...f, fileId: fileData.id } : f)
         );
 
-        // Trigger preview generation (fire and forget)
-        if (file.type.startsWith('image/')) {
+        // Trigger preview generation (fire and forget) for images and PDFs
+        if (file.type.startsWith('image/') || file.type === 'application/pdf') {
           supabase.functions.invoke('generate-preview', {
             body: { file_id: fileData.id },
           }).then(({ error: previewError }) => {
@@ -458,9 +458,8 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
                     </div>
                   )}
 
-                  {/* Smart Upload Button for image files */}
+                  {/* Smart Upload Button for all document files */}
                   {uploadFile.status === 'success' && 
-                   uploadFile.file.type.startsWith('image/') && 
                    uploadFile.fileId && (
                     <div className="mt-3 pt-3 border-t">
                       <Button

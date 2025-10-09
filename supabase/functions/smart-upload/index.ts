@@ -59,13 +59,16 @@ serve(async (req) => {
       );
     }
 
-    // Only process images for now (PDF support can be added later)
-    if (!file.mime.startsWith('image/')) {
-      console.log(`Skipping non-image file: ${file.mime}`);
+    // Support images and PDFs
+    const isImage = file.mime.startsWith('image/');
+    const isPdf = file.mime === 'application/pdf';
+    
+    if (!isImage && !isPdf) {
+      console.log(`Skipping unsupported file type: ${file.mime}`);
       return new Response(
         JSON.stringify({
           success: true,
-          message: 'Smart upload only supports images currently',
+          message: 'Smart upload supports images and PDFs',
           extracted: null,
         }),
         {
@@ -83,15 +86,46 @@ serve(async (req) => {
       throw new Error('Failed to get signed URL');
     }
 
-    // Download image as base64
-    const imageResponse = await fetch(signedData.signedUrl);
-    if (!imageResponse.ok) {
-      throw new Error('Failed to download image');
+    // Download file content
+    const fileResponse = await fetch(signedData.signedUrl);
+    if (!fileResponse.ok) {
+      throw new Error('Failed to download file');
     }
     
-    const imageBuffer = await imageResponse.arrayBuffer();
-    const base64Image = btoa(String.fromCharCode(...new Uint8Array(imageBuffer)));
-    const imageDataUrl = `data:${file.mime};base64,${base64Image}`;
+    const fileBuffer = await fileResponse.arrayBuffer();
+    const base64Content = btoa(String.fromCharCode(...new Uint8Array(fileBuffer)));
+    
+    // Build content based on file type
+    let contentPayload;
+    if (isImage) {
+      // For images, use image_url
+      contentPayload = [
+        {
+          type: 'text',
+          text: 'Analyze this document and extract: document type (e.g., invoice, receipt, letter, contract, photo, diagram), a suggested descriptive title (max 60 chars), and 3-5 relevant keywords.',
+        },
+        {
+          type: 'image_url',
+          image_url: {
+            url: `data:${file.mime};base64,${base64Content}`,
+          },
+        },
+      ];
+    } else if (isPdf) {
+      // For PDFs, we send the first page or text extraction request
+      contentPayload = [
+        {
+          type: 'text',
+          text: `Analyze this PDF document (filename: ${file.title}) and extract: document type (e.g., invoice, receipt, letter, contract, report), a suggested descriptive title (max 60 chars), and 3-5 relevant keywords. Use the filename and context to infer document type if needed.`,
+        },
+        {
+          type: 'image_url',
+          image_url: {
+            url: `data:${file.mime};base64,${base64Content}`,
+          },
+        },
+      ];
+    }
 
     // Call Lovable AI Gateway with Vision
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
@@ -110,22 +144,11 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a document analysis assistant. Extract key information from documents to help users organize them.',
+            content: 'You are a document analysis assistant. Extract key information from documents (images and PDFs) to help users organize them.',
           },
           {
             role: 'user',
-            content: [
-              {
-                type: 'text',
-                text: 'Analyze this document image and extract: document type (e.g., invoice, receipt, letter, contract, photo), a suggested descriptive title (max 60 chars), and 3-5 relevant keywords.',
-              },
-              {
-                type: 'image_url',
-                image_url: {
-                  url: imageDataUrl,
-                },
-              },
-            ],
+            content: contentPayload,
           },
         ],
         tools: [
