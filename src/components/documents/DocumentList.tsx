@@ -42,7 +42,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Card } from '@/components/ui/card';
-import { MoreVertical, Download, Trash2, Edit, FileIcon, Loader2, Search, Folder as FolderIcon, SlidersHorizontal, CheckCheck, Tags, LayoutGrid, List } from 'lucide-react';
+import { MoreVertical, Download, Trash2, Edit, FileIcon, Loader2, Search, Folder as FolderIcon, SlidersHorizontal, CheckCheck, Tags, LayoutGrid, List, Eye } from 'lucide-react';
 import { MoveFileDialog } from './MoveFileDialog';
 import { DocumentPreview } from './DocumentPreview';
 import { FilterPanel, FileFilters } from './FilterPanel';
@@ -601,6 +601,10 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => setPreviewFile(file)}>
+                          <Eye className="h-4 w-4 mr-2" />
+                          {t('documents.preview')}
+                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => downloadFile(file)}>
                           <Download className="h-4 w-4 mr-2" />
                           {t('documents.download')}
