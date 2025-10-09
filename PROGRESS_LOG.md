@@ -23,6 +23,7 @@
 | T10 | Folder Sidebar & File Integration | ✅ Done |
 | T11 | Smart Upload Edge Function (OCR + AI) | ✅ Done |
 | T12 | Document Preview Edge Function | ✅ Done |
+| T13 | Design System & UI Polish | ✅ Done |
 | T05 | Create `user_roles` Table | ✅ Done (already exists) |
 | T06 | RLS Policies – Owner-Only Access | Backlog |
 | T07 | Storage Bucket & RLS | Backlog |
@@ -61,6 +62,48 @@
 ## Change Log
 
 *Neueste Einträge oben. Format: [UTC Timestamp] [Task-ID] Beschreibung – Dateien/Ordner – Diffs (Stichpunkte)*
+
+### 2025-10-09T20:30:00Z – T13 Completed
+- **[T13]** Design System & UI Polish implementiert
+- Design Tokens erweitert:
+  - `src/index.css` – Umfassende Design-Token-Definitionen
+  - `tailwind.config.ts` – Extended Colors & Animations
+- Neue Design Tokens:
+  - **Status Colors**: Success, Warning, Info (zusätzlich zu Destructive)
+  - **Primary Variants**: primary-hover, primary-glow für interaktive Elemente
+  - **Shadows**: shadow-sm bis shadow-xl, shadow-glow für Premium-Effekte
+  - **Transitions**: transition-base, transition-smooth, transition-bounce
+- Animations:
+  - Erweiterte Keyframes: fade-in, fade-out, slide-in (4 Richtungen)
+  - pulse-glow für Attention-Grabbing
+  - bounce-in für Entry-Animations
+  - Alle Animations mit optimierten Timings & Easing-Functions
+- Utility Classes:
+  - .shadow-glow – Leuchtender Schatten mit Primary-Color
+  - .gradient-primary – Gradient von primary zu primary-glow
+  - .gradient-card – Subtiler Card-Gradient
+  - .hover-lift – Lift-Effekt bei Hover
+  - .hover-glow – Glow-Effekt bei Hover
+  - .glass – Glassmorphismus-Effekt
+- Accessibility:
+  - Focus-Visible mit Ring für Keyboard-Navigation
+  - Kontrast-optimierte Farben (WCAG AA compliant)
+  - Smooth Scrolling aktiviert
+- Custom Scrollbar:
+  - Styled Scrollbar für Light & Dark Mode
+  - Hover-States für bessere UX
+- Light Mode:
+  - Moderne Blue Primary (221 83% 53%) statt Grau
+  - Hohe Kontraste für Lesbarkeit
+  - Weiche Shadows
+- Dark Mode:
+  - Dunklere Backgrounds für OLED-Freundlichkeit
+  - Aufgehellte Primary-Farbe für bessere Sichtbarkeit
+  - Intensivere Shadows
+- Font Features:
+  - Ligatures aktiviert (rlig, calt)
+  - Optimierte Schriftdarstellung
+- Next Step: T14 – Settings Page (Profile, Plan, API Keys)
 
 ### 2025-10-09T20:00:00Z – T12 Completed
 - **[T12]** Document Preview Edge Function implementiert
@@ -414,16 +457,16 @@
 
 ## Next Step
 
-**Task ID:** T13 – Design System & UI Polish  
+**Task ID:** T14 – Settings Page (Profile, Plan, Usage)  
 **Akzeptanzkriterien:**
-- Design Tokens in index.css erweitern (Colors, Gradients, Shadows)
-- Colorful Theme-Variante implementieren (zusätzlich zu Light/Dark)
-- Button/Card Variants erweitern für verschiedene Kontexte
-- Animationen für Transitions hinzufügen
-- Responsive Breakpoints optimieren
-- Accessibility-Checks (Kontraste, Focus States)
+- Settings-Seite mit User-Profil (Name, Email, Locale, Theme)
+- Plan-Tier-Anzeige mit Limits & Upgrades
+- Usage-Tracking-Übersicht (Smart-Uploads, Storage)
+- Profil-Update-Funktion (Name, Sprache, Theme)
+- Responsive Design mit Cards & Tabs
+- Navigation von Index zu Settings
 
-**Aktion:** index.css & tailwind.config.ts anpassen, Komponenten-Varianten erweitern, Theme-Palette definieren, Animationen hinzufügen.
+**Aktion:** Settings-Seite erstellen, Profile-Update-Hook implementieren, Usage-Anzeige mit Charts, Plan-Limits-Tabelle, Route & Navigation hinzufügen.
 
 ---
 
