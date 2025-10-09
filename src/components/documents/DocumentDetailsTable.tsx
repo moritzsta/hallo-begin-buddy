@@ -82,13 +82,13 @@ export const DocumentDetailsTable = ({
             exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}
             layout
           >
-            <Card className="p-4 transition-all duration-200 hover:shadow-md border border-border/50">
-              <div className="flex items-center gap-4">
+            <Card className="p-3 transition-all duration-200 hover:shadow-md border border-border/50">
+              <div className="flex items-center gap-3">
                 {/* File Name - Flexible width */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className={cn(
-                      "font-medium truncate",
+                      "font-medium truncate text-sm",
                       isNewFile(file) && "font-semibold"
                     )}>
                       {file.title}
@@ -96,7 +96,7 @@ export const DocumentDetailsTable = ({
                     {isNewFile(file) && (
                       <Badge 
                         variant={isLifestyle ? "lifestyle" : "default"} 
-                        className="text-xs shrink-0 px-2 py-0.5 animate-pulse"
+                        className="text-xs shrink-0 px-1.5 py-0"
                       >
                         {t('documents.new')}
                       </Badge>
@@ -115,31 +115,31 @@ export const DocumentDetailsTable = ({
                 </div>
 
                 {/* File Size */}
-                <div className="shrink-0 w-20 text-right">
-                  <span className="text-sm text-muted-foreground font-mono">
+                <div className="shrink-0 w-16 text-right">
+                  <span className="text-xs text-muted-foreground font-mono">
                     {formatFileSize(file.size)}
                   </span>
                 </div>
 
                 {/* Tags */}
-                <div className="shrink-0 w-64">
+                <div className="shrink-0 w-48">
                   {file.tags && file.tags.length > 0 ? (
-                    <div className="flex gap-1.5 overflow-hidden">
+                    <div className="flex gap-1 overflow-hidden">
                       {file.tags.slice(0, 3).map((tag) => (
                         <Badge 
                           key={tag} 
                           variant={isLifestyle ? "lifestyle-secondary" : "secondary"}
-                          className="text-xs truncate max-w-[80px] px-2 py-0.5"
+                          className="text-xs truncate max-w-[70px] px-1.5 py-0"
                         >
                           {tag}
                         </Badge>
                       ))}
-                      {file.tags.length > 3 && (
+                      {file.tags.length > 2 && (
                         <Badge 
                           variant="outline" 
-                          className="text-xs px-2 py-0.5 bg-muted/50"
+                          className="text-xs px-1.5 py-0 bg-muted/50"
                         >
-                          +{file.tags.length - 3}
+                          +{file.tags.length - 2}
                         </Badge>
                       )}
                     </div>
@@ -149,10 +149,10 @@ export const DocumentDetailsTable = ({
                 </div>
 
                 {/* Date */}
-                <div className="shrink-0 w-32 text-right">
-                  <span className="text-sm text-muted-foreground">
+                <div className="shrink-0 w-24 text-right">
+                  <span className="text-xs text-muted-foreground">
                     {new Date(file.created_at).toLocaleDateString(undefined, {
-                      year: 'numeric',
+                      year: '2-digit',
                       month: 'short',
                       day: 'numeric'
                     })}
@@ -166,9 +166,9 @@ export const DocumentDetailsTable = ({
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        className="h-8 w-8 rounded-md hover:bg-accent"
+                        className="h-7 w-7 rounded-md hover:bg-accent"
                       >
-                        <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                        <MoreVertical className="h-3.5 w-3.5 text-muted-foreground" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56 rounded-lg bg-popover border-2 border-border shadow-2xl backdrop-blur-md">
