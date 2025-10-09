@@ -52,6 +52,9 @@
     "metadataUpdateError": "Fehler beim Aktualisieren",
     "aiSuggestedPath": "Dieser Pfad wurde von der KI basierend auf dem Dokumentinhalt vorgeschlagen.",
     "addPathElement": "Neues Pfadelement hinzufügen...",
+    "addPathElementTooltip": "Neues Pfadelement hinzufügen (max. 6 Ebenen)",
+    "removePathElement": "Pfadelement entfernen",
+    "pathElementName": "Ordnername...",
     "userContext": "Optionale Hinweise für KI",
     "userContextPlaceholder": "z.B. Katze, Operation, Pfote",
     "userContextHelp": "Diese Informationen helfen der KI bei der Benennung und Einordnung"

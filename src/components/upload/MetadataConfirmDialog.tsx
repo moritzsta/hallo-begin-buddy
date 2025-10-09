@@ -14,6 +14,8 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, CheckCircle2, FolderPlus, Edit2, Plus, Minus } from 'lucide-react';
 import { TagInput } from '@/components/documents/TagInput';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface MetadataConfirmDialogProps {
   open: boolean;
@@ -62,6 +64,7 @@ export const MetadataConfirmDialog = ({
   const initialPath = (suggestedPath || metadata.suggested_path || '').split('/').filter(Boolean);
   const [pathElements, setPathElements] = useState<string[]>(initialPath);
   const [newPathElement, setNewPathElement] = useState('');
+  const [isAddingPath, setIsAddingPath] = useState(false);
 
   const handleConfirm = async () => {
     setIsConfirming(true);
@@ -88,6 +91,7 @@ export const MetadataConfirmDialog = ({
     if (newPathElement.trim() && pathElements.length < 6) {
       setPathElements(prev => [...prev, newPathElement.trim()]);
       setNewPathElement('');
+      setIsAddingPath(false);
     }
   };
 
@@ -99,7 +103,7 @@ export const MetadataConfirmDialog = ({
   // Render editable path with plus/minus controls
   const renderPathPreview = () => {
     return (
-      <div className="space-y-3">
+      <TooltipProvider>
         <div className="flex flex-wrap items-center gap-2 p-3 bg-muted/50 rounded-md">
           <span className="text-sm text-muted-foreground">/</span>
           {pathElements.map((part, index) => {
@@ -116,14 +120,21 @@ export const MetadataConfirmDialog = ({
                       {t('common.new')}
                     </Badge>
                   )}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-5 w-5 ml-1"
-                    onClick={() => handleRemovePathElement(index)}
-                  >
-                    <Minus className="h-3 w-3" />
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-5 w-5 ml-1 hover:bg-destructive/10 hover:text-destructive"
+                        onClick={() => handleRemovePathElement(index)}
+                      >
+                        <Minus className="h-3 w-3" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{t('upload.removePathElement', { defaultValue: 'Pfadelement entfernen' })}</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
                 {index < pathElements.length - 1 && (
                   <span className="text-sm text-muted-foreground">/</span>
@@ -131,33 +142,57 @@ export const MetadataConfirmDialog = ({
               </div>
             );
           })}
+          
+          {pathElements.length < 6 && (
+            <Popover open={isAddingPath} onOpenChange={setIsAddingPath}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 rounded-md border border-dashed hover:border-solid hover:bg-primary/10"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{t('upload.addPathElementTooltip', { defaultValue: 'Neues Pfadelement hinzufügen (max. 6 Ebenen)' })}</p>
+                </TooltipContent>
+              </Tooltip>
+              <PopoverContent className="w-64" align="start">
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={newPathElement}
+                    onChange={(e) => setNewPathElement(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddPathElement();
+                      }
+                      if (e.key === 'Escape') {
+                        setIsAddingPath(false);
+                        setNewPathElement('');
+                      }
+                    }}
+                    placeholder={t('upload.pathElementName', { defaultValue: 'Ordnername...' })}
+                    className="flex-1"
+                    autoFocus
+                  />
+                  <Button
+                    size="icon"
+                    onClick={handleAddPathElement}
+                    disabled={!newPathElement.trim()}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
         </div>
-        
-        {pathElements.length < 6 && (
-          <div className="flex items-center gap-2">
-            <Input
-              value={newPathElement}
-              onChange={(e) => setNewPathElement(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleAddPathElement();
-                }
-              }}
-              placeholder={t('upload.addPathElement', { defaultValue: 'Neues Pfadelement hinzufügen...' })}
-              className="flex-1"
-            />
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleAddPathElement}
-              disabled={!newPathElement.trim()}
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
-      </div>
+      </TooltipProvider>
     );
   };
 
