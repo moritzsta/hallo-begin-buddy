@@ -109,7 +109,17 @@
     "editTags": "Edit tags",
     "docType": "Document Type",
     "party": "Party/Sender",
-    "amount": "Amount"
+    "amount": "Amount",
+    "preview": "Preview",
+    "viewGrid": "Grid View",
+    "viewDetails": "Details View",
+    "documentList": "Document List",
+    "selectedCount": "{{count}} selected",
+    "typeImage": "Image",
+    "typeDocument": "Document",
+    "typeSpreadsheet": "Spreadsheet",
+    "typePresentation": "Presentation",
+    "typeOther": "Other"
   },
   "plans": {
     "upgrade": "Upgrade",
@@ -165,7 +175,8 @@
     "back": "Back",
     "or": "or",
     "view": "View",
-    "new": "New"
+    "new": "New",
+    "resize": "Resize"
   },
   "theme": {
     "toggle": "Toggle theme",

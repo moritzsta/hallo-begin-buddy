@@ -109,7 +109,17 @@
     "editTags": "Tags bearbeiten",
     "docType": "Dokumenttyp",
     "party": "Partei/Absender",
-    "amount": "Betrag"
+    "amount": "Betrag",
+    "preview": "Vorschau",
+    "viewGrid": "Kachelansicht",
+    "viewDetails": "Detailansicht",
+    "documentList": "Dokumentenliste",
+    "selectedCount": "{{count}} ausgewählt",
+    "typeImage": "Bild",
+    "typeDocument": "Dokument",
+    "typeSpreadsheet": "Tabelle",
+    "typePresentation": "Präsentation",
+    "typeOther": "Andere"
   },
   "plans": {
     "upgrade": "Upgraden",
@@ -165,7 +175,8 @@
     "back": "Zurück",
     "or": "oder",
     "view": "Ansehen",
-    "new": "Neu"
+    "new": "Neu",
+    "resize": "Größe ändern"
   },
   "theme": {
     "toggle": "Theme umschalten",

@@ -42,11 +42,12 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Card } from '@/components/ui/card';
-import { MoreVertical, Download, Trash2, Edit, FileIcon, Loader2, Search, Folder as FolderIcon, SlidersHorizontal, CheckCheck, Tags } from 'lucide-react';
+import { MoreVertical, Download, Trash2, Edit, FileIcon, Loader2, Search, Folder as FolderIcon, SlidersHorizontal, CheckCheck, Tags, LayoutGrid, List } from 'lucide-react';
 import { MoveFileDialog } from './MoveFileDialog';
 import { DocumentPreview } from './DocumentPreview';
 import { FilterPanel, FileFilters } from './FilterPanel';
 import { EditTagsDialog } from './EditTagsDialog';
+import { DocumentDetailsTable } from './DocumentDetailsTable';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -65,6 +66,7 @@ interface FileRecord {
 
 type SortField = 'created_at' | 'title' | 'size';
 type SortOrder = 'asc' | 'desc';
+type ViewMode = 'grid' | 'details';
 
 interface DocumentListProps {
   folderId: string | null;
@@ -88,6 +90,8 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
   const [editTagsFileId, setEditTagsFileId] = useState<string | null>(null);
   const [editTagsCurrentTags, setEditTagsCurrentTags] = useState<string[]>([]);
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [previewFile, setPreviewFile] = useState<FileRecord | null>(null);
   const [filters, setFilters] = useState<FileFilters>({
     mimeTypes: [],
     dateFrom: '',
@@ -426,6 +430,27 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
             />
           </div>
           <div className="flex gap-2">
+            {/* View Mode Toggle */}
+            <div className="flex gap-1 border rounded-lg p-1">
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('grid')}
+                className="gap-2"
+                aria-label={t('documents.viewGrid')}
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'details' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('details')}
+                className="gap-2"
+                aria-label={t('documents.viewDetails')}
+              >
+                <List className="h-4 w-4" />
+              </Button>
+            </div>
             <Select value={sortField} onValueChange={(v) => setSortField(v as SortField)}>
               <SelectTrigger className="w-[150px]">
                 <SelectValue />
@@ -462,7 +487,7 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
         </div>
       </Card>
 
-      {/* Documents Table */}
+      {/* Documents View */}
       {!files || files.length === 0 ? (
         <Card className="p-12 text-center">
           <FileIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
@@ -472,6 +497,18 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
               : t('documents.noDocuments')}
           </p>
         </Card>
+      ) : viewMode === 'details' ? (
+        <DocumentDetailsTable
+          files={files}
+          isNewFile={isNewFile}
+          onDownload={downloadFile}
+          onDelete={setDeleteId}
+          onRename={startEdit}
+          onMove={setMoveFileId}
+          onEditTags={startEditTags}
+          onPreview={setPreviewFile}
+          formatFileSize={formatFileSize}
+        />
       ) : (
         <Card>
           <Table>
@@ -635,6 +672,28 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
         fileId={editTagsFileId}
         currentTags={editTagsCurrentTags}
       />
+
+      {/* Preview Dialog for Details View */}
+      {previewFile && (
+        <AlertDialog open={!!previewFile} onOpenChange={() => setPreviewFile(null)}>
+          <AlertDialogContent className="max-w-4xl">
+            <AlertDialogHeader>
+              <AlertDialogTitle>{previewFile.title}</AlertDialogTitle>
+            </AlertDialogHeader>
+            <div className="py-4">
+              <DocumentPreview 
+                fileId={previewFile.id}
+                fileName={previewFile.title}
+                mimeType={previewFile.mime}
+                size="lg"
+              />
+            </div>
+            <AlertDialogFooter>
+              <AlertDialogCancel>{t('common.close')}</AlertDialogCancel>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </div>
   );
 };
