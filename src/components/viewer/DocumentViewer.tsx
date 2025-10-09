@@ -61,8 +61,8 @@ export const DocumentViewer = ({ fileId, fileName, mimeType, onClose }: Document
       setError(null);
 
       try {
-        // For images, get signed URL directly
-        if (isImage) {
+        // For images and PDFs, get signed URL directly
+        if (isImage || isPdf) {
           const { data, error: urlError } = await supabase.functions.invoke('generate-signed-url', {
             body: {
               fileId: fileId,
@@ -73,15 +73,20 @@ export const DocumentViewer = ({ fileId, fileName, mimeType, onClose }: Document
           if (urlError) throw urlError;
           setSignedUrl(data.signedUrl);
           setTotalPages(1);
-        } else {
-          // For PDF/Office, get preview
+        } else if (isOffice) {
+          // For Office files, get preview
           const { data, error: previewError } = await supabase.functions.invoke('generate-preview', {
             body: { file_id: fileId },
           });
 
           if (previewError) throw previewError;
+          
+          if (!data.success) {
+            throw new Error(data.message || 'Preview generation failed');
+          }
+          
           setPreviewUrl(data.preview_url);
-          setTotalPages(1); // For now, treat as single page
+          setTotalPages(1);
         }
       } catch (err) {
         console.error('Error loading document:', err);
