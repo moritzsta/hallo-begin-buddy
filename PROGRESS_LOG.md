@@ -35,6 +35,7 @@
 | T22 | Smart Upload Confirmation Dialog | ✅ Done |
 | T23 | UI-Polish & Animations (Framer Motion) | ✅ Done |
 | T24 | Admin Dashboard (Usage-Tracking) | ✅ Done |
+| T25 | Tests & Dokumentation (E2E + README) | ✅ Done |
 | T05 | Create `user_roles` Table | ✅ Done (already exists) |
 | T06 | RLS Policies – Owner-Only Access | Backlog |
 | T07 | Storage Bucket & RLS | Backlog |
@@ -343,6 +344,104 @@
   - **Keine Stripe-Revenue-Tracking** (prospektiv via Stripe API)
   - Focus auf Core Usage-Metriken aus existierenden Tables
 - Next Step: T25 – Tests & Dokumentation oder Deployment
+
+### 2025-10-10T04:00:00Z – T25 Completed
+- **[T25]** Tests & Dokumentation (E2E Tests + README) implementiert
+- Dependencies hinzugefügt:
+  - `@playwright/test@latest` – E2E Testing Framework
+  - `vitest` – Unit Testing (bereits vorhanden via Vite)
+- E2E Tests erstellt (Playwright):
+  - **tests/e2e/auth.spec.ts**:
+    - Signup-Flow: Neuer User → Redirect zur App
+    - Login-Flow: Existierender User → Redirect zur App
+    - Logout-Flow: Via Profil-Menü → Redirect zu Auth
+    - Protected Routes: Unauth User → Redirect zu Auth
+  - **tests/e2e/upload.spec.ts**:
+    - File Upload: Upload → Success Toast → Datei in Liste
+    - Duplicate Detection: Zweiter Upload → Duplikat-Warnung
+    - Progress Indicator: Progress-Bar während Upload
+  - **tests/e2e/owner-isolation.spec.ts** (KRITISCH):
+    - User A vs User B Isolation: User A kann User B's Dateien NICHT sehen
+    - Folder Isolation: User A's Ordner NICHT sichtbar für User B
+    - Parallel Browser Contexts für Multi-User-Tests
+  - **tests/e2e/feature-gating.spec.ts**:
+    - Free User Plan Badge: Anzeige in Settings
+    - File Size Limit: Free User (5 MB) → Upgrade-Prompt bei 6 MB
+    - Upgrade Prompts: Sichtbar für Premium-Features
+    - Smart Upload Usage: Counter in Settings
+- Unit Tests erstellt (Vitest):
+  - **tests/unit/plans.test.ts**:
+    - Plan Config: Alle Tiers (Free/Basic/Plus/Max) korrekt
+    - Feature Access: canUseFeature() für alle Features
+    - Upgrade Suggestions: getNextTierForFeature() korrekt
+    - Invalid Tier Handling: Fallback zu Free
+- Test-Config:
+  - **playwright.config.ts**:
+    - Chromium/Firefox/Webkit Support
+    - baseURL: http://localhost:8080
+    - Screenshot/Trace on Failure
+    - HTML-Reporter
+  - **vitest.config.ts**:
+    - jsdom Environment
+    - Coverage mit v8 Provider
+    - Path-Alias (@/) Support
+- Test Fixtures:
+  - **tests/fixtures/test-document.pdf**: Minimales PDF für Upload-Tests
+  - **tests/setup.ts**: Vitest Setup mit @testing-library/jest-dom
+- README.md komplett überarbeitet:
+  - **Sections**:
+    - Features (Core/UI/Security)
+    - Quick Start (Prerequisites, Installation)
+    - Project Structure (Detaillierter Ordnerbaum)
+    - Database Schema (Tabellen + RLS Policies)
+    - Configuration (Env Variables, Secrets)
+    - Testing (E2E + Unit, Commands)
+    - Deployment (Lovable Cloud + Manual)
+    - Stripe Setup (Produkte, Webhooks, Price IDs)
+    - Design System (Themes, Animations)
+    - Security Best Practices (✅ Implemented, 🚨 Important)
+    - Admin Dashboard (Zugriff, Features)
+    - Troubleshooting (Häufige Probleme + Lösungen)
+    - Contributing (Workflow, Code Style)
+    - Documentation (API-Docs, weitere Dokumente)
+    - Roadmap (MVP+1 Features)
+    - Credits & Support
+  - **Highlights**:
+    - Emojis für bessere Lesbarkeit
+    - Code-Snippets mit Syntax-Highlighting
+    - Konkrete Beispiele (RLS Policies, API-Calls)
+    - Troubleshooting-Section mit Lösungen
+    - Security-Checkliste (✅/🚨)
+    - Deployment-Guides (Lovable + Manual)
+    - Testing-Commands (E2E + Unit)
+- Testing-Commands hinzugefügt (package.json):
+  - `npm run test:e2e` – Playwright E2E Tests
+  - `npm run test:e2e:ui` – Playwright UI Mode
+  - `npm run test:unit` – Vitest Unit Tests
+  - `npm run test:unit:coverage` – Coverage-Report
+  - `npm run test:unit:watch` – Watch Mode
+- Akzeptanzkriterien erfüllt:
+  - ✅ E2E-Tests für kritische Flows (Auth, Upload, RLS, Feature-Gating)
+  - ✅ Unit-Tests für Core-Logic (Plans, Feature Access)
+  - ✅ Test-Fixtures für reproduzierbare Tests
+  - ✅ README mit vollständiger Setup-Anleitung
+  - ✅ API-Dokumentation für Edge Functions
+  - ✅ Troubleshooting-Guide
+  - ✅ Security Best Practices dokumentiert
+  - ✅ Deployment-Guides (Lovable + Manual)
+- Performance & Best Practices:
+  - E2E-Tests mit parallelen Browser-Contexts (Owner-Isolation)
+  - Playwright: Screenshot + Trace on Failure
+  - Vitest: Coverage-Reporting mit v8
+  - Test-Fixtures in dediziertem Ordner
+  - Setup-File für Test-Matchers
+- Sicherheitshinweise in README:
+  - RLS Best Practices
+  - Signierte URLs (TTL 5 Min)
+  - Server-Side Plan-Gating
+  - Keine PII in Logs
+  - Audit Logging für kritische Aktionen
+- Next Step: T26 – Deployment & CI/CD (GitHub Actions) oder DONE
 
 ### 2025-10-10T02:00:00Z – T23 Completed
 - **[T23]** UI-Polish & Animations (Framer Motion) implementiert
