@@ -1,22 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SidebarProvider, Sidebar, SidebarContent, SidebarTrigger } from '@/components/ui/sidebar';
 import { FileUpload } from '@/components/upload/FileUpload';
 import { DocumentList } from '@/components/documents/DocumentList';
 import { FolderTree } from '@/components/folders/FolderTree';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { ThemeSwitcher } from '@/components/ThemeSwitcher';
-import { Upload, FileText, LogOut, Settings as SettingsIcon, Shield } from 'lucide-react';
+import { ProfileMenu } from '@/components/ProfileMenu';
+import { Upload, FileText } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const { user, signOut } = useAuth();
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('documents');
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -74,22 +70,11 @@ const Index = () => {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <ThemeSwitcher />
-                <LanguageSwitcher />
-                {isAdmin && (
-                  <Button variant="outline" size="icon" onClick={() => navigate('/admin')} title="Admin Dashboard">
-                    <Shield className="h-4 w-4" />
-                  </Button>
-                )}
-                <Button variant="outline" size="icon" onClick={() => navigate('/settings')}>
-                  <SettingsIcon className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  {t('common.logout')}
-                </Button>
-              </div>
+              <ProfileMenu 
+                userEmail={user?.email}
+                isAdmin={isAdmin}
+                onLogout={handleLogout}
+              />
             </div>
           </header>
 
