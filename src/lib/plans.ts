@@ -20,6 +20,8 @@ export interface PlanConfig {
   priceLabel: string;
   limits: PlanLimits;
   popular?: boolean;
+  stripePriceId?: string;
+  stripeProductId?: string;
 }
 
 export const PLAN_CONFIGS: Record<PlanTier, PlanConfig> = {
@@ -46,6 +48,8 @@ export const PLAN_CONFIGS: Record<PlanTier, PlanConfig> = {
     name: 'Basic',
     priceEUR: 3.99,
     priceLabel: '3,99 €',
+    stripePriceId: 'price_1SGJFsF1OSJWIsTvhzDzmWAm',
+    stripeProductId: 'prod_TCihzhXsEk2D9C',
     limits: {
       smartUploadsPerMonth: 50,
       storageGB: 10,
@@ -65,6 +69,8 @@ export const PLAN_CONFIGS: Record<PlanTier, PlanConfig> = {
     priceEUR: 7.99,
     priceLabel: '7,99 €',
     popular: true,
+    stripePriceId: 'price_1SGJGYF1OSJWIsTvJTLsC52n',
+    stripeProductId: 'prod_TCihy1wKNQBKtK',
     limits: {
       smartUploadsPerMonth: 200,
       storageGB: 50,
@@ -83,6 +89,8 @@ export const PLAN_CONFIGS: Record<PlanTier, PlanConfig> = {
     name: 'Max',
     priceEUR: 12.99,
     priceLabel: '12,99 €',
+    stripePriceId: 'price_1SGJJfF1OSJWIsTve2ey4TpR',
+    stripeProductId: 'prod_TCilpc2DxaIcl0',
     limits: {
       smartUploadsPerMonth: 1000,
       storageGB: 200,

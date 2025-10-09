@@ -98,7 +98,19 @@
     "bulkOperations": "Bulk Operations",
     "apiAccess": "API Access",
     "prioritySupport": "Priority Support",
-    "popular": "Popular"
+    "popular": "Popular",
+    "checkoutStarted": "Checkout started",
+    "checkoutStartedDesc": "You'll be redirected to Stripe.",
+    "checkoutSuccess": "Upgrade successful!",
+    "checkoutSuccessDesc": "Your plan has been updated.",
+    "checkoutCanceled": "Checkout canceled",
+    "checkoutCanceledDesc": "The upgrade was not completed.",
+    "activeSubscription": "Active Subscription",
+    "renewsOn": "Renews on",
+    "manageSubscription": "Manage Subscription",
+    "availablePlans": "Available Plans",
+    "freePlan": "Free Plan",
+    "downgrade": "Downgrade not available"
   },
   "tags": {
     "inputPlaceholder": "Add tag...",

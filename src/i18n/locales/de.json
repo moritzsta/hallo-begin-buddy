@@ -98,7 +98,19 @@
     "bulkOperations": "Stapeloperationen",
     "apiAccess": "API-Zugriff",
     "prioritySupport": "Prioritäts-Support",
-    "popular": "Beliebt"
+    "popular": "Beliebt",
+    "checkoutStarted": "Checkout gestartet",
+    "checkoutStartedDesc": "Sie werden zu Stripe weitergeleitet.",
+    "checkoutSuccess": "Upgrade erfolgreich!",
+    "checkoutSuccessDesc": "Ihr Plan wurde aktualisiert.",
+    "checkoutCanceled": "Checkout abgebrochen",
+    "checkoutCanceledDesc": "Das Upgrade wurde nicht abgeschlossen.",
+    "activeSubscription": "Aktives Abonnement",
+    "renewsOn": "Verlängert am",
+    "manageSubscription": "Abonnement verwalten",
+    "availablePlans": "Verfügbare Pläne",
+    "freePlan": "Kostenloser Plan",
+    "downgrade": "Downgrade nicht verfügbar"
   },
   "tags": {
     "inputPlaceholder": "Tag hinzufügen...",

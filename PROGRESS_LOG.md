@@ -30,6 +30,7 @@
 | T17 | Badges & Neue Dateien-Indikator | ✅ Done |
 | T18 | Manuelles Tag-System | ✅ Done |
 | T19 | Feature-Gating & Pläne | ✅ Done |
+| T20 | Stripe-Integration (Subscriptions) | ✅ Done |
 | T05 | Create `user_roles` Table | ✅ Done (already exists) |
 | T06 | RLS Policies – Owner-Only Access | Backlog |
 | T07 | Storage Bucket & RLS | Backlog |
@@ -267,6 +268,91 @@
   - Clientseitige Checks sind nur UX – Server MUSS prüfen
   - Stripe-Integration folgt in nächstem Task (T20)
 - Next Step: T20 – Stripe-Integration (Checkout, Portal, Webhooks)
+
+### 2025-10-09T23:45:00Z – T20 Completed
+- **[T20]** Stripe-Integration (Subscriptions) implementiert
+- Stripe Setup:
+  - Stripe aktiviert via Tool
+  - 3 Produkte erstellt:
+    - **Basic Plan**: €3,99/Monat (prod_TCihzhXsEk2D9C, price_1SGJFsF1OSJWIsTvhzDzmWAm)
+    - **Plus Plan**: €7,99/Monat (prod_TCihy1wKNQBKtK, price_1SGJGYF1OSJWIsTvJTLsC52n)
+    - **Max Plan**: €12,99/Monat (prod_TCilpc2DxaIcl0, price_1SGJJfF1OSJWIsTve2ey4TpR)
+- Edge Functions erstellt:
+  - `supabase/functions/create-checkout/index.ts`:
+    - Authenticated user check via JWT
+    - Stripe Customer lookup/creation
+    - Checkout Session Creation (mode: subscription)
+    - Redirect URLs: success -> /settings?tab=plan&checkout=success
+    - Comprehensive logging (logStep helper)
+  - `supabase/functions/check-subscription/index.ts`:
+    - Checks Stripe subscription status for user
+    - Maps Stripe Product ID to plan_tier (basic/plus/max)
+    - Auto-updates profiles.plan_tier based on subscription
+    - Returns: subscribed, product_id, plan_tier, subscription_end
+    - Falls back to 'free' wenn keine Subscription
+  - `supabase/functions/customer-portal/index.ts`:
+    - Creates Stripe Customer Portal Session
+    - Authenticated user check
+    - Return URL: /settings?tab=plan
+    - Allows users to manage subscription (cancel, update payment, etc.)
+- Frontend Integration:
+  - `src/hooks/useSubscription.ts`:
+    - Custom Hook für Subscription-Management
+    - checkSubscription() – ruft check-subscription Edge Function
+    - createCheckout(priceId) – startet Checkout-Flow
+    - openCustomerPortal() – öffnet Stripe Portal
+    - Auto-Refresh alle 60 Sekunden
+    - State: subscribed, product_id, plan_tier, subscription_end, loading
+  - `src/components/plans/PlanCard.tsx`:
+    - Plan-Karte mit Features-Liste
+    - Upgrade-Button (disabled wenn current/downgrade)
+    - Popular Badge für Plus Plan
+    - Responsive Design
+    - Check-Icons für Features
+  - `src/pages/Settings.tsx`:
+    - Plan Tab komplett überarbeitet
+    - Zeigt aktuellen Plan mit Badge & Refresh-Button
+    - Active Subscription Status (Renews on Date)
+    - "Manage Subscription"-Button für subscribed Users
+    - 3 Plan-Karten (Basic, Plus, Max) mit Upgrade-Buttons
+    - Checkout Success/Cancel Toast-Handling (URL params)
+    - useSubscription Hook Integration
+- Plan-Konfiguration:
+  - `src/lib/plans.ts` erweitert:
+    - stripePriceId & stripeProductId für Basic/Plus/Max
+    - Mapping zwischen Stripe Product IDs und Plan Tiers
+- UI/UX:
+  - Plan-Karten in 3-Spalten-Grid (responsive)
+  - Current Plan hervorgehoben (border-primary, shadow-lg)
+  - Popular Badge für Plus Plan
+  - Upgrade-Buttons öffnen Checkout in neuem Tab
+  - Manage Subscription öffnet Portal in neuem Tab
+  - Auto-Refresh nach Checkout-Success
+- Übersetzungen:
+  - `src/i18n/locales/de.json`:
+    - plans.checkoutStarted, checkoutStartedDesc
+    - plans.checkoutSuccess, checkoutSuccessDesc, checkoutCanceled, checkoutCanceledDesc
+    - plans.activeSubscription, renewsOn, manageSubscription
+    - plans.availablePlans, freePlan, downgrade
+  - `src/i18n/locales/en.json` – Englische Entsprechungen
+- Security:
+  - Edge Functions mit JWT-Authentication
+  - User kann nur eigene Subscriptions sehen/managen
+  - Stripe Customer Lookup via Email
+  - STRIPE_SECRET_KEY aus Secrets (bereits konfiguriert)
+- Flow:
+  1. User klickt "Upgrade to Plus"
+  2. create-checkout Edge Function erstellt Checkout Session
+  3. User wird zu Stripe Checkout weitergeleitet (neuer Tab)
+  4. Nach Zahlung: Redirect zu /settings?tab=plan&checkout=success
+  5. check-subscription wird getriggert (auto-refresh)
+  6. profiles.plan_tier wird auf 'plus' gesetzt
+  7. UI aktualisiert sich automatisch (useSubscription Hook)
+- Hinweis:
+  - **Keine Webhooks** implementiert (not needed for MVP, check-subscription aktualisiert plan_tier)
+  - Stripe Customer Portal muss in Stripe Dashboard konfiguriert werden
+  - Server-Side Plan-Checks in Edge Functions (smart-upload etc.) kommen später
+- Next Step: T21 – Server-Side Plan-Gating in Edge Functions
 
 ### 2025-10-09T21:30:00Z – T15 Completed
 - **[T15]** Security Scan & RLS Verification abgeschlossen

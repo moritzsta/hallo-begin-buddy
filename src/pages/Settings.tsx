@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
@@ -14,8 +14,11 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
-import { User, CreditCard, BarChart3, ArrowLeft, Save } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { User, CreditCard, BarChart3, ArrowLeft, Save, RefreshCw, Settings2 } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { PLAN_CONFIGS } from '@/lib/plans';
+import { PlanCard } from '@/components/plans/PlanCard';
+import { useSubscription } from '@/hooks/useSubscription';
 
 const PLAN_LIMITS = {
   free: {
@@ -45,11 +48,35 @@ const Settings = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [displayName, setDisplayName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
-  const planTier = (profile?.plan_tier || 'free') as keyof typeof PLAN_LIMITS;
-  const limits = PLAN_LIMITS[planTier];
+  const subscription = useSubscription();
+  
+  // Get initial tab from URL params
+  const initialTab = searchParams.get('tab') || 'profile';
+  const checkoutStatus = searchParams.get('checkout');
+
+  useEffect(() => {
+    if (checkoutStatus === 'success') {
+      toast({
+        title: t('plans.checkoutSuccess'),
+        description: t('plans.checkoutSuccessDesc'),
+      });
+      // Refresh subscription status
+      subscription.checkSubscription();
+    } else if (checkoutStatus === 'cancel') {
+      toast({
+        title: t('plans.checkoutCanceled'),
+        description: t('plans.checkoutCanceledDesc'),
+        variant: 'destructive',
+      });
+    }
+  }, [checkoutStatus]);
+
+  const planTier = subscription.plan_tier;
+  const limits = PLAN_LIMITS[planTier as keyof typeof PLAN_LIMITS];
 
   // Fetch usage data
   const { data: usage } = useQuery({
@@ -136,7 +163,7 @@ const Settings = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="profile" className="w-full">
+        <Tabs defaultValue={initialTab} className="w-full">
           <TabsList className="grid w-full max-w-md grid-cols-3">
             <TabsTrigger value="profile" className="flex items-center gap-2">
               <User className="h-4 w-4" />
@@ -215,65 +242,77 @@ const Settings = () => {
 
           {/* Plan Tab */}
           <TabsContent value="plan" className="mt-6">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>{t('settings.currentPlan')}</CardTitle>
-                    <CardDescription>{t('settings.planDesc')}</CardDescription>
+            <div className="space-y-6">
+              {/* Current Plan Status */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle>{t('settings.currentPlan')}</CardTitle>
+                      <CardDescription>{t('settings.planDesc')}</CardDescription>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant={planTier === 'free' ? 'secondary' : 'default'} className="text-lg px-4 py-1">
+                        {PLAN_CONFIGS[planTier].name}
+                      </Badge>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => subscription.checkSubscription()}
+                        disabled={subscription.loading}
+                      >
+                        <RefreshCw className={`h-4 w-4 ${subscription.loading ? 'animate-spin' : ''}`} />
+                      </Button>
+                    </div>
                   </div>
-                  <Badge variant={planTier === 'free' ? 'secondary' : 'default'} className="text-lg px-4 py-1">
-                    {planTier.toUpperCase()}
-                  </Badge>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {subscription.subscribed && subscription.subscription_end && (
+                    <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+                      <p className="text-sm font-medium mb-1">
+                        {t('plans.activeSubscription')}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {t('plans.renewsOn')}: {new Date(subscription.subscription_end).toLocaleDateString()}
+                      </p>
+                    </div>
+                  )}
+
+                  {subscription.subscribed && (
+                    <Button
+                      variant="outline"
+                      onClick={() => subscription.openCustomerPortal()}
+                      className="w-full gap-2"
+                    >
+                      <Settings2 className="h-4 w-4" />
+                      {t('plans.manageSubscription')}
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Available Plans */}
+              <div>
+                <h2 className="text-2xl font-bold mb-4">{t('plans.availablePlans')}</h2>
+                <div className="grid gap-6 md:grid-cols-3">
+                  {(['basic', 'plus', 'max'] as const).map((tier) => (
+                    <PlanCard
+                      key={tier}
+                      plan={PLAN_CONFIGS[tier]}
+                      currentTier={planTier}
+                      onUpgrade={() => {
+                        const priceId = PLAN_CONFIGS[tier].stripePriceId;
+                        if (priceId) {
+                          subscription.createCheckout(priceId);
+                        }
+                      }}
+                      isSubscribed={subscription.subscribed}
+                      loading={subscription.loading}
+                    />
+                  ))}
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid gap-4">
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <p className="font-medium">{t('settings.smartUploadsLimit')}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {t('settings.perMonth')}
-                      </p>
-                    </div>
-                    <Badge variant="outline">
-                      {limits.smartUploads === 999999 ? t('settings.unlimited') : limits.smartUploads}
-                    </Badge>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <p className="font-medium">{t('settings.storageLimit')}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {t('settings.totalStorage')}
-                      </p>
-                    </div>
-                    <Badge variant="outline">{limits.storage} GB</Badge>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <p className="font-medium">{t('settings.maxFileSize')}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {t('settings.perFile')}
-                      </p>
-                    </div>
-                    <Badge variant="outline">{limits.maxFileSize} MB</Badge>
-                  </div>
-                </div>
-
-                {planTier === 'free' && (
-                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
-                    <p className="text-sm font-medium text-primary mb-2">
-                      {t('settings.upgradeTitle')}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {t('settings.upgradeDesc')}
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </TabsContent>
 
           {/* Usage Tab */}
