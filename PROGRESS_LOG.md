@@ -25,6 +25,7 @@
 | T12 | Document Preview Edge Function | ✅ Done |
 | T13 | Design System & UI Polish | ✅ Done |
 | T14 | Settings Page (Profile, Plan, Usage) | ✅ Done |
+| T15 | Security Scan & RLS Verification | ✅ Done |
 | T05 | Create `user_roles` Table | ✅ Done (already exists) |
 | T06 | RLS Policies – Owner-Only Access | Backlog |
 | T07 | Storage Bucket & RLS | Backlog |
@@ -63,6 +64,39 @@
 ## Change Log
 
 *Neueste Einträge oben. Format: [UTC Timestamp] [Task-ID] Beschreibung – Dateien/Ordner – Diffs (Stichpunkte)*
+
+### 2025-10-09T21:30:00Z – T15 Completed
+- **[T15]** Security Scan & RLS Verification abgeschlossen
+- Security Scans durchgeführt:
+  - **Supabase Linter**: ✅ Keine Issues gefunden
+  - **Security Scanner**: 2 Findings identifiziert und behoben
+- Findings behoben:
+  - **ERROR** – Audit Log Protection:
+    - Problem: `audit_log` hatte keine INSERT/DELETE RLS Policies
+    - Risiko: User könnten Logs manipulieren oder löschen
+    - Lösung: Policy "System only can insert audit logs" (INSERT WITH CHECK false)
+    - Lösung: Policy "Prevent audit log deletion" (DELETE USING false)
+    - Ergebnis: Nur System/Triggers können Audit Logs erstellen, keine User-Löschung möglich
+  - **WARN** – Usage Tracking Protection:
+    - Problem: `usage_tracking` hatte keine DELETE Policy
+    - Risiko: User könnten Usage-Records löschen um Limits zu umgehen
+    - Lösung: Policy "Prevent usage tracking deletion" (DELETE USING false)
+    - Ergebnis: Usage-Daten sind immutable, können nicht gelöscht werden
+- Migration erstellt:
+  - 3 neue RLS Policies für Audit & Usage Compliance
+  - Audit Logs sind jetzt immutable (keine User-Manipulation möglich)
+  - Usage Tracking kann nicht gelöscht werden (Rate-Limit-Schutz)
+- Security Status:
+  - ✅ Alle Tabellen haben korrekte Owner-Only RLS Policies
+  - ✅ Audit Logs sind gegen Tampering geschützt
+  - ✅ Usage Tracking ist gegen Bypass-Versuche geschützt
+  - ✅ Storage Buckets haben RLS für Owner-Only Access
+  - ✅ Edge Functions verifizieren JWT korrekt
+- Compliance:
+  - Audit Logs erfüllen Immutability-Anforderungen (DSGVO/GoBD konform)
+  - Usage Tracking verhindert Rate-Limit-Umgehung
+  - Owner-Isolation durchgängig gewährleistet
+- Next Step: T16 – Admin Panel (Type & Field Config) oder Feature-Erweiterungen
 
 ### 2025-10-09T21:00:00Z – T14 Completed
 - **[T14]** Settings Page (Profile, Plan, Usage) implementiert
