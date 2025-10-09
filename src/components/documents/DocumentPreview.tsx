@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
+import { useTheme } from 'next-themes';
 import { supabase } from '@/integrations/supabase/client';
-import { FileIcon, Loader2, ImageOff } from 'lucide-react';
+import { FileIcon, Loader2, ImageOff, FileText, Film, FileImage } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 
 interface DocumentPreviewProps {
@@ -14,11 +15,43 @@ export function DocumentPreview({ fileId, fileName, mimeType, size = 'md' }: Doc
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
+  const { theme } = useTheme();
+  const isLifestyle = theme === 'lifestyle';
 
   const sizeClasses = {
-    sm: 'w-12 h-12',
-    md: 'w-16 h-16',
-    lg: 'w-32 h-32',
+    sm: isLifestyle ? 'w-14 h-14' : 'w-12 h-12',
+    md: isLifestyle ? 'w-20 h-20' : 'w-16 h-16',
+    lg: isLifestyle ? 'w-40 h-40' : 'w-32 h-32',
+  };
+
+  const iconSizeClasses = {
+    sm: isLifestyle ? 'w-7 h-7' : 'w-6 h-6',
+    md: isLifestyle ? 'w-10 h-10' : 'w-8 h-8',
+    lg: isLifestyle ? 'w-20 h-20' : 'w-16 h-16',
+  };
+
+  const getPastelClass = () => {
+    if (!isLifestyle) return '';
+    
+    if (mimeType.includes('pdf')) return 'bg-pastel-pdf';
+    if (mimeType.startsWith('image/')) return 'bg-pastel-image';
+    if (mimeType.startsWith('video/')) return 'bg-pastel-video';
+    if (mimeType.includes('document') || mimeType.includes('word') || mimeType.includes('text')) {
+      return 'bg-pastel-doc';
+    }
+    return 'bg-pastel-other';
+  };
+
+  const getFileTypeIcon = () => {
+    const iconClass = `${iconSizeClasses[size]} ${isLifestyle ? 'text-primary' : 'text-muted-foreground'}`;
+    
+    if (mimeType.includes('pdf')) return <FileText className={iconClass} />;
+    if (mimeType.startsWith('image/')) return <FileImage className={iconClass} />;
+    if (mimeType.startsWith('video/')) return <Film className={iconClass} />;
+    if (mimeType.includes('document') || mimeType.includes('word') || mimeType.includes('text')) {
+      return <FileText className={iconClass} />;
+    }
+    return <FileIcon className={iconClass} />;
   };
 
   useEffect(() => {
@@ -56,38 +89,42 @@ export function DocumentPreview({ fileId, fileName, mimeType, size = 'md' }: Doc
     loadPreview();
   }, [fileId, mimeType]);
 
-  if (!mimeType.startsWith('image/')) {
+  // For images, show thumbnail if available
+  if (mimeType.startsWith('image/')) {
     return (
-      <div className={`${sizeClasses[size]} flex items-center justify-center bg-muted rounded`}>
-        <FileIcon className="h-1/2 w-1/2 text-muted-foreground" />
-      </div>
+      <Card 
+        className={`
+          ${sizeClasses[size]} 
+          flex items-center justify-center overflow-hidden
+          ${isLifestyle ? 'hover-lift rounded-2xl' : ''}
+          ${getPastelClass()}
+        `}
+      >
+        {isLoading && <Loader2 className="w-4 h-4 animate-spin text-primary" />}
+        {error && <ImageOff className={`${iconSizeClasses[size]} text-muted-foreground`} />}
+        {!isLoading && !error && previewUrl && (
+          <img 
+            src={previewUrl} 
+            alt={fileName} 
+            className="w-full h-full object-cover"
+          />
+        )}
+        {!isLoading && !error && !previewUrl && getFileTypeIcon()}
+      </Card>
     );
   }
 
-  if (isLoading) {
-    return (
-      <div className={`${sizeClasses[size]} flex items-center justify-center bg-muted rounded`}>
-        <Loader2 className="h-1/3 w-1/3 text-muted-foreground animate-spin" />
-      </div>
-    );
-  }
-
-  if (error || !previewUrl) {
-    return (
-      <div className={`${sizeClasses[size]} flex items-center justify-center bg-muted rounded`}>
-        <ImageOff className="h-1/2 w-1/2 text-muted-foreground" />
-      </div>
-    );
-  }
-
+  // For non-images, show file type icon with pastel background in lifestyle mode
   return (
-    <Card className={`${sizeClasses[size]} overflow-hidden p-0 border-2`}>
-      <img
-        src={previewUrl}
-        alt={fileName}
-        className="w-full h-full object-cover"
-        onError={() => setError(true)}
-      />
+    <Card 
+      className={`
+        ${sizeClasses[size]} 
+        flex items-center justify-center
+        ${isLifestyle ? 'hover-lift rounded-2xl' : ''}
+        ${getPastelClass()}
+      `}
+    >
+      {getFileTypeIcon()}
     </Card>
   );
 }

@@ -148,89 +148,105 @@ All colors MUST be HSL.
   }
 
   .lifestyle {
-    /* Base Colors */
-    --background: 0 0% 100%;
-    --foreground: 231 15% 12%;
+    /* Base Colors - warmer, friendlier */
+    --background: 48 100% 99%;
+    --foreground: 231 15% 18%;
 
     --card: 0 0% 100%;
-    --card-foreground: 231 15% 12%;
+    --card-foreground: 231 15% 18%;
 
-    --popover: 0 0% 100% / 0.75;
-    --popover-foreground: 231 15% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 231 15% 18%;
 
-    /* Primary Brand Colors - Vivid Purple */
-    --primary: 268 89% 60%;
+    /* Primary Brand Colors - Vibrant Purple */
+    --primary: 268 89% 58%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 268 89% 50%;
-    --primary-glow: 268 89% 70%;
+    --primary-hover: 268 89% 48%;
+    --primary-glow: 268 89% 75%;
 
-    /* Secondary Colors - Azure */
-    --secondary: 196 88% 48%;
+    /* Secondary Colors - Bright Azure */
+    --secondary: 196 88% 52%;
     --secondary-foreground: 0 0% 100%;
 
-    /* Tertiary Colors - Tangerine */
-    --tertiary: 25 95% 57%;
+    /* Tertiary Colors - Warm Tangerine */
+    --tertiary: 25 95% 60%;
     --tertiary-foreground: 0 0% 100%;
 
-    /* Muted Colors */
-    --muted: 230 20% 96%;
-    --muted-foreground: 230 12% 40%;
+    /* Quaternary - Pink/Magenta */
+    --quaternary: 330 85% 65%;
+    --quaternary-foreground: 0 0% 100%;
 
-    /* Accent Colors */
-    --accent: 268 89% 60%;
-    --accent-foreground: 0 0% 100%;
+    /* Muted Colors - softer, warmer */
+    --muted: 48 60% 96%;
+    --muted-foreground: 231 12% 42%;
 
-    /* Status Colors */
-    --destructive: 350 84% 55%;
+    /* Accent Colors - playful purple */
+    --accent: 280 75% 92%;
+    --accent-foreground: 268 89% 35%;
+
+    /* Status Colors - vibrant */
+    --destructive: 350 84% 58%;
     --destructive-foreground: 0 0% 100%;
     
-    --success: 146 64% 44%;
+    --success: 146 70% 48%;
     --success-foreground: 0 0% 100%;
     
-    --warning: 38 96% 52%;
+    --warning: 38 96% 55%;
     --warning-foreground: 0 0% 100%;
     
-    --info: 196 88% 48%;
+    --info: 196 88% 52%;
     --info-foreground: 0 0% 100%;
 
-    /* Border & Input */
-    --border: 230 18% 88%;
-    --input: 230 18% 88%;
-    --ring: 268 89% 60%;
+    /* Border & Input - softer */
+    --border: 240 15% 90%;
+    --input: 240 15% 90%;
+    --ring: 268 89% 58%;
 
-    /* Border Radius - larger for lifestyle */
-    --radius: 1rem;
+    /* Border Radius - extra large */
+    --radius: 1.25rem;
 
     /* Sidebar */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 231 15% 12%;
-    --sidebar-primary: 268 89% 60%;
+    --sidebar-background: 280 75% 98%;
+    --sidebar-foreground: 231 15% 18%;
+    --sidebar-primary: 268 89% 58%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 230 20% 96%;
-    --sidebar-accent-foreground: 231 15% 12%;
-    --sidebar-border: 230 18% 88%;
-    --sidebar-ring: 268 89% 60%;
+    --sidebar-accent: 280 60% 95%;
+    --sidebar-accent-foreground: 231 15% 18%;
+    --sidebar-border: 240 15% 90%;
+    --sidebar-ring: 268 89% 58%;
 
-    /* Gradients */
-    --gradient-from: 268 89% 60%;
-    --gradient-via: 196 88% 48%;
-    --gradient-to: 25 95% 57%;
+    /* Rich Gradients */
+    --gradient-from: 268 89% 58%;
+    --gradient-via: 196 88% 52%;
+    --gradient-to: 25 95% 60%;
+    
+    --gradient-alt-from: 330 85% 65%;
+    --gradient-alt-via: 268 89% 58%;
+    --gradient-alt-to: 196 88% 52%;
 
-    /* Glow Effect */
-    --glow: 196 88% 48% / 0.35;
+    /* Glow Effects */
+    --glow: 268 89% 58% / 0.4;
+    --glow-secondary: 196 88% 52% / 0.3;
 
-    /* Shadows - softer, more colorful */
-    --shadow-sm: 0 2px 4px 0 hsl(268 89% 60% / 0.08);
-    --shadow: 0 2px 8px 0 hsl(268 89% 60% / 0.1), 0 4px 12px -2px hsl(196 88% 48% / 0.08);
-    --shadow-md: 0 6px 12px -2px hsl(268 89% 60% / 0.12), 0 4px 8px -4px hsl(196 88% 48% / 0.1);
-    --shadow-lg: 0 12px 24px -6px hsl(268 89% 60% / 0.15), 0 8px 16px -8px hsl(196 88% 48% / 0.12);
-    --shadow-xl: 0 24px 48px -12px hsl(268 89% 60% / 0.2), 0 16px 32px -16px hsl(196 88% 48% / 0.15);
-    --shadow-glow: 0 0 20px hsl(var(--glow));
+    /* Pastel Backgrounds for Doc Types */
+    --pastel-pdf: 0 70% 95%;
+    --pastel-image: 280 70% 95%;
+    --pastel-video: 196 70% 95%;
+    --pastel-doc: 146 70% 95%;
+    --pastel-other: 38 70% 95%;
 
-    /* Transitions - slightly bouncier */
-    --transition-base: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-smooth: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    /* Shadows - colorful and soft */
+    --shadow-sm: 0 2px 6px 0 hsl(268 89% 58% / 0.1);
+    --shadow: 0 4px 12px 0 hsl(268 89% 58% / 0.12), 0 2px 6px -2px hsl(196 88% 52% / 0.1);
+    --shadow-md: 0 8px 20px -4px hsl(268 89% 58% / 0.15), 0 4px 10px -4px hsl(196 88% 52% / 0.12);
+    --shadow-lg: 0 16px 32px -8px hsl(268 89% 58% / 0.18), 0 8px 16px -8px hsl(196 88% 52% / 0.15);
+    --shadow-xl: 0 32px 64px -16px hsl(268 89% 58% / 0.22), 0 16px 32px -16px hsl(196 88% 52% / 0.18);
+    --shadow-glow: 0 0 24px hsl(var(--glow)), 0 0 12px hsl(var(--glow-secondary));
+
+    /* Transitions - bouncy and playful */
+    --transition-base: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    --transition-smooth: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 }
 
@@ -331,13 +347,38 @@ All colors MUST be HSL.
     background: linear-gradient(135deg, hsl(var(--gradient-from)) 0%, hsl(var(--gradient-via)) 50%, hsl(var(--gradient-to)) 100%);
   }
 
+  html.lifestyle .gradient-lifestyle-alt {
+    background: linear-gradient(135deg, hsl(var(--gradient-alt-from)) 0%, hsl(var(--gradient-alt-via)) 50%, hsl(var(--gradient-alt-to)) 100%);
+  }
+
   html.lifestyle .gradient-lifestyle-soft {
-    background: linear-gradient(180deg, hsl(var(--gradient-from) / 0.1) 0%, hsl(var(--gradient-via) / 0.05) 100%);
+    background: linear-gradient(180deg, hsl(var(--gradient-from) / 0.08) 0%, hsl(var(--gradient-via) / 0.04) 100%);
   }
 
   html.lifestyle .gradient-header {
-    background: linear-gradient(90deg, hsl(var(--gradient-from)) 0%, hsl(var(--gradient-via)) 50%, hsl(var(--gradient-to)) 100%);
-    height: 0.25rem;
+    background: linear-gradient(90deg, hsl(var(--gradient-from)) 0%, hsl(var(--gradient-via)) 35%, hsl(var(--gradient-to)) 70%, hsl(var(--gradient-alt-from)) 100%);
+    height: 0.3rem;
+  }
+
+  /* Pastel Backgrounds */
+  html.lifestyle .bg-pastel-pdf {
+    background: linear-gradient(135deg, hsl(var(--pastel-pdf)) 0%, hsl(0 70% 98%) 100%);
+  }
+
+  html.lifestyle .bg-pastel-image {
+    background: linear-gradient(135deg, hsl(var(--pastel-image)) 0%, hsl(280 70% 98%) 100%);
+  }
+
+  html.lifestyle .bg-pastel-video {
+    background: linear-gradient(135deg, hsl(var(--pastel-video)) 0%, hsl(196 70% 98%) 100%);
+  }
+
+  html.lifestyle .bg-pastel-doc {
+    background: linear-gradient(135deg, hsl(var(--pastel-doc)) 0%, hsl(146 70% 98%) 100%);
+  }
+
+  html.lifestyle .bg-pastel-other {
+    background: linear-gradient(135deg, hsl(var(--pastel-other)) 0%, hsl(38 70% 98%) 100%);
   }
 
   /* Hover Effects */
@@ -364,7 +405,23 @@ All colors MUST be HSL.
   }
 
   html.lifestyle .hover-scale:hover {
-    @apply scale-[1.02];
+    @apply scale-[1.03] shadow-lg;
+  }
+
+  html.lifestyle .hover-lift {
+    @apply transition-smooth;
+  }
+
+  html.lifestyle .hover-lift:hover {
+    @apply -translate-y-1 shadow-xl;
+  }
+
+  html.lifestyle .hover-glow {
+    @apply transition-smooth;
+  }
+
+  html.lifestyle .hover-glow:hover {
+    box-shadow: 0 0 24px hsl(var(--glow)), 0 0 12px hsl(var(--glow-secondary));
   }
 
   html.lifestyle .hover-bounce {
@@ -372,11 +429,21 @@ All colors MUST be HSL.
   }
 
   html.lifestyle .pulse-glow {
-    animation: pulse-glow 150ms ease-out;
+    animation: pulse-glow-lifestyle 200ms ease-out;
   }
 
-  @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 0 0 hsl(var(--glow)); }
-    50% { box-shadow: 0 0 20px 5px hsl(var(--glow)); }
+  @keyframes pulse-glow-lifestyle {
+    0% { 
+      box-shadow: 0 0 0 0 hsl(var(--glow)); 
+      transform: scale(1);
+    }
+    50% { 
+      box-shadow: 0 0 24px 8px hsl(var(--glow)), 0 0 12px 4px hsl(var(--glow-secondary)); 
+      transform: scale(1.02);
+    }
+    100% { 
+      box-shadow: 0 0 0 0 hsl(var(--glow)); 
+      transform: scale(1);
+    }
   }
 }
