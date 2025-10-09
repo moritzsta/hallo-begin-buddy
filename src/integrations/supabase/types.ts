@@ -115,6 +115,33 @@ export type Database = {
           },
         ]
       }
+      folder_unread_counts: {
+        Row: {
+          count: number
+          created_at: string
+          folder_id: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          count?: number
+          created_at?: string
+          folder_id: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          count?: number
+          created_at?: string
+          folder_id?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       folders: {
         Row: {
           created_at: string
@@ -339,6 +366,14 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_folder_unread_count: {
+        Args: { p_folder_id: string; p_increment?: number; p_user_id: string }
+        Returns: undefined
+      }
+      reset_folder_unread_count: {
+        Args: { p_folder_id: string; p_user_id: string }
+        Returns: number
       }
     }
     Enums: {

@@ -169,6 +169,20 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
 
       if (dbError) throw dbError;
 
+      // Increment unread count for the target folder and all parent folders
+      if (targetFolderId) {
+        const { error: incrementError } = await supabase.rpc('increment_folder_unread_count', {
+          p_user_id: user!.id,
+          p_folder_id: targetFolderId,
+          p_increment: 1,
+        });
+
+        if (incrementError) {
+          console.error('Failed to increment unread count:', incrementError);
+          // Don't fail the upload, just log the error
+        }
+      }
+
       setUploadFiles(prev => 
         prev.map(f => f.id === id ? { ...f, status: 'success' as const, progress: 100 } : f)
       );
@@ -414,6 +428,20 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
         .eq('id', uploadFile.fileId);
 
       if (updateError) throw updateError;
+
+      // Increment unread count for the target folder and all parent folders
+      if (targetFolderId) {
+        const { error: incrementError } = await supabase.rpc('increment_folder_unread_count', {
+          p_user_id: user!.id,
+          p_folder_id: targetFolderId,
+          p_increment: 1,
+        });
+
+        if (incrementError) {
+          console.error('Failed to increment unread count:', incrementError);
+          // Don't fail the upload, just log the error
+        }
+      }
 
       setUploadFiles(prev =>
         prev.map(f => (f.id === uploadFileId ? { ...f, status: 'success' as const, tags } : f))

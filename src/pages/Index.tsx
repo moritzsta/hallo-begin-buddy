@@ -8,12 +8,14 @@ import { DocumentList } from '@/components/documents/DocumentList';
 import { FolderTree } from '@/components/folders/FolderTree';
 import { ProfileMenu } from '@/components/ProfileMenu';
 import { LifestyleGradientBar } from '@/components/LifestyleGradientBar';
+import { useFolderUnreadCounts } from '@/hooks/useFolderUnreadCounts';
 import { Upload, FileText } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const { user, signOut } = useAuth();
   const { t } = useTranslation();
+  const { invalidate: invalidateUnreadCounts } = useFolderUnreadCounts();
   const [activeTab, setActiveTab] = useState('documents');
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -102,7 +104,10 @@ const Index = () => {
                 <div className="max-w-3xl mx-auto">
                   <FileUpload 
                     folderId={selectedFolderId}
-                    onUploadComplete={() => setActiveTab('documents')} 
+                    onUploadComplete={() => {
+                      invalidateUnreadCounts();
+                      setActiveTab('documents');
+                    }} 
                   />
                 </div>
               </TabsContent>

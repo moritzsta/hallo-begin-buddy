@@ -235,7 +235,9 @@
     "deleteSuccessDesc": "The folder has been deleted successfully.",
     "deleteError": "Error deleting folder",
     "maxDepthError": "Maximum folder depth (3 levels) reached",
-    "circularError": "Circular reference not allowed"
+    "circularError": "Circular reference not allowed",
+    "unreadBadgeLabel": "{{count}} new files",
+    "unreadBadgeTooltip": "{{count}} new files since your last visit"
   },
   "settings": {
     "title": "Settings",

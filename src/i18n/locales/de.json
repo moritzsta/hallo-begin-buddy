@@ -235,7 +235,9 @@
     "deleteSuccessDesc": "Der Ordner wurde erfolgreich gelöscht.",
     "deleteError": "Fehler beim Löschen",
     "maxDepthError": "Maximale Ordnertiefe (3 Ebenen) erreicht",
-    "circularError": "Zirkuläre Referenz nicht erlaubt"
+    "circularError": "Zirkuläre Referenz nicht erlaubt",
+    "unreadBadgeLabel": "{{count}} neue Dateien",
+    "unreadBadgeTooltip": "{{count}} neue Dateien seit deinem letzten Besuch"
   },
   "settings": {
     "title": "Einstellungen",

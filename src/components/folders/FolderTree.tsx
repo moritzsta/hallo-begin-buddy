@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronRight, ChevronDown, Folder, FolderOpen, MoreVertical, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useFolders, type Folder as FolderType } from '@/hooks/useFolders';
+import { useFolderUnreadCounts } from '@/hooks/useFolderUnreadCounts';
 import { Button } from '@/components/ui/button';
 import { listItem, getAnimationProps } from '@/lib/animations';
 import {
@@ -14,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { CreateFolderDialog } from './CreateFolderDialog';
 import { RenameFolderDialog } from './RenameFolderDialog';
 import { DeleteFolderDialog } from './DeleteFolderDialog';
+import { FolderBadgeCount } from './FolderBadgeCount';
 
 interface FolderTreeProps {
   selectedFolderId?: string | null;
@@ -23,6 +25,7 @@ interface FolderTreeProps {
 export function FolderTree({ selectedFolderId, onSelectFolder }: FolderTreeProps) {
   const { t } = useTranslation();
   const { folders } = useFolders();
+  const { unreadCounts, resetFolderVisit } = useFolderUnreadCounts();
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [createParentId, setCreateParentId] = useState<string | undefined>(undefined);
@@ -30,6 +33,14 @@ export function FolderTree({ selectedFolderId, onSelectFolder }: FolderTreeProps
   const [renameFolder, setRenameFolder] = useState<FolderType | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteFolder, setDeleteFolder] = useState<FolderType | null>(null);
+
+  const handleSelectFolder = async (folderId: string | null) => {
+    // Reset unread count when folder is visited
+    if (folderId) {
+      await resetFolderVisit(folderId);
+    }
+    onSelectFolder(folderId);
+  };
 
   const toggleExpanded = (folderId: string) => {
     setExpandedFolders(prev => {
@@ -71,6 +82,7 @@ export function FolderTree({ selectedFolderId, onSelectFolder }: FolderTreeProps
     const isSelected = selectedFolderId === folder.id;
     const children = getChildFolders(folder.id);
     const hasChildren = children.length > 0;
+    const unreadCount = unreadCounts.get(folder.id) || 0;
 
     return (
       <motion.div key={folder.id} className="select-none" {...getAnimationProps(listItem)}>
@@ -101,7 +113,7 @@ export function FolderTree({ selectedFolderId, onSelectFolder }: FolderTreeProps
           
           <div
             className="flex-1 flex items-center gap-2 cursor-pointer"
-            onClick={() => onSelectFolder(folder.id)}
+            onClick={() => handleSelectFolder(folder.id)}
           >
             {isExpanded && hasChildren ? (
               <FolderOpen className="h-4 w-4 text-muted-foreground" />
@@ -110,6 +122,10 @@ export function FolderTree({ selectedFolderId, onSelectFolder }: FolderTreeProps
             )}
             <span className="text-sm truncate">{folder.name}</span>
           </div>
+
+          {unreadCount > 0 && (
+            <FolderBadgeCount count={unreadCount} folderId={folder.id} />
+          )}
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -169,7 +185,7 @@ export function FolderTree({ selectedFolderId, onSelectFolder }: FolderTreeProps
         className={`py-1 px-2 rounded-md cursor-pointer hover:bg-accent ${
           selectedFolderId === null ? 'bg-accent' : ''
         }`}
-        onClick={() => onSelectFolder(null)}
+        onClick={() => handleSelectFolder(null)}
       >
         <div className="flex items-center gap-2">
           <Folder className="h-4 w-4 text-muted-foreground" />
