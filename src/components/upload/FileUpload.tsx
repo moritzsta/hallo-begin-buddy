@@ -278,30 +278,14 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
     setSmartUploadLoading(uploadFileId);
 
     try {
-      // If user wants to skip AI analysis, use minimal metadata
-      if (uploadFile.skipAiAnalysis) {
-        const minimalMetadata = {
-          title: uploadFile.file.name.replace(/\.[^/.]+$/, ''), // Remove extension
-          keywords: uploadFile.userContext ? uploadFile.userContext.split(',').map(k => k.trim()) : [],
-        };
-        
-        setUploadFiles(prev =>
-          prev.map(f =>
-            f.id === uploadFileId
-              ? { ...f, status: 'awaiting-confirmation' as const, smartMetadata: minimalMetadata }
-              : f
-          )
-        );
-        setConfirmDialogState({ open: true, uploadFileId });
-        setSmartUploadLoading(null);
-        return;
-      }
-
-      // Call smart-upload edge function for AI analysis
+      // Call smart-upload edge function
+      // skipDocumentAnalysis means: don't analyze the document content, 
+      // but still use AI to generate optimal folder structure from metadata and title
       const { data, error } = await supabase.functions.invoke('smart-upload', {
         body: { 
           file_id: uploadFile.fileId,
-          user_context: uploadFile.userContext || undefined
+          user_context: uploadFile.userContext || undefined,
+          skip_document_analysis: uploadFile.skipAiAnalysis || false
         },
       });
 

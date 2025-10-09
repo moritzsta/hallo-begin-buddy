@@ -58,7 +58,7 @@
     "userContext": "Optionale Hinweise für KI",
     "userContextPlaceholder": "z.B. Katze, Operation, Pfote",
     "userContextHelp": "Diese Informationen helfen der KI bei der Benennung und Einordnung",
-    "skipAiAnalysis": "Ohne KI-Analyse (nur Metadaten und Titel verwenden)",
+    "skipAiAnalysis": "Ohne Dokumentenanalyse (nutzt nur Metadaten und Titel)",
     "smartUploadProcessing": "Analysiere Dokument..."
   },
   "documents": {

@@ -17,7 +17,7 @@ serve(async (req) => {
   }
 
   try {
-    const { file_id, user_context } = await req.json();
+    const { file_id, user_context, skip_document_analysis } = await req.json();
 
     if (!file_id) {
       throw new Error('file_id is required');
@@ -131,6 +131,104 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY not configured');
+    }
+
+    // If skip_document_analysis is true, skip text extraction and OCR
+    // and only use filename + user_context for AI analysis
+    if (skip_document_analysis) {
+      console.log('Skipping document analysis, using only metadata and title for AI');
+      
+      const metadataPrompt = `Based on the document filename and user-provided metadata, suggest an optimal folder structure and organization:
+
+Document filename: ${file.title}
+${userContextInstruction}
+
+Extract:
+1. document_type: Type of document based on filename (e.g., photo, document, report, etc.)
+2. suggested_title: A descriptive title (max 60 chars) based on the filename and metadata
+3. keywords: 3-5 relevant keywords from the filename and user context
+4. suggested_path: A logical folder structure path with flexible depth (1-6 levels, ideally 3-4). CRITICAL: AVOID duplicate or similar folder names (e.g., "Katze" and "Katzen" are duplicates). REUSE existing folders when they match the document content.
+
+${languageInstruction}${folderStructureText}`;
+
+      const metadataResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [
+            {
+              role: 'user',
+              content: metadataPrompt,
+            },
+          ],
+          tools: [
+            {
+              type: 'function',
+              function: {
+                name: 'extract_document_metadata',
+                description: 'Extract metadata from document for organization',
+                parameters: {
+                  type: 'object',
+                  properties: {
+                    document_type: {
+                      type: 'string',
+                      description: 'Type of document (photo, invoice, receipt, letter, contract, report, etc.)',
+                    },
+                    suggested_title: {
+                      type: 'string',
+                      description: 'A descriptive title (max 60 chars) based on filename and metadata',
+                    },
+                    keywords: {
+                      type: 'array',
+                      items: { type: 'string' },
+                      description: '3-5 relevant keywords',
+                    },
+                    suggested_path: {
+                      type: 'string',
+                      description: 'Suggested folder path with 1-6 levels (ideally 3-4). AVOID duplicates like "Katze" and "Katzen". REUSE existing folders when appropriate.',
+                    },
+                  },
+                  required: ['document_type', 'suggested_title', 'keywords', 'suggested_path'],
+                },
+              },
+            },
+          ],
+          tool_choice: { type: 'function', function: { name: 'extract_document_metadata' } },
+        }),
+      });
+
+      if (!metadataResponse.ok) {
+        const errorText = await metadataResponse.text();
+        console.error('Metadata AI error:', metadataResponse.status, errorText);
+        throw new Error(`AI request failed: ${errorText}`);
+      }
+
+      const metadataData = await metadataResponse.json();
+      const toolCall = metadataData.choices?.[0]?.message?.tool_calls?.[0];
+      
+      if (!toolCall?.function?.arguments) {
+        throw new Error('No metadata extracted from AI response');
+      }
+
+      const extracted = JSON.parse(toolCall.function.arguments);
+      console.log(`Smart upload completed (metadata-only) for ${file.mime} file ${file_id}:`, extracted);
+
+      // Increment usage tracking
+      await incrementUsageTracking(supabase, file.owner_id, 'smart_upload');
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          extracted,
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     // For PDFs and Office documents, extract text content first

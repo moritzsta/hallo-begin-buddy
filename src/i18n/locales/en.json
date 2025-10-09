@@ -58,7 +58,7 @@
     "userContext": "Optional hints for AI",
     "userContextPlaceholder": "e.g. Cat, Surgery, Paw",
     "userContextHelp": "This information helps the AI with naming and organization",
-    "skipAiAnalysis": "Without AI analysis (use only metadata and title)",
+    "skipAiAnalysis": "Without document analysis (uses only metadata and title)",
     "smartUploadProcessing": "Analyzing document..."
   },
   "documents": {
