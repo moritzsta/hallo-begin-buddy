@@ -23,6 +23,7 @@ interface UploadFile {
   tags?: string[];
   fileId?: string; // Database file ID for smart upload
   smartMetadata?: any; // AI-extracted metadata
+  userContext?: string; // Optional user-provided context for AI
 }
 
 const PLAN_LIMITS = {
@@ -251,6 +252,12 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
     );
   };
 
+  const updateFileContext = (id: string, userContext: string) => {
+    setUploadFiles(prev =>
+      prev.map(f => f.id === id ? { ...f, userContext } : f)
+    );
+  };
+
   const clearCompleted = () => {
     setUploadFiles(prev => prev.filter(f => f.status === 'uploading'));
     if (onUploadComplete) onUploadComplete();
@@ -265,7 +272,10 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
     try {
       // Call smart-upload edge function
       const { data, error } = await supabase.functions.invoke('smart-upload', {
-        body: { file_id: uploadFile.fileId },
+        body: { 
+          file_id: uploadFile.fileId,
+          user_context: uploadFile.userContext || undefined
+        },
       });
 
       if (error) throw error;
@@ -529,10 +539,32 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
                     </div>
                   )}
 
-                  {/* Smart Upload Button for all document files */}
+                  {/* Smart Upload Section for successfully uploaded files */}
                   {uploadFile.status === 'success' && 
                    uploadFile.fileId && (
-                    <div className="mt-3 pt-3 border-t">
+                    <div className="mt-3 pt-3 border-t space-y-3">
+                      {/* User Context Input */}
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                          {t('upload.userContext', { defaultValue: 'Optionale Hinweise für KI' })}
+                        </label>
+                        <input
+                          type="text"
+                          placeholder={t('upload.userContextPlaceholder', { 
+                            defaultValue: 'z.B. Katze, Operation, Pfote' 
+                          })}
+                          value={uploadFile.userContext || ''}
+                          onChange={(e) => updateFileContext(uploadFile.id, e.target.value)}
+                          className="w-full px-3 py-2 text-sm border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {t('upload.userContextHelp', { 
+                            defaultValue: 'Diese Informationen helfen der KI bei der Benennung und Einordnung' 
+                          })}
+                        </p>
+                      </div>
+
+                      {/* Smart Upload Button */}
                       <Button
                         variant="outline"
                         size="sm"

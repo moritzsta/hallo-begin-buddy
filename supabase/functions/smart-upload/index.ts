@@ -17,7 +17,7 @@ serve(async (req) => {
   }
 
   try {
-    const { file_id } = await req.json();
+    const { file_id, user_context } = await req.json();
 
     if (!file_id) {
       throw new Error('file_id is required');
@@ -70,6 +70,11 @@ serve(async (req) => {
     const languageInstruction = userLocale === 'de' 
       ? 'Provide all metadata (title, keywords, folder path) in German.'
       : 'Provide all metadata (title, keywords, folder path) in English.';
+
+    // Add user context instruction if provided
+    const userContextInstruction = user_context 
+      ? `\n\nUSER PROVIDED CONTEXT: The user has indicated this document is related to: "${user_context}". Use this information as PRIMARY guidance for naming and organizing the document.`
+      : '';
 
     // Get existing folder structure to ensure consistent organization
     const { data: existingFolders } = await supabase
@@ -215,7 +220,7 @@ serve(async (req) => {
         throw new Error('Failed to get signed URL for image');
       }
 
-      analysisPrompt = `Analyze this image/document and extract: document type (e.g., invoice, receipt, letter, contract, photo, diagram), a suggested descriptive title (max 60 chars), 3-5 relevant keywords, and suggest an appropriate folder structure path (e.g., "Invoices/2025/Supplier Name" or "Photos/Vacation/Italy"). The folder path should be logical and help organize this document. ${languageInstruction}${folderStructureText}`;
+      analysisPrompt = `Analyze this image/document and extract: document type (e.g., invoice, receipt, letter, contract, photo, diagram), a suggested descriptive title (max 60 chars), 3-5 relevant keywords, and suggest an appropriate folder structure path (e.g., "Invoices/2025/Supplier Name" or "Photos/Vacation/Italy"). The folder path should be logical and help organize this document. ${languageInstruction}${userContextInstruction}${folderStructureText}`;
 
       contentPayload = [
         {
@@ -244,7 +249,7 @@ Extract:
 
 The folder path should be based on the content and help create an intelligent filing system.
 
-${languageInstruction}${folderStructureText}`;
+${languageInstruction}${userContextInstruction}${folderStructureText}`;
 
       contentPayload = analysisPrompt;
     }

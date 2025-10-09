@@ -50,7 +50,10 @@
     "metadataConfirmed": "Metadata confirmed",
     "metadataConfirmedDesc": "File was saved with updated metadata.",
     "metadataUpdateError": "Update error",
-    "aiSuggestedPath": "This path was suggested by AI based on the document content."
+    "aiSuggestedPath": "This path was suggested by AI based on the document content.",
+    "userContext": "Optional hints for AI",
+    "userContextPlaceholder": "e.g. Cat, Surgery, Paw",
+    "userContextHelp": "This information helps the AI with naming and organization"
   },
   "documents": {
     "title": "My Documents",

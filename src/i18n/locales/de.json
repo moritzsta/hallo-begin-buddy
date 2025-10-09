@@ -50,7 +50,10 @@
     "metadataConfirmed": "Metadaten bestätigt",
     "metadataConfirmedDesc": "Datei wurde mit aktualisierten Metadaten abgelegt.",
     "metadataUpdateError": "Fehler beim Aktualisieren",
-    "aiSuggestedPath": "Dieser Pfad wurde von der KI basierend auf dem Dokumentinhalt vorgeschlagen."
+    "aiSuggestedPath": "Dieser Pfad wurde von der KI basierend auf dem Dokumentinhalt vorgeschlagen.",
+    "userContext": "Optionale Hinweise für KI",
+    "userContextPlaceholder": "z.B. Katze, Operation, Pfote",
+    "userContextHelp": "Diese Informationen helfen der KI bei der Benennung und Einordnung"
   },
   "documents": {
     "title": "Meine Dokumente",
