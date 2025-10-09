@@ -269,23 +269,31 @@ export const DocumentViewer = ({ fileId, fileName, mimeType, onClose }: Document
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseUp}
               >
-                <motion.div
-                  animate={{
-                    scale: zoom,
-                    x: panPosition.x,
-                    y: panPosition.y,
-                  }}
-                  transition={{ type: 'tween', duration: 0.2 }}
-                  className="max-w-full max-h-full"
-                >
-                  <img
-                    ref={imageRef}
-                    src={displayUrl}
-                    alt={fileName}
-                    className="max-w-full max-h-full object-contain shadow-2xl"
-                    draggable={false}
+                {isPdf ? (
+                  <iframe
+                    src={`${displayUrl}#view=FitH`}
+                    title={fileName}
+                    className="w-full h-full"
                   />
-                </motion.div>
+                ) : (
+                  <motion.div
+                    animate={{
+                      scale: zoom,
+                      x: panPosition.x,
+                      y: panPosition.y,
+                    }}
+                    transition={{ type: 'tween', duration: 0.2 }}
+                    className="max-w-full max-h-full"
+                  >
+                    <img
+                      ref={imageRef}
+                      src={displayUrl}
+                      alt={fileName}
+                      className="max-w-full max-h-full object-contain shadow-2xl"
+                      draggable={false}
+                    />
+                  </motion.div>
+                )}
               </div>
             )}
 
