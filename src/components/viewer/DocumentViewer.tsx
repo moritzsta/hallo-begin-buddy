@@ -190,21 +190,21 @@ export const DocumentViewer = ({ fileId, fileName, mimeType, onClose }: Document
 
   return (
     <Dialog open={!!fileId} onOpenChange={onClose}>
-      <DialogContent className="max-w-[95vw] max-h-[95vh] h-[95vh] p-0 gap-0">
+      <DialogContent className="max-w-[95vw] max-h-[95vh] h-[95vh] p-0 gap-0 flex flex-col">
         {/* Header Toolbar */}
-        <DialogHeader className="px-3 py-1 border-b flex flex-row items-center justify-between space-y-0">
+        <div className="px-2 py-1.5 border-b flex flex-row items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="icon"
               onClick={onClose}
-              className="shrink-0 h-7 w-7"
+              className="h-6 w-6"
             >
-              <X className="h-4 w-4" />
+              <X className="h-3.5 w-3.5" />
             </Button>
-            <DialogTitle className="text-sm font-medium truncate">
+            <span className="text-xs font-medium truncate">
               {fileName}
-            </DialogTitle>
+            </span>
           </div>
 
           <div className="flex items-center gap-1">
@@ -219,13 +219,13 @@ export const DocumentViewer = ({ fileId, fileName, mimeType, onClose }: Document
               variant="outline"
               size="sm"
               onClick={handleDownload}
-              className="gap-1 h-7 text-xs px-2"
+              className="gap-1 h-6 text-xs px-2"
             >
               <Download className="h-3 w-3" />
               {t('documents.download')}
             </Button>
           </div>
-        </DialogHeader>
+        </div>
 
         {/* Main Content */}
         <div className="flex flex-1 overflow-hidden">
