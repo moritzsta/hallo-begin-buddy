@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -24,6 +25,7 @@ interface UploadFile {
   fileId?: string; // Database file ID for smart upload
   smartMetadata?: any; // AI-extracted metadata
   userContext?: string; // Optional user-provided context for AI
+  skipAiAnalysis?: boolean; // Skip AI analysis, use only metadata and title
 }
 
 const PLAN_LIMITS = {
@@ -258,6 +260,12 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
     );
   };
 
+  const updateSkipAiAnalysis = (id: string, skipAiAnalysis: boolean) => {
+    setUploadFiles(prev =>
+      prev.map(f => f.id === id ? { ...f, skipAiAnalysis } : f)
+    );
+  };
+
   const clearCompleted = () => {
     setUploadFiles(prev => prev.filter(f => f.status === 'uploading'));
     if (onUploadComplete) onUploadComplete();
@@ -270,7 +278,26 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
     setSmartUploadLoading(uploadFileId);
 
     try {
-      // Call smart-upload edge function
+      // If user wants to skip AI analysis, use minimal metadata
+      if (uploadFile.skipAiAnalysis) {
+        const minimalMetadata = {
+          title: uploadFile.file.name.replace(/\.[^/.]+$/, ''), // Remove extension
+          keywords: uploadFile.userContext ? uploadFile.userContext.split(',').map(k => k.trim()) : [],
+        };
+        
+        setUploadFiles(prev =>
+          prev.map(f =>
+            f.id === uploadFileId
+              ? { ...f, status: 'awaiting-confirmation' as const, smartMetadata: minimalMetadata }
+              : f
+          )
+        );
+        setConfirmDialogState({ open: true, uploadFileId });
+        setSmartUploadLoading(null);
+        return;
+      }
+
+      // Call smart-upload edge function for AI analysis
       const { data, error } = await supabase.functions.invoke('smart-upload', {
         body: { 
           file_id: uploadFile.fileId,
@@ -562,6 +589,23 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
                             defaultValue: 'Diese Informationen helfen der KI bei der Benennung und Einordnung' 
                           })}
                         </p>
+                      </div>
+
+                      {/* Skip AI Analysis Checkbox */}
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`skip-ai-${uploadFile.id}`}
+                          checked={uploadFile.skipAiAnalysis || false}
+                          onCheckedChange={(checked) => updateSkipAiAnalysis(uploadFile.id, checked as boolean)}
+                        />
+                        <label 
+                          htmlFor={`skip-ai-${uploadFile.id}`}
+                          className="text-xs text-muted-foreground cursor-pointer leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {t('upload.skipAiAnalysis', { 
+                            defaultValue: 'Ohne KI-Analyse (nur Metadaten und Titel verwenden)' 
+                          })}
+                        </label>
                       </div>
 
                       {/* Smart Upload Button */}

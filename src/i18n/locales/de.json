@@ -57,7 +57,9 @@
     "pathElementName": "Ordnername...",
     "userContext": "Optionale Hinweise für KI",
     "userContextPlaceholder": "z.B. Katze, Operation, Pfote",
-    "userContextHelp": "Diese Informationen helfen der KI bei der Benennung und Einordnung"
+    "userContextHelp": "Diese Informationen helfen der KI bei der Benennung und Einordnung",
+    "skipAiAnalysis": "Ohne KI-Analyse (nur Metadaten und Titel verwenden)",
+    "smartUploadProcessing": "Analysiere Dokument..."
   },
   "documents": {
     "title": "Meine Dokumente",
