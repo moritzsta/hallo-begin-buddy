@@ -570,6 +570,7 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
                           fileName={file.title}
                           mimeType={file.mime}
                           size="sm"
+                          clickable={true}
                         />
                         <span className="font-medium">{file.title}</span>
                         {isNewFile(file) && (

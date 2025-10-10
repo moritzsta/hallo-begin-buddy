@@ -3,18 +3,21 @@ import { useTheme } from 'next-themes';
 import { supabase } from '@/integrations/supabase/client';
 import { FileIcon, Loader2, ImageOff, FileText, Film, FileImage } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { ImageLightbox } from './ImageLightbox';
 
 interface DocumentPreviewProps {
   fileId: string;
   fileName: string;
   mimeType: string;
   size?: 'sm' | 'md' | 'lg';
+  clickable?: boolean;
 }
 
-export function DocumentPreview({ fileId, fileName, mimeType, size = 'md' }: DocumentPreviewProps) {
+export function DocumentPreview({ fileId, fileName, mimeType, size = 'md', clickable = false }: DocumentPreviewProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const { theme } = useTheme();
   const isLifestyle = theme === 'lifestyle';
 
@@ -92,25 +95,41 @@ export function DocumentPreview({ fileId, fileName, mimeType, size = 'md' }: Doc
   // For images, show thumbnail if available
   if (mimeType.startsWith('image/')) {
     return (
-      <Card 
-        className={`
-          ${sizeClasses[size]} 
-          flex items-center justify-center overflow-hidden
-          ${isLifestyle ? 'hover-lift rounded-2xl' : ''}
-          ${getPastelClass()}
-        `}
-      >
-        {isLoading && <Loader2 className="w-4 h-4 animate-spin text-primary" />}
-        {error && <ImageOff className={`${iconSizeClasses[size]} text-muted-foreground`} />}
-        {!isLoading && !error && previewUrl && (
-          <img 
-            src={previewUrl} 
-            alt={fileName} 
-            className="w-full h-full object-cover"
+      <>
+        <Card 
+          className={`
+            ${sizeClasses[size]} 
+            flex items-center justify-center overflow-hidden
+            ${isLifestyle ? 'hover-lift rounded-2xl' : ''}
+            ${getPastelClass()}
+            ${clickable && previewUrl ? 'cursor-pointer' : ''}
+          `}
+          onClick={() => {
+            if (clickable && previewUrl) {
+              setLightboxOpen(true);
+            }
+          }}
+        >
+          {isLoading && <Loader2 className="w-4 h-4 animate-spin text-primary" />}
+          {error && <ImageOff className={`${iconSizeClasses[size]} text-muted-foreground`} />}
+          {!isLoading && !error && previewUrl && (
+            <img 
+              src={previewUrl} 
+              alt={fileName} 
+              className="w-full h-full object-cover"
+            />
+          )}
+          {!isLoading && !error && !previewUrl && getFileTypeIcon()}
+        </Card>
+        {clickable && previewUrl && (
+          <ImageLightbox
+            isOpen={lightboxOpen}
+            onClose={() => setLightboxOpen(false)}
+            imageUrl={previewUrl}
+            fileName={fileName}
           />
         )}
-        {!isLoading && !error && !previewUrl && getFileTypeIcon()}
-      </Card>
+      </>
     );
   }
 
