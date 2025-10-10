@@ -16,6 +16,7 @@ import { CreateFolderDialog } from './CreateFolderDialog';
 import { RenameFolderDialog } from './RenameFolderDialog';
 import { DeleteFolderDialog } from './DeleteFolderDialog';
 import { FolderBadgeCount } from './FolderBadgeCount';
+const SHOW_UNREAD_BADGES = false;
 
 interface FolderTreeProps {
   selectedFolderId?: string | null;
@@ -35,8 +36,8 @@ export function FolderTree({ selectedFolderId, onSelectFolder }: FolderTreeProps
   const [deleteFolder, setDeleteFolder] = useState<FolderType | null>(null);
 
   const handleSelectFolder = async (folderId: string | null) => {
-    // Reset unread count when folder is visited
-    if (folderId) {
+    // Only reset unread counts if the feature is enabled
+    if (folderId && SHOW_UNREAD_BADGES) {
       await resetFolderVisit(folderId);
     }
     onSelectFolder(folderId);
@@ -132,7 +133,7 @@ export function FolderTree({ selectedFolderId, onSelectFolder }: FolderTreeProps
             <span className="text-sm truncate">{folder.name}</span>
           </div>
 
-          {unreadCount > 0 && (
+          {SHOW_UNREAD_BADGES && unreadCount > 0 && (
             <FolderBadgeCount count={unreadCount} folderId={folder.id} />
           )}
 
