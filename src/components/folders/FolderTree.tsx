@@ -62,6 +62,15 @@ export function FolderTree({ selectedFolderId, onSelectFolder }: FolderTreeProps
     return folders.filter(f => f.parent_id === parentId);
   };
 
+  // Compute direct (non-duplicated) unread count for a folder.
+  // Our backend stores cumulative counts per folder (including descendants).
+  // To avoid double-counting at parents, subtract the children's cumulative counts.
+  const getDirectUnreadCount = (folderId: string) => {
+    const own = unreadCounts.get(folderId) || 0;
+    const children = getChildFolders(folderId);
+    const childrenSum = children.reduce((sum, child) => sum + (unreadCounts.get(child.id) || 0), 0);
+    return Math.max(0, own - childrenSum);
+  };
   const handleCreateFolder = (parentId?: string) => {
     setCreateParentId(parentId);
     setCreateDialogOpen(true);
@@ -82,7 +91,7 @@ export function FolderTree({ selectedFolderId, onSelectFolder }: FolderTreeProps
     const isSelected = selectedFolderId === folder.id;
     const children = getChildFolders(folder.id);
     const hasChildren = children.length > 0;
-    const unreadCount = unreadCounts.get(folder.id) || 0;
+    const unreadCount = getDirectUnreadCount(folder.id);
 
     return (
       <motion.div key={folder.id} className="select-none" {...getAnimationProps(listItem)}>
