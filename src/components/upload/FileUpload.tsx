@@ -504,13 +504,32 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
     <div className="space-y-4">
       <Card
         {...getRootProps()}
-        className={`border-2 border-dashed p-8 text-center cursor-pointer transition-colors ${
-          isDragActive ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
-        }`}
+        className={`
+          relative overflow-hidden border-2 border-dashed p-8 text-center cursor-pointer 
+          transition-all duration-300 hover-lift group
+          ${isDragActive 
+            ? 'border-primary bg-primary/10 scale-[1.02] shadow-glow' 
+            : 'border-border hover:border-primary/50 hover:shadow-md'
+          }
+        `}
       >
         <input {...getInputProps()} />
-        <Upload className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-        <p className="text-lg font-medium mb-2">
+        
+        {/* Gradient Background for Lifestyle Theme */}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 gradient-lifestyle-soft -z-10" />
+        
+        <motion.div
+          animate={isDragActive ? { scale: [1, 1.1, 1] } : {}}
+          transition={{ duration: 0.3 }}
+        >
+          <Upload 
+            className={`mx-auto h-12 w-12 mb-4 transition-colors duration-300 ${
+              isDragActive ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'
+            }`} 
+          />
+        </motion.div>
+        
+        <p className="text-lg font-semibold mb-2 transition-colors group-hover:text-primary">
           {isDragActive ? t('upload.dragDropActive') : t('upload.dragDrop')}
         </p>
         <p className="text-sm text-muted-foreground">
@@ -541,9 +560,14 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
                   exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
                   layout
                 >
-                  <Card className="p-4 hover:shadow-md transition-shadow">
+                  <Card className="p-4 hover:shadow-lg hover-lift transition-all duration-300 group relative overflow-hidden">
+                    {/* Subtle gradient accent on hover */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 gradient-lifestyle-soft -z-10" />
+                    
               <div className="flex items-start gap-3">
-                <FileIcon className="h-5 w-5 mt-0.5 text-muted-foreground flex-shrink-0" />
+                <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors duration-300">
+                  <FileIcon className="h-5 w-5 text-primary flex-shrink-0" />
+                </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2 mb-1">
                     <p className="text-sm font-medium truncate">{uploadFile.file.name}</p>
@@ -569,9 +593,15 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
                     </div>
                   )}
 
-                  {uploadFile.status === 'success' && (
-                    <p className="text-xs text-green-600">✓ {t('upload.success')}</p>
-                  )}
+                   {uploadFile.status === 'success' && (
+                     <motion.p 
+                       initial={{ scale: 0 }}
+                       animate={{ scale: 1 }}
+                       className="text-xs font-semibold text-success flex items-center gap-1"
+                     >
+                       <span className="inline-block">✓</span> {t('upload.success')}
+                     </motion.p>
+                   )}
 
                   {uploadFile.status === 'error' && (
                     <p className="text-xs text-destructive">✗ {uploadFile.error}</p>
@@ -645,34 +675,52 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
                         size="sm"
                         onClick={() => triggerSmartUpload(uploadFile.id)}
                         disabled={smartUploadLoading === uploadFile.id}
-                        className="w-full"
+                        className="w-full relative overflow-hidden group/btn hover:shadow-glow transition-all duration-300"
                       >
+                        {/* Animated gradient background on hover */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-secondary/10 to-tertiary/10 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
+                        
                         {smartUploadLoading === uploadFile.id ? (
                           <>
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            {t('upload.smartUploadProcessing', { defaultValue: 'Analysiere Dokument...' })}
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin relative z-10" />
+                            <span className="relative z-10">{t('upload.smartUploadProcessing', { defaultValue: 'Analysiere Dokument...' })}</span>
                           </>
                         ) : (
                           <>
-                            <Sparkles className="h-4 w-4 mr-2" />
-                            {t('upload.smartUpload', { defaultValue: 'Smart Upload' })}
+                            <motion.div
+                              animate={{ rotate: [0, 10, -10, 0] }}
+                              transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
+                              className="relative z-10"
+                            >
+                              <Sparkles className="h-4 w-4 mr-2 text-primary" />
+                            </motion.div>
+                            <span className="relative z-10 font-semibold">{t('upload.smartUpload', { defaultValue: 'Smart Upload' })}</span>
                           </>
                         )}
                       </Button>
                     </div>
                   )}
 
-                  {/* Awaiting Confirmation State */}
-                  {uploadFile.status === 'awaiting-confirmation' && (
-                    <div className="mt-3 pt-3 border-t">
-                      <p className="text-xs text-primary flex items-center gap-1">
-                        <Sparkles className="h-3 w-3 animate-pulse" />
-                        {t('upload.awaitingConfirmation', { 
-                          defaultValue: 'Warte auf Bestätigung der Metadaten...' 
-                        })}
-                      </p>
-                    </div>
-                  )}
+                   {/* Awaiting Confirmation State */}
+                   {uploadFile.status === 'awaiting-confirmation' && (
+                     <motion.div 
+                       initial={{ opacity: 0, y: -10 }}
+                       animate={{ opacity: 1, y: 0 }}
+                       className="mt-3 pt-3 border-t bg-primary/5 -mx-4 -mb-4 p-4 rounded-b-lg"
+                     >
+                       <p className="text-xs font-semibold text-primary flex items-center gap-1">
+                         <motion.div
+                           animate={{ scale: [1, 1.2, 1] }}
+                           transition={{ duration: 1, repeat: Infinity }}
+                         >
+                           <Sparkles className="h-3 w-3" />
+                         </motion.div>
+                         {t('upload.awaitingConfirmation', { 
+                           defaultValue: 'Warte auf Bestätigung der Metadaten...' 
+                         })}
+                       </p>
+                     </motion.div>
+                   )}
                   </div>
                 </div>
               </Card>
