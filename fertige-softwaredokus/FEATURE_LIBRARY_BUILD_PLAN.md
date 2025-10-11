@@ -85,6 +85,9 @@
 
 ## Status: Phase 2 Abgeschlossen ✅
 
+**Phase 0 - Übersicht:**
+- ✅ `00-Feature-Library-Overview.md` - Schnellreferenz für Lovable KI
+
 **Phase 1 - Kern-Features:**
 - ✅ `01-Auth-Profile-Pattern.md` - Authentifizierung, Profile, Gastbenutzer
 - ✅ `02-Subscription-Feature-Gating-Pattern.md` - Multi-Tier Plans, Usage Tracking, Stripe
