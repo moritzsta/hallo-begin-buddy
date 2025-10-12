@@ -96,6 +96,19 @@
 
 ---
 
+### [08-Advanced-Sharing-Pattern.md](./08-Advanced-Sharing-Pattern.md)
+**Was:** Private & Public Sharing ohne E-Mail-Exposure  
+**Wann:** Team-Kollaboration + Öffentliche Links  
+**Enthält:**
+- **Private Sharing:** `shared_prompts/folders` mit Rollen (Viewer/Editor)
+- **Public Link Sharing:** `shared_links` mit UUID-Token + Expiry
+- **E-Mail-Lookup:** `find_user_by_email()` für User-Sharing
+- **Edge Functions:** `create-share-link`, `get-shared-file`
+- **Security:** Kryptographisch sichere Tokens, Signierte URLs
+- **UI:** Share-Dialoge für beide Methoden
+
+---
+
 ## 🎯 Anwendungshinweise für Lovable KI
 
 ### Bei neuem Projekt:
@@ -124,6 +137,7 @@
 - [ ] **03-Security:** RLS auf alle User-Tabellen
 - [ ] **06-UI-UX:** Design System + Theme
 - [ ] **05-Datenstruktur:** Hierarchien (falls benötigt)
+- [ ] **08-Advanced-Sharing:** (Optional) Private/Public Sharing
 - [ ] **02-Subscription:** (Optional) Feature-Gating
 - [ ] **04-KI-Integration:** (Optional) Smart Features
 - [ ] **07-Communication:** (Optional) Realtime/Chat
@@ -131,7 +145,7 @@
 **Reihenfolge:**
 1. Auth + Security (Fundament)
 2. UI/UX + Datenstruktur (MVP-Features)
-3. Subscription + KI + Communication (Erweitert)
+3. Sharing + Subscription + KI + Communication (Erweitert)
 
 ---
 
