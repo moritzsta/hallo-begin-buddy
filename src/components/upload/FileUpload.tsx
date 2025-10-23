@@ -562,9 +562,25 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
         <div className="flex items-start gap-2">
           <Sparkles className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
           <div className="flex-1">
-            <Label htmlFor="document-type" className="text-sm font-semibold mb-1 block">
-              {t('upload.documentTypeOptional', { defaultValue: 'Dokumententyp (optional)' })}
-            </Label>
+            <div className="flex items-center gap-2 mb-1">
+              <Label htmlFor="document-type" className="text-sm font-semibold">
+                {t('upload.documentTypeOptional', { defaultValue: 'Dokumententyp (optional)' })}
+              </Label>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="max-w-xs">
+                    <p className="text-sm">
+                      {t('upload.documentTypeTooltip', { 
+                        defaultValue: 'Wählen Sie den Dokumenttyp, damit die KI bessere Ordnerstrukturen und Metadaten vorschlagen kann.' 
+                      })}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
             <p className="text-xs text-muted-foreground mb-3">
               {t('upload.documentTypeHelp', { 
                 defaultValue: 'Hilft der KI, bessere Ordnerstrukturen und Metadaten vorzuschlagen.' 

@@ -37,6 +37,7 @@
     "uploadError": "Upload fehlgeschlagen",
     "fileTooLarge": "Datei zu groß (max. {{size}}MB für {{tier}}-Plan)",
     "smartUpload": "Smart Upload",
+    "smartUploadTooltip": "Unsere KI analysiert Ihr Dokument, erkennt wichtige Informationen und schlägt automatisch den besten Ablageort vor.",
     "smartUploadSkipped": "Smart Upload übersprungen",
     "smartUploadSkippedDesc": "Keine Metadaten extrahiert. Datei wurde normal abgelegt.",
     "smartUploadError": "Smart Upload fehlgeschlagen",
@@ -69,6 +70,7 @@
     "smartUploadProcessing": "Analysiere Dokument...",
     "documentTypeOptional": "Dokumententyp (optional)",
     "documentTypeHelp": "Hilft der KI, bessere Ordnerstrukturen und Metadaten vorzuschlagen.",
+    "documentTypeTooltip": "Wählen Sie den Dokumenttyp, damit die KI bessere Ordnerstrukturen und Metadaten vorschlagen kann.",
     "selectDocumentType": "Typ auswählen...",
     "noDocumentType": "Kein Typ ausgewählt"
   },

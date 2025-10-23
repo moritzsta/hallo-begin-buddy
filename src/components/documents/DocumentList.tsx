@@ -175,6 +175,24 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
     return new Date(file.created_at) > new Date(profile.last_seen_at);
   };
 
+  // Mark single file as seen when viewing
+  const markFileAsSeenMutation = useMutation({
+    mutationFn: async (fileCreatedAt: string) => {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ last_seen_at: fileCreatedAt })
+        .eq('id', user!.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+    },
+    onError: (error) => {
+      console.error('Failed to mark file as seen:', error);
+    },
+  });
+
   // Apply client-side filters
   const files = useMemo(() => {
     if (!allFiles) return [];
@@ -384,6 +402,14 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
     setShareFileName(file.title);
   };
 
+  const handlePreview = (file: FileRecord) => {
+    setPreviewFile(file);
+    // Mark file as seen if it's new
+    if (isNewFile(file)) {
+      markFileAsSeenMutation.mutate(file.created_at);
+    }
+  };
+
   const saveEdit = () => {
     if (editingId && editTitle.trim()) {
       renameMutation.mutate({ id: editingId, title: editTitle.trim() });
@@ -523,7 +549,7 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
           onRename={startEdit}
           onMove={setMoveFileId}
           onEditTags={startEditTags}
-          onPreview={setPreviewFile}
+          onPreview={handlePreview}
           onShare={handleShare}
           formatFileSize={formatFileSize}
         />
@@ -618,14 +644,14 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-56 rounded-lg bg-popover border-2 border-border shadow-2xl backdrop-blur-md">
-                        <DropdownMenuItem 
-                          onClick={() => setPreviewFile(file)}
-                          className="gap-2 rounded-md transition-colors hover:bg-accent focus:bg-accent"
-                        >
-                          <Eye className="h-4 w-4 text-indigo-500" />
-                          <span className="font-medium">{t('documents.preview')}</span>
-                        </DropdownMenuItem>
+                       <DropdownMenuContent align="end" className="w-56 rounded-lg bg-popover border-2 border-border shadow-2xl backdrop-blur-md">
+                         <DropdownMenuItem 
+                           onClick={() => handlePreview(file)}
+                           className="gap-2 rounded-md transition-colors hover:bg-accent focus:bg-accent"
+                         >
+                           <Eye className="h-4 w-4 text-indigo-500" />
+                           <span className="font-medium">{t('documents.preview')}</span>
+                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={() => handleShare(file)}
                           className="gap-2 rounded-md transition-colors hover:bg-accent focus:bg-accent"

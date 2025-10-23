@@ -37,6 +37,7 @@
     "uploadError": "Upload failed",
     "fileTooLarge": "File too large (max. {{size}}MB for {{tier}} plan)",
     "smartUpload": "Smart Upload",
+    "smartUploadTooltip": "Our AI analyzes your document, recognizes important information, and automatically suggests the best storage location.",
     "smartUploadSkipped": "Smart Upload skipped",
     "smartUploadSkippedDesc": "No metadata extracted. File was saved normally.",
     "smartUploadError": "Smart Upload failed",
@@ -69,6 +70,7 @@
     "smartUploadProcessing": "Analyzing document...",
     "documentTypeOptional": "Document Type (optional)",
     "documentTypeHelp": "Helps the AI suggest better folder structures and metadata.",
+    "documentTypeTooltip": "Select the document type so the AI can suggest better folder structures and metadata.",
     "selectDocumentType": "Select type...",
     "noDocumentType": "No type selected"
   },
