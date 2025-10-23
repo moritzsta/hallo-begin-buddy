@@ -30,7 +30,7 @@ const App = () => (
       enableSystem={false}
       themes={['light', 'dark', 'lifestyle']}
     >
-      <TooltipProvider>
+      <TooltipProvider delayDuration={200}>
         <Toaster />
         <Sonner />
         <BrowserRouter>

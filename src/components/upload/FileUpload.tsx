@@ -566,20 +566,20 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
               <Label htmlFor="document-type" className="text-sm font-semibold">
                 {t('upload.documentTypeOptional', { defaultValue: 'Dokumententyp (optional)' })}
               </Label>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent side="top" className="max-w-xs">
-                    <p className="text-sm">
-                      {t('upload.documentTypeTooltip', { 
-                        defaultValue: 'Wählen Sie den Dokumenttyp, damit die KI bessere Ordnerstrukturen und Metadaten vorschlagen kann.' 
-                      })}
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button type="button" className="focus:outline-none">
+                    <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help hover:text-primary transition-colors" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="max-w-xs">
+                  <p className="text-sm">
+                    {t('upload.documentTypeTooltip', { 
+                      defaultValue: 'Wählen Sie den Dokumenttyp, damit die KI bessere Ordnerstrukturen und Metadaten vorschlagen kann.' 
+                    })}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
             </div>
             <p className="text-xs text-muted-foreground mb-3">
               {t('upload.documentTypeHelp', { 
@@ -770,47 +770,45 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
                       </div>
 
                       {/* Smart Upload Button */}
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => triggerSmartUpload(uploadFile.id)}
-                              disabled={smartUploadLoading === uploadFile.id}
-                              className="w-full relative overflow-hidden group/btn hover:shadow-glow transition-all duration-300"
-                            >
-                              {/* Animated gradient background on hover */}
-                              <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-secondary/10 to-tertiary/10 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
-                              
-                              {smartUploadLoading === uploadFile.id ? (
-                                <>
-                                  <Loader2 className="h-4 w-4 mr-2 animate-spin relative z-10" />
-                                  <span className="relative z-10">{t('upload.smartUploadProcessing', { defaultValue: 'Analysiere Dokument...' })}</span>
-                                </>
-                              ) : (
-                                <>
-                                  <motion.div
-                                    animate={{ rotate: [0, 10, -10, 0] }}
-                                    transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
-                                    className="relative z-10"
-                                  >
-                                    <Sparkles className="h-4 w-4 mr-2 text-primary" />
-                                  </motion.div>
-                                  <span className="relative z-10 font-semibold">{t('upload.smartUpload', { defaultValue: 'Smart Upload' })}</span>
-                                </>
-                              )}
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent side="top" className="max-w-xs">
-                            <p className="text-sm">
-                              {t('upload.smartUploadTooltip', { 
-                                defaultValue: 'Unsere KI analysiert Ihr Dokument, erkennt wichtige Informationen und schlägt automatisch den besten Ablageort vor.' 
-                              })}
-                            </p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => triggerSmartUpload(uploadFile.id)}
+                            disabled={smartUploadLoading === uploadFile.id}
+                            className="w-full relative overflow-hidden group/btn hover:shadow-glow transition-all duration-300"
+                          >
+                            {/* Animated gradient background on hover */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-secondary/10 to-tertiary/10 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
+                            
+                            {smartUploadLoading === uploadFile.id ? (
+                              <>
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin relative z-10" />
+                                <span className="relative z-10">{t('upload.smartUploadProcessing', { defaultValue: 'Analysiere Dokument...' })}</span>
+                              </>
+                            ) : (
+                              <>
+                                <motion.div
+                                  animate={{ rotate: [0, 10, -10, 0] }}
+                                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
+                                  className="relative z-10"
+                                >
+                                  <Sparkles className="h-4 w-4 mr-2 text-primary" />
+                                </motion.div>
+                                <span className="relative z-10 font-semibold">{t('upload.smartUpload', { defaultValue: 'Smart Upload' })}</span>
+                              </>
+                            )}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="max-w-xs">
+                          <p className="text-sm">
+                            {t('upload.smartUploadTooltip', { 
+                              defaultValue: 'Unsere KI analysiert Ihr Dokument, erkennt wichtige Informationen und schlägt automatisch den besten Ablageort vor.' 
+                            })}
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
                   )}
 
