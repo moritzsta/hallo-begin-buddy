@@ -335,34 +335,60 @@ ${languageInstruction}${userContextInstruction}${folderStructureText}`;
 
         contentPayload = analysisPrompt;
       } else {
-        // For supported images, download and send as base64 for reliable processing
-        const { data: fileData, error: downloadError } = await supabase.storage
-          .from('documents')
-          .download(file.storage_path);
+        // For supported images, check size limit (5MB for AI analysis)
+        const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+        
+        if (file.size && file.size > MAX_IMAGE_SIZE) {
+          console.info(`Image too large for AI analysis (${(file.size / 1024 / 1024).toFixed(2)}MB), using filename-based analysis`);
+          
+          // Fall back to metadata-only analysis for large images
+          analysisPrompt = `Analyze the filename "${file.name}" and extract metadata to help organize it:
+1. document_type: Type of document based on filename
+2. suggested_title: A descriptive title (max 60 chars) based on the filename
+3. keywords: 3-5 relevant keywords from the filename
+4. suggested_path: A logical folder structure path with flexible depth (1-6 levels, ideally 3-4). CRITICAL: AVOID duplicate or similar folder names (e.g., "Katze" and "Katzen" are duplicates). REUSE existing folders when they match the document content.
 
-        if (downloadError || !fileData) {
-          throw new Error('Failed to download image for analysis');
-        }
+${languageInstruction}${userContextInstruction}${folderStructureText}`;
+          
+          contentPayload = analysisPrompt;
+        } else {
+          // For supported images under size limit, download and send as base64
+          const { data: fileData, error: downloadError } = await supabase.storage
+            .from('documents')
+            .download(file.storage_path);
 
-        const arrayBuffer = await fileData.arrayBuffer();
-        const base64Image = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
-        const mimeType = file.mime || 'image/jpeg';
-        const dataUrl = `data:${mimeType};base64,${base64Image}`;
+          if (downloadError || !fileData) {
+            throw new Error('Failed to download image for analysis');
+          }
 
-        analysisPrompt = `Analyze this image/document and extract: document type (e.g., invoice, receipt, letter, contract, photo, diagram), a suggested descriptive title (max 60 chars), 3-5 relevant keywords, and suggest an appropriate folder structure path with flexible depth (1-6 levels, ideally 3-4). AVOID duplicate or similar folder names (e.g., "Katze" and "Katzen"). REUSE existing folders whenever they match the content. ${languageInstruction}${userContextInstruction}${folderStructureText}`;
+          const arrayBuffer = await fileData.arrayBuffer();
+          
+          // Efficient base64 conversion without spread operator
+          const bytes = new Uint8Array(arrayBuffer);
+          let binary = '';
+          for (let i = 0; i < bytes.length; i++) {
+            binary += String.fromCharCode(bytes[i]);
+          }
+          const base64Image = btoa(binary);
+          
+          const mimeType = file.mime || 'image/jpeg';
+          const dataUrl = `data:${mimeType};base64,${base64Image}`;
 
-        contentPayload = [
-          {
-            type: 'text',
-            text: analysisPrompt,
-          },
-          {
-            type: 'image_url',
-            image_url: {
-              url: dataUrl,
+          analysisPrompt = `Analyze this image/document and extract: document type (e.g., invoice, receipt, letter, contract, photo, diagram), a suggested descriptive title (max 60 chars), 3-5 relevant keywords, and suggest an appropriate folder structure path with flexible depth (1-6 levels, ideally 3-4). AVOID duplicate or similar folder names (e.g., "Katze" and "Katzen"). REUSE existing folders whenever they match the content. ${languageInstruction}${userContextInstruction}${folderStructureText}`;
+
+          contentPayload = [
+            {
+              type: 'text',
+              text: analysisPrompt,
             },
-          },
-        ];
+            {
+              type: 'image_url',
+              image_url: {
+                url: dataUrl,
+              },
+            },
+          ];
+        }
       }
     } else {
       // For PDFs and Office docs, use extracted text
