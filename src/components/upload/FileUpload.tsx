@@ -263,6 +263,8 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
         progress: 0,
         status: validationError ? ('error' as const) : ('pending' as const),
         error: validationError || undefined,
+        // Set skipAiAnalysis based on user preferences: if smart_upload_enabled is false, skip AI analysis by default
+        skipAiAnalysis: userPreferences?.smart_upload_enabled === false,
       };
     });
 
@@ -272,7 +274,7 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
     newFiles
       .filter(f => f.status === 'pending')
       .forEach(f => uploadFile(f));
-  }, [user, profile]);
+  }, [user, profile, userPreferences]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -310,8 +312,8 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
     const uploadFile = uploadFiles.find(f => f.id === uploadFileId);
     if (!uploadFile?.fileId) return;
 
-    // Check if AI confirmation is needed
-    const showConfirmation = userPreferences?.show_ai_confirmation !== false;
+    // Only show AI confirmation if AI analysis is enabled (not skipped)
+    const showConfirmation = userPreferences?.show_ai_confirmation !== false && !uploadFile.skipAiAnalysis;
     
     if (showConfirmation) {
       // Show AI confirmation dialog first
