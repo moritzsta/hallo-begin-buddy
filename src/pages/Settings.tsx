@@ -12,7 +12,6 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
@@ -53,8 +52,8 @@ const Settings = () => {
   const [searchParams] = useSearchParams();
   const [displayName, setDisplayName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-  // Smart upload mode: 'disabled' | 'with-confirmation' | 'auto'
-  const [smartUploadMode, setSmartUploadMode] = useState<'disabled' | 'with-confirmation' | 'auto'>('with-confirmation');
+  const [aiDocAnalysisEnabled, setAiDocAnalysisEnabled] = useState(false);
+  const [showAiConfirmation, setShowAiConfirmation] = useState(true);
 
   const subscription = useSubscription();
   
@@ -101,14 +100,8 @@ const Settings = () => {
   // Initialize preferences state from fetched data
   useEffect(() => {
     if (preferences) {
-      // Convert DB values to mode
-      if (!preferences.smart_upload_enabled) {
-        setSmartUploadMode('disabled');
-      } else if (preferences.show_ai_confirmation) {
-        setSmartUploadMode('with-confirmation');
-      } else {
-        setSmartUploadMode('auto');
-      }
+      setAiDocAnalysisEnabled(preferences.smart_upload_enabled);
+      setShowAiConfirmation(preferences.show_ai_confirmation);
     }
   }, [preferences]);
 
@@ -182,18 +175,14 @@ const Settings = () => {
   const handleSaveSmartUploadPreferences = async () => {
     setIsSaving(true);
     try {
-      // Convert mode to DB values
-      const smart_upload_enabled = smartUploadMode !== 'disabled';
-      const show_ai_confirmation = smartUploadMode === 'with-confirmation';
-
       // Check if preferences exist
       if (preferences) {
         // Update existing preferences
         const { error } = await supabase
           .from('user_preferences')
           .update({
-            smart_upload_enabled,
-            show_ai_confirmation,
+            smart_upload_enabled: aiDocAnalysisEnabled,
+            show_ai_confirmation: showAiConfirmation,
           })
           .eq('user_id', user!.id);
         
@@ -204,8 +193,8 @@ const Settings = () => {
           .from('user_preferences')
           .insert({
             user_id: user!.id,
-            smart_upload_enabled,
-            show_ai_confirmation,
+            smart_upload_enabled: aiDocAnalysisEnabled,
+            show_ai_confirmation: showAiConfirmation,
           });
         
         if (error) throw error;
@@ -338,46 +327,45 @@ const Settings = () => {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4">
-                  <Label className="text-base font-medium">
-                    {t('settings.smartUploadMode')}
-                  </Label>
-                  <RadioGroup value={smartUploadMode} onValueChange={(value) => setSmartUploadMode(value as any)}>
-                    <div className="flex items-start gap-4 rounded-lg border p-4 hover:bg-accent/50 transition-colors">
-                      <RadioGroupItem value="disabled" id="mode-disabled" className="mt-1" />
-                      <div className="space-y-1 flex-1">
-                        <Label htmlFor="mode-disabled" className="text-base font-medium cursor-pointer">
-                          {t('settings.smartUploadDisabled')}
-                        </Label>
-                        <p className="text-sm text-muted-foreground">
-                          {t('settings.smartUploadDisabledDesc')}
-                        </p>
-                      </div>
+                  {/* Option 1: KI-Dokumentenanalyse aktivieren */}
+                  <div className="flex items-start justify-between gap-4 rounded-lg border p-4">
+                    <div className="space-y-1 flex-1">
+                      <Label className="text-base font-medium">
+                        {t('settings.enableAiDocAnalysis')}
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        {t('settings.enableAiDocAnalysisDesc')}
+                      </p>
+                      <p className="text-xs text-muted-foreground italic mt-2">
+                        {t('settings.enableAiDocAnalysisNote')}
+                      </p>
                     </div>
+                    <Checkbox
+                      checked={aiDocAnalysisEnabled}
+                      onCheckedChange={(checked) => setAiDocAnalysisEnabled(checked === true)}
+                      className="mt-1"
+                    />
+                  </div>
 
-                    <div className="flex items-start gap-4 rounded-lg border p-4 hover:bg-accent/50 transition-colors">
-                      <RadioGroupItem value="with-confirmation" id="mode-with-confirmation" className="mt-1" />
-                      <div className="space-y-1 flex-1">
-                        <Label htmlFor="mode-with-confirmation" className="text-base font-medium cursor-pointer">
-                          {t('settings.smartUploadWithConfirmation')}
-                        </Label>
-                        <p className="text-sm text-muted-foreground">
-                          {t('settings.smartUploadWithConfirmationDesc')}
-                        </p>
-                      </div>
+                  {/* Option 2: Bestätigungsdialog (nur sichtbar wenn Option 1 aktiv) */}
+                  <div className={`flex items-start justify-between gap-4 rounded-lg border p-4 transition-opacity ${
+                    aiDocAnalysisEnabled ? 'opacity-100' : 'opacity-50'
+                  }`}>
+                    <div className="space-y-1 flex-1">
+                      <Label className="text-base font-medium">
+                        {t('settings.showAiConfirmation')}
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        {t('settings.showAiConfirmationDesc')}
+                      </p>
                     </div>
-
-                    <div className="flex items-start gap-4 rounded-lg border p-4 hover:bg-accent/50 transition-colors">
-                      <RadioGroupItem value="auto" id="mode-auto" className="mt-1" />
-                      <div className="space-y-1 flex-1">
-                        <Label htmlFor="mode-auto" className="text-base font-medium cursor-pointer">
-                          {t('settings.smartUploadAuto')}
-                        </Label>
-                        <p className="text-sm text-muted-foreground">
-                          {t('settings.smartUploadAutoDesc')}
-                        </p>
-                      </div>
-                    </div>
-                  </RadioGroup>
+                    <Checkbox
+                      checked={showAiConfirmation}
+                      onCheckedChange={(checked) => setShowAiConfirmation(checked === true)}
+                      disabled={!aiDocAnalysisEnabled}
+                      className="mt-1"
+                    />
+                  </div>
                 </div>
 
                 <Separator />

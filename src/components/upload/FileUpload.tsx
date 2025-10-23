@@ -258,8 +258,8 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
     const newFiles: UploadFile[] = acceptedFiles.map(file => {
       const validationError = validateFile(file);
       // Set skipAiAnalysis based on user preferences:
-      // - If smart_upload_enabled is FALSE (disabled mode): skip AI analysis by default
-      // - If smart_upload_enabled is TRUE: do NOT skip (with-confirmation or auto mode)
+      // - If smart_upload_enabled is FALSE: Checkbox "Ohne KI-Analyse" is SET → skipAiAnalysis = true
+      // - If smart_upload_enabled is TRUE: Checkbox "Ohne KI-Analyse" is NOT SET → skipAiAnalysis = false
       const skipAiAnalysis = userPreferences?.smart_upload_enabled === false;
       
       return {
@@ -316,14 +316,14 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
     const uploadFile = uploadFiles.find(f => f.id === uploadFileId);
     if (!uploadFile?.fileId) return;
 
-    // Three modes based on user preferences:
-    // 1. disabled mode (smart_upload_enabled = false): User manually enabled AI via checkbox
-    // 2. with-confirmation mode (smart_upload_enabled = true, show_ai_confirmation = true): Show popup
-    // 3. auto mode (smart_upload_enabled = true, show_ai_confirmation = false): Direct execution
+    // Logic:
+    // - If skipAiAnalysis is true (document analysis disabled): No confirmation needed
+    // - If skipAiAnalysis is false AND show_ai_confirmation is true: Show confirmation popup
+    // - If skipAiAnalysis is false AND show_ai_confirmation is false: Direct execution
     
     const shouldShowConfirmation = 
-      userPreferences?.show_ai_confirmation !== false && 
-      !uploadFile.skipAiAnalysis;
+      !uploadFile.skipAiAnalysis && 
+      userPreferences?.show_ai_confirmation !== false;
     
     if (shouldShowConfirmation) {
       // Show AI confirmation dialog first
