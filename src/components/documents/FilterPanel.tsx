@@ -211,26 +211,28 @@ export const FilterPanel = ({
               </Badge>
             )}
           </div>
-          <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1 border rounded-md p-2 bg-muted/20">
-            {getAllDocumentTypes().map((type) => (
-              <div 
-                key={type} 
-                className="flex items-center space-x-2 hover:bg-accent/50 rounded px-2 py-1.5 transition-colors"
-              >
-                <Checkbox
-                  id={`doctype-${type}`}
-                  checked={filters.documentTypes.includes(type)}
-                  onCheckedChange={() => handleDocumentTypeToggle(type)}
-                  className="shrink-0"
-                />
-                <label
-                  htmlFor={`doctype-${type}`}
-                  className="text-sm cursor-pointer select-none flex-1 leading-tight"
+          <div className="relative border rounded-md overflow-hidden bg-muted/20">
+            <div className="space-y-1.5 max-h-64 overflow-y-auto p-2 custom-scrollbar">
+              {getAllDocumentTypes().map((type) => (
+                <div 
+                  key={type} 
+                  className="flex items-center space-x-2 hover:bg-accent/50 rounded px-2 py-1.5 transition-colors"
                 >
-                  {getDocumentTypeLabel(type, i18n.language)}
-                </label>
-              </div>
-            ))}
+                  <Checkbox
+                    id={`doctype-${type}`}
+                    checked={filters.documentTypes.includes(type)}
+                    onCheckedChange={() => handleDocumentTypeToggle(type)}
+                    className="shrink-0"
+                  />
+                  <label
+                    htmlFor={`doctype-${type}`}
+                    className="text-sm cursor-pointer select-none flex-1 leading-tight"
+                  >
+                    {getDocumentTypeLabel(type, i18n.language)}
+                  </label>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -245,26 +247,28 @@ export const FilterPanel = ({
                 </Badge>
               )}
             </div>
-            <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1 border rounded-md p-2 bg-muted/20">
-              {availableTags.sort().map((tag) => (
-                <div 
-                  key={tag}
-                  className="flex items-center space-x-2 hover:bg-accent/50 rounded px-2 py-1.5 transition-colors"
-                >
-                  <Checkbox
-                    id={`tag-${tag}`}
-                    checked={filters.tags.includes(tag)}
-                    onCheckedChange={() => handleTagToggle(tag)}
-                    className="shrink-0"
-                  />
-                  <label
-                    htmlFor={`tag-${tag}`}
-                    className="text-sm cursor-pointer select-none flex-1 leading-tight"
+            <div className="relative border rounded-md overflow-hidden bg-muted/20">
+              <div className="space-y-1.5 max-h-64 overflow-y-auto p-2 custom-scrollbar">
+                {availableTags.sort().map((tag) => (
+                  <div 
+                    key={tag}
+                    className="flex items-center space-x-2 hover:bg-accent/50 rounded px-2 py-1.5 transition-colors"
                   >
-                    {tag}
-                  </label>
-                </div>
-              ))}
+                    <Checkbox
+                      id={`tag-${tag}`}
+                      checked={filters.tags.includes(tag)}
+                      onCheckedChange={() => handleTagToggle(tag)}
+                      className="shrink-0"
+                    />
+                    <label
+                      htmlFor={`tag-${tag}`}
+                      className="text-sm cursor-pointer select-none flex-1 leading-tight"
+                    >
+                      {tag}
+                    </label>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
