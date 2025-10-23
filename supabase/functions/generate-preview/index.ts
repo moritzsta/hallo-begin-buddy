@@ -64,7 +64,7 @@ serve(async (req) => {
       );
     }
 
-    // Only support images for now
+    // Only support images for now (PDF previews would require complex rendering)
     if (!file.mime.startsWith('image/')) {
       console.log(`Preview generation not supported for ${file.mime}`);
       return new Response(
@@ -95,22 +95,13 @@ serve(async (req) => {
 
     const imageBuffer = await imageResponse.arrayBuffer();
     
-    // For now, we'll store a resized version using a simple approach
-    // In production, you'd use a proper image processing library
-    // Since we're in Deno, we can use browser APIs
-    
-    // Create a canvas-based resize (using ImageMagick-like approach via fetch to external service)
-    // OR simply store original with a size limit check
-    
-    // For MVP: Check size and either store as-is or reject if too large
+    // For MVP: Store image as-is (could add resizing in future)
     const maxSize = 10 * 1024 * 1024; // 10MB max for preview storage
     
     let previewBuffer = imageBuffer;
     let previewMime = file.mime;
     
     if (imageBuffer.byteLength > maxSize) {
-      // For very large images, we'll need to resize
-      // This is a limitation - proper image processing would require additional setup
       console.warn(`Image too large (${imageBuffer.byteLength} bytes), storing original anyway`);
     }
 

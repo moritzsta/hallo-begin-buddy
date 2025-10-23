@@ -208,13 +208,15 @@ export const DocumentViewer = ({ fileId, fileName, mimeType, onClose }: Document
           </div>
 
           <div className="flex items-center gap-1">
-            <ZoomControls
-              zoom={zoom}
-              onZoomIn={handleZoomIn}
-              onZoomOut={handleZoomOut}
-              onFitToWidth={handleFitToWidth}
-              onZoom100={handleZoom100}
-            />
+            {!isPdf && (
+              <ZoomControls
+                zoom={zoom}
+                onZoomIn={handleZoomIn}
+                onZoomOut={handleZoomOut}
+                onFitToWidth={handleFitToWidth}
+                onZoom100={handleZoom100}
+              />
+            )}
             <Button
               variant="outline"
               size="sm"
@@ -262,7 +264,7 @@ export const DocumentViewer = ({ fileId, fileName, mimeType, onClose }: Document
                 ref={containerRef}
                 className={cn(
                   "w-full h-full flex items-center justify-center overflow-hidden",
-                  zoom > 1 && "cursor-move"
+                  zoom > 1 && !isPdf && "cursor-move"
                 )}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
@@ -270,11 +272,14 @@ export const DocumentViewer = ({ fileId, fileName, mimeType, onClose }: Document
                 onMouseLeave={handleMouseUp}
               >
                 {isPdf ? (
-                  <iframe
-                    src={`${displayUrl}#view=FitH`}
-                    title={fileName}
-                    className="w-full h-full"
-                  />
+                  <div className="w-full h-full flex flex-col">
+                    <iframe
+                      src={`${displayUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+                      title={fileName}
+                      className="w-full h-full border-0"
+                      allow="fullscreen"
+                    />
+                  </div>
                 ) : (
                   <motion.div
                     animate={{

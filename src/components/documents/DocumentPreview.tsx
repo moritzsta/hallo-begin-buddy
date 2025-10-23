@@ -58,6 +58,7 @@ export function DocumentPreview({ fileId, fileName, mimeType, size = 'md', click
   };
 
   useEffect(() => {
+    // Only generate previews for images
     if (!mimeType.startsWith('image/')) {
       return;
     }
@@ -92,7 +93,7 @@ export function DocumentPreview({ fileId, fileName, mimeType, size = 'md', click
     loadPreview();
   }, [fileId, mimeType]);
 
-  // For images, show thumbnail if available
+  // For images, show thumbnail if available; for PDFs show icon
   if (mimeType.startsWith('image/')) {
     return (
       <>
