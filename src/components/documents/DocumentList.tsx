@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -82,6 +82,7 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
   const { theme } = useTheme();
   const queryClient = useQueryClient();
   const isLifestyle = theme === 'lifestyle';
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [sortField, setSortField] = useState<SortField>('created_at');
@@ -427,6 +428,7 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
+              ref={searchInputRef}
               placeholder={t('documents.search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
