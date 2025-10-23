@@ -66,7 +66,11 @@
     "userContextPlaceholder": "e.g. Cat, Surgery, Paw",
     "userContextHelp": "This information helps the AI with naming and organization",
     "skipAiAnalysis": "Without document analysis (uses only metadata and title)",
-    "smartUploadProcessing": "Analyzing document..."
+    "smartUploadProcessing": "Analyzing document...",
+    "documentTypeOptional": "Document Type (optional)",
+    "documentTypeHelp": "Helps the AI suggest better folder structures and metadata.",
+    "selectDocumentType": "Select type...",
+    "noDocumentType": "No type selected"
   },
   "documents": {
     "title": "My Documents",

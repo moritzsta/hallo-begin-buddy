@@ -15,6 +15,9 @@ import { useQuery } from '@tanstack/react-query';
 import { MetadataConfirmDialog } from './MetadataConfirmDialog';
 import { AiConfirmationDialog } from './AiConfirmationDialog';
 import { fadeInUp, staggerContainer, getAnimationProps } from '@/lib/animations';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { DOCUMENT_TYPES, getDocumentTypeLabel } from '@/lib/documentTypes';
 
 interface UploadFile {
   file: File;
@@ -51,10 +54,11 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
   const [aiConfirmDialogOpen, setAiConfirmDialogOpen] = useState(false);
   const [pendingSmartUploadId, setPendingSmartUploadId] = useState<string | null>(null);
   const [smartUploadLoading, setSmartUploadLoading] = useState<string | null>(null);
+  const [selectedDocumentType, setSelectedDocumentType] = useState<string>('');
   
   const { toast } = useToast();
   const { user, profile } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const planTier = (profile?.plan_tier || 'free') as keyof typeof PLAN_LIMITS;
   const limits = PLAN_LIMITS[planTier];
@@ -350,7 +354,8 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
         body: { 
           file_id: uploadFile.fileId,
           user_context: uploadFile.userContext || undefined,
-          skip_document_analysis: uploadFile.skipAiAnalysis || false
+          skip_document_analysis: uploadFile.skipAiAnalysis || false,
+          document_type_hint: selectedDocumentType || undefined
         },
       });
 
@@ -551,6 +556,36 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
 
   return (
     <div className="space-y-4">
+      {/* Document Type Selector */}
+      <Card className="p-4 space-y-3 border-primary/20 hover:border-primary/40 transition-colors">
+        <div className="flex items-start gap-2">
+          <Sparkles className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+          <div className="flex-1">
+            <Label htmlFor="document-type" className="text-sm font-semibold mb-1 block">
+              {t('upload.documentTypeOptional', { defaultValue: 'Dokumententyp (optional)' })}
+            </Label>
+            <p className="text-xs text-muted-foreground mb-3">
+              {t('upload.documentTypeHelp', { 
+                defaultValue: 'Hilft der KI, bessere Ordnerstrukturen und Metadaten vorzuschlagen.' 
+              })}
+            </p>
+            <Select value={selectedDocumentType} onValueChange={setSelectedDocumentType}>
+              <SelectTrigger id="document-type" className="w-full bg-background">
+                <SelectValue placeholder={t('upload.selectDocumentType', { defaultValue: 'Typ auswählen...' })} />
+              </SelectTrigger>
+              <SelectContent className="bg-popover z-50">
+                <SelectItem value="">{t('upload.noDocumentType', { defaultValue: 'Kein Typ ausgewählt' })}</SelectItem>
+                {Object.keys(DOCUMENT_TYPES).map((typeKey) => (
+                  <SelectItem key={typeKey} value={typeKey}>
+                    {getDocumentTypeLabel(typeKey, i18n.language)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </Card>
+
       <Card
         {...getRootProps()}
         className={`

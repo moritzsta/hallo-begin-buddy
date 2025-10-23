@@ -5,6 +5,7 @@ import {
   checkSmartUploadLimit,
   incrementUsageTracking,
 } from '../_shared/plan-utils.ts';
+import { getDocumentTypeContext } from './document-types.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -17,7 +18,7 @@ serve(async (req) => {
   }
 
   try {
-    const { file_id, user_context, skip_document_analysis } = await req.json();
+    const { file_id, user_context, skip_document_analysis, document_type_hint } = await req.json();
 
     if (!file_id) {
       throw new Error('file_id is required');
@@ -74,6 +75,15 @@ serve(async (req) => {
     // Add user context instruction if provided
     const userContextInstruction = user_context 
       ? `\n\nUSER PROVIDED CONTEXT: The user has indicated this document is related to: "${user_context}". Use this information as PRIMARY guidance for naming and organizing the document.`
+      : '';
+
+    // Add document type hint instruction if provided
+    const documentTypeContext = document_type_hint 
+      ? getDocumentTypeContext(document_type_hint)
+      : '';
+    
+    const documentTypeInstruction = document_type_hint
+      ? `\n\nDOCUMENT TYPE HINT: The user has indicated this is a "${document_type_hint}" document. ${documentTypeContext}`
       : '';
 
     // Get existing folder structure to ensure consistent organization
@@ -141,7 +151,7 @@ serve(async (req) => {
       const metadataPrompt = `Based on the document filename and user-provided metadata, suggest an optimal folder structure and organization:
 
 Document filename: ${file.title}
-${userContextInstruction}
+${userContextInstruction}${documentTypeInstruction}
 
 Extract:
 1. document_type: Type of document based on filename (e.g., photo, document, report, etc.)
@@ -331,7 +341,7 @@ Extract:
 3. keywords: 3-5 relevant keywords from the filename
 4. suggested_path: A logical folder structure path with flexible depth (1-6 levels, ideally 3-4). CRITICAL: AVOID duplicate or similar folder names (e.g., "Katze" and "Katzen" are duplicates). REUSE existing folders when they match the document content.
 
-${languageInstruction}${userContextInstruction}${folderStructureText}`;
+${languageInstruction}${userContextInstruction}${documentTypeInstruction}${folderStructureText}`;
 
         contentPayload = analysisPrompt;
       } else {
@@ -348,7 +358,7 @@ ${languageInstruction}${userContextInstruction}${folderStructureText}`;
 3. keywords: 3-5 relevant keywords from the filename
 4. suggested_path: A logical folder structure path with flexible depth (1-6 levels, ideally 3-4). CRITICAL: AVOID duplicate or similar folder names (e.g., "Katze" and "Katzen" are duplicates). REUSE existing folders when they match the document content.
 
-${languageInstruction}${userContextInstruction}${folderStructureText}`;
+${languageInstruction}${userContextInstruction}${documentTypeInstruction}${folderStructureText}`;
           
           contentPayload = analysisPrompt;
         } else {
@@ -374,7 +384,7 @@ ${languageInstruction}${userContextInstruction}${folderStructureText}`;
           const mimeType = file.mime || 'image/jpeg';
           const dataUrl = `data:${mimeType};base64,${base64Image}`;
 
-          analysisPrompt = `Analyze this image/document and extract: document type (e.g., invoice, receipt, letter, contract, photo, diagram), a suggested descriptive title (max 60 chars), 3-5 relevant keywords, and suggest an appropriate folder structure path with flexible depth (1-6 levels, ideally 3-4). AVOID duplicate or similar folder names (e.g., "Katze" and "Katzen"). REUSE existing folders whenever they match the content. ${languageInstruction}${userContextInstruction}${folderStructureText}`;
+          analysisPrompt = `Analyze this image/document and extract: document type (e.g., invoice, receipt, letter, contract, photo, diagram), a suggested descriptive title (max 60 chars), 3-5 relevant keywords, and suggest an appropriate folder structure path with flexible depth (1-6 levels, ideally 3-4). AVOID duplicate or similar folder names (e.g., "Katze" and "Katzen"). REUSE existing folders whenever they match the content. ${languageInstruction}${userContextInstruction}${documentTypeInstruction}${folderStructureText}`;
 
           contentPayload = [
             {
@@ -403,7 +413,7 @@ Extract:
 3. keywords: 3-5 relevant keywords from the content
 4. suggested_path: A logical folder structure path with flexible depth (1-6 levels, ideally 3-4). CRITICAL: AVOID duplicate or similar folder names (e.g., "Katze" and "Katzen" are duplicates). REUSE existing folders when they match the document content.
 
-${languageInstruction}${userContextInstruction}${folderStructureText}`;
+${languageInstruction}${userContextInstruction}${documentTypeInstruction}${folderStructureText}`;
 
       contentPayload = analysisPrompt;
     }

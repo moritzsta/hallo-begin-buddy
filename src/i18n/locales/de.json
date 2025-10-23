@@ -66,7 +66,11 @@
     "userContextPlaceholder": "z.B. Katze, Operation, Pfote",
     "userContextHelp": "Diese Informationen helfen der KI bei der Benennung und Einordnung",
     "skipAiAnalysis": "Ohne Dokumentenanalyse (nutzt nur Metadaten und Titel)",
-    "smartUploadProcessing": "Analysiere Dokument..."
+    "smartUploadProcessing": "Analysiere Dokument...",
+    "documentTypeOptional": "Dokumententyp (optional)",
+    "documentTypeHelp": "Hilft der KI, bessere Ordnerstrukturen und Metadaten vorzuschlagen.",
+    "selectDocumentType": "Typ auswählen...",
+    "noDocumentType": "Kein Typ ausgewählt"
   },
   "documents": {
     "title": "Meine Dokumente",
