@@ -126,7 +126,7 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
   const debouncedSearch = useDebounce(searchQuery, 1000);
 
   // Fetch documents
-  const { data: allFiles, isLoading } = useQuery({
+  const { data: allFiles, isLoading, isFetching } = useQuery({
     queryKey: ['files', user?.id, folderId, sortField, sortOrder, debouncedSearch],
     queryFn: async () => {
       let query = supabase
@@ -154,6 +154,13 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
     },
     enabled: !!user,
   });
+  
+  // Keep cursor focused in search input during searches
+  useEffect(() => {
+    if (searchInputRef.current && document.activeElement !== searchInputRef.current) {
+      searchInputRef.current.focus({ preventScroll: true });
+    }
+  }, [isLoading, isFetching]);
 
   // Check for new files
   const newFilesCount = useMemo(() => {
@@ -382,13 +389,6 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
     return `${(bytes / 1024 / 1024 / 1024).toFixed(1)} GB`;
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-4">
@@ -434,6 +434,9 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9"
             />
+            {(isLoading || isFetching) && (
+              <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
+            )}
           </div>
           <div className="flex gap-2">
             {/* View Mode Toggle */}
