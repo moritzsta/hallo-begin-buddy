@@ -257,14 +257,18 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const newFiles: UploadFile[] = acceptedFiles.map(file => {
       const validationError = validateFile(file);
+      // Set skipAiAnalysis based on user preferences:
+      // - If smart_upload_enabled is FALSE (disabled mode): skip AI analysis by default
+      // - If smart_upload_enabled is TRUE: do NOT skip (with-confirmation or auto mode)
+      const skipAiAnalysis = userPreferences?.smart_upload_enabled === false;
+      
       return {
         file,
         id: `${Date.now()}-${Math.random()}`,
         progress: 0,
         status: validationError ? ('error' as const) : ('pending' as const),
         error: validationError || undefined,
-        // Set skipAiAnalysis based on user preferences: if smart_upload_enabled is false, skip AI analysis by default
-        skipAiAnalysis: userPreferences?.smart_upload_enabled === false,
+        skipAiAnalysis,
       };
     });
 
@@ -312,17 +316,23 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
     const uploadFile = uploadFiles.find(f => f.id === uploadFileId);
     if (!uploadFile?.fileId) return;
 
-    // Only show AI confirmation if AI analysis is enabled (not skipped)
-    const showConfirmation = userPreferences?.show_ai_confirmation !== false && !uploadFile.skipAiAnalysis;
+    // Three modes based on user preferences:
+    // 1. disabled mode (smart_upload_enabled = false): User manually enabled AI via checkbox
+    // 2. with-confirmation mode (smart_upload_enabled = true, show_ai_confirmation = true): Show popup
+    // 3. auto mode (smart_upload_enabled = true, show_ai_confirmation = false): Direct execution
     
-    if (showConfirmation) {
+    const shouldShowConfirmation = 
+      userPreferences?.show_ai_confirmation !== false && 
+      !uploadFile.skipAiAnalysis;
+    
+    if (shouldShowConfirmation) {
       // Show AI confirmation dialog first
       setPendingSmartUploadId(uploadFileId);
       setAiConfirmDialogOpen(true);
       return;
     }
 
-    // Proceed with smart upload
+    // Proceed with smart upload directly
     await executeSmartUpload(uploadFileId);
   };
 

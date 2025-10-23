@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
@@ -52,8 +53,8 @@ const Settings = () => {
   const [searchParams] = useSearchParams();
   const [displayName, setDisplayName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-  const [smartUploadEnabled, setSmartUploadEnabled] = useState(false);
-  const [showAiConfirmation, setShowAiConfirmation] = useState(true);
+  // Smart upload mode: 'disabled' | 'with-confirmation' | 'auto'
+  const [smartUploadMode, setSmartUploadMode] = useState<'disabled' | 'with-confirmation' | 'auto'>('with-confirmation');
 
   const subscription = useSubscription();
   
@@ -100,8 +101,14 @@ const Settings = () => {
   // Initialize preferences state from fetched data
   useEffect(() => {
     if (preferences) {
-      setSmartUploadEnabled(preferences.smart_upload_enabled);
-      setShowAiConfirmation(preferences.show_ai_confirmation);
+      // Convert DB values to mode
+      if (!preferences.smart_upload_enabled) {
+        setSmartUploadMode('disabled');
+      } else if (preferences.show_ai_confirmation) {
+        setSmartUploadMode('with-confirmation');
+      } else {
+        setSmartUploadMode('auto');
+      }
     }
   }, [preferences]);
 
@@ -175,14 +182,18 @@ const Settings = () => {
   const handleSaveSmartUploadPreferences = async () => {
     setIsSaving(true);
     try {
+      // Convert mode to DB values
+      const smart_upload_enabled = smartUploadMode !== 'disabled';
+      const show_ai_confirmation = smartUploadMode === 'with-confirmation';
+
       // Check if preferences exist
       if (preferences) {
         // Update existing preferences
         const { error } = await supabase
           .from('user_preferences')
           .update({
-            smart_upload_enabled: smartUploadEnabled,
-            show_ai_confirmation: showAiConfirmation,
+            smart_upload_enabled,
+            show_ai_confirmation,
           })
           .eq('user_id', user!.id);
         
@@ -193,8 +204,8 @@ const Settings = () => {
           .from('user_preferences')
           .insert({
             user_id: user!.id,
-            smart_upload_enabled: smartUploadEnabled,
-            show_ai_confirmation: showAiConfirmation,
+            smart_upload_enabled,
+            show_ai_confirmation,
           });
         
         if (error) throw error;
@@ -327,37 +338,46 @@ const Settings = () => {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4">
-                  <div className="flex items-start justify-between gap-4 rounded-lg border p-4">
-                    <div className="space-y-1 flex-1">
-                      <Label className="text-base font-medium">
-                        {t('settings.enableSmartUpload')}
-                      </Label>
-                      <p className="text-sm text-muted-foreground">
-                        {t('settings.enableSmartUploadDesc')}
-                      </p>
+                  <Label className="text-base font-medium">
+                    {t('settings.smartUploadMode')}
+                  </Label>
+                  <RadioGroup value={smartUploadMode} onValueChange={(value) => setSmartUploadMode(value as any)}>
+                    <div className="flex items-start gap-4 rounded-lg border p-4 hover:bg-accent/50 transition-colors">
+                      <RadioGroupItem value="disabled" id="mode-disabled" className="mt-1" />
+                      <div className="space-y-1 flex-1">
+                        <Label htmlFor="mode-disabled" className="text-base font-medium cursor-pointer">
+                          {t('settings.smartUploadDisabled')}
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                          {t('settings.smartUploadDisabledDesc')}
+                        </p>
+                      </div>
                     </div>
-                    <Checkbox
-                      checked={smartUploadEnabled}
-                      onCheckedChange={(checked) => setSmartUploadEnabled(checked === true)}
-                      className="mt-1"
-                    />
-                  </div>
 
-                  <div className="flex items-start justify-between gap-4 rounded-lg border p-4 bg-muted/30">
-                    <div className="space-y-1 flex-1">
-                      <Label className="text-base font-medium">
-                        {t('settings.showAiConfirmation')}
-                      </Label>
-                      <p className="text-sm text-muted-foreground">
-                        {t('settings.showAiConfirmationDesc')}
-                      </p>
+                    <div className="flex items-start gap-4 rounded-lg border p-4 hover:bg-accent/50 transition-colors">
+                      <RadioGroupItem value="with-confirmation" id="mode-with-confirmation" className="mt-1" />
+                      <div className="space-y-1 flex-1">
+                        <Label htmlFor="mode-with-confirmation" className="text-base font-medium cursor-pointer">
+                          {t('settings.smartUploadWithConfirmation')}
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                          {t('settings.smartUploadWithConfirmationDesc')}
+                        </p>
+                      </div>
                     </div>
-                    <Checkbox
-                      checked={showAiConfirmation}
-                      onCheckedChange={(checked) => setShowAiConfirmation(checked === true)}
-                      className="mt-1"
-                    />
-                  </div>
+
+                    <div className="flex items-start gap-4 rounded-lg border p-4 hover:bg-accent/50 transition-colors">
+                      <RadioGroupItem value="auto" id="mode-auto" className="mt-1" />
+                      <div className="space-y-1 flex-1">
+                        <Label htmlFor="mode-auto" className="text-base font-medium cursor-pointer">
+                          {t('settings.smartUploadAuto')}
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                          {t('settings.smartUploadAutoDesc')}
+                        </p>
+                      </div>
+                    </div>
+                  </RadioGroup>
                 </div>
 
                 <Separator />
