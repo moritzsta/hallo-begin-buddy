@@ -15,22 +15,22 @@ export const DOCUMENT_TYPES: Record<string, DocumentTypeConfig> = {
   insurance: {
     label_de: 'Versicherung',
     label_en: 'Insurance',
-    context: 'This is an insurance-related document. Suggest folder structures like "Versicherungen/[Insurance Type]/[Year]" or "Insurance/[Type]/[Year]". Look for policy numbers, coverage dates, and insurance company names.',
+    context: 'This is an insurance-related document. TITLE FORMAT: Use "[Insurance Type] - [Company] - [Policy Number] - [Year]" format (e.g., "Kfz-Versicherung - Allianz - 123456789 - 2024"). KEYWORDS: Extract insurance type, policy number, insurance company, coverage start date, coverage end date, insured person/object. FOLDER: "Versicherungen/[Type]/[Year]" or "Insurance/[Type]/[Year]".',
   },
   contract: {
     label_de: 'Vertrag',
     label_en: 'Contract',
-    context: 'This is a contract document. Suggest folder structures like "Verträge/[Contract Type]" or "Contracts/[Type]". Look for contract dates, parties involved, and contract types (rental, employment, service, etc.).',
+    context: 'This is a contract document. TITLE FORMAT: Use "[Contract Type] - [Party Name] - [Start Date]" format (e.g., "Mietvertrag - Mustermann GmbH - 01.01.2024"). KEYWORDS: Extract contract type, contract number, both parties\' names, start date, end date, contract value. FOLDER: "Verträge/[Type]/[Year]" or "Contracts/[Type]/[Year]".',
   },
   invoice: {
     label_de: 'Rechnung',
     label_en: 'Invoice',
-    context: 'This is an invoice or bill. Suggest folder structures like "Rechnungen/[Year]/[Vendor]" or "Invoices/[Year]/[Vendor]". Extract invoice numbers, dates, amounts, and vendor names.',
+    context: 'This is an invoice or bill. TITLE FORMAT: Use "RE[Invoice Number] - [Vendor] - [Amount] - [Date]" format (e.g., "RE2024-0027 - Acme GmbH - 1.234,56 EUR - 15.03.2024"). KEYWORDS: Extract invoice number, vendor name, invoice date, due date, total amount, tax ID/VAT number. FOLDER: "Rechnungen/[Year]/[Vendor Category]" or "Invoices/[Year]/[Vendor Category]".',
   },
   tax: {
     label_de: 'Steuer',
     label_en: 'Tax',
-    context: 'This is a tax-related document. Suggest folder structures like "Steuern/[Year]/[Tax Type]" or "Taxes/[Year]/[Type]". Look for tax years, tax IDs, and document types (returns, assessments, receipts).',
+    context: 'This is a tax-related document. TITLE FORMAT: Use "[Document Type] - [Tax Year] - [Tax ID/Number]" format (e.g., "Einkommensteuerbescheid 2023 - Steuernummer 123/456/78901"). KEYWORDS: Extract tax year, tax ID, document type (return/assessment/receipt), tax office, taxpayer name, filing date. FOLDER: "Steuern/[Year]/[Type]" or "Taxes/[Year]/[Type]".',
   },
   id_document: {
     label_de: 'Ausweis / Identitätsdokument',
@@ -40,12 +40,12 @@ export const DOCUMENT_TYPES: Record<string, DocumentTypeConfig> = {
   bank_statement: {
     label_de: 'Kontoauszug',
     label_en: 'Bank Statement',
-    context: 'This is a bank statement. Suggest folder structures like "Finanzen/Kontoauszüge/[Year]/[Month]" or "Finance/Bank Statements/[Year]/[Month]". Look for account numbers, dates, and bank names.',
+    context: 'This is a bank statement. TITLE FORMAT: Use "[Bank Name] - Kontoauszug [Month/Year] - Konto [Last 4 digits]" format (e.g., "Sparkasse - Kontoauszug März 2024 - Konto 1234"). KEYWORDS: Extract bank name, account number (last 4 digits only), statement period, statement date, account holder name. FOLDER: "Finanzen/Kontoauszüge/[Year]/[Month]" or "Finance/Bank Statements/[Year]/[Month]".',
   },
   quote: {
     label_de: 'Angebot / Kostenvoranschlag',
     label_en: 'Quote / Estimate',
-    context: 'This is a quote or cost estimate. Suggest folder structures like "Angebote/[Year]/[Vendor]" or "Quotes/[Year]/[Vendor]". Extract quote numbers, dates, amounts, and vendor information.',
+    context: 'This is a quote or cost estimate. TITLE FORMAT: Use "Angebot [Number] - [Vendor] - [Amount] - [Date]" format (e.g., "Angebot 2024-042 - Handwerk GmbH - 2.500 EUR - 10.03.2024"). KEYWORDS: Extract quote number, vendor name, quote date, valid until date, total amount, service/product description. FOLDER: "Angebote/[Year]/[Service Category]" or "Quotes/[Year]/[Service Category]".',
   },
   photo: {
     label_de: 'Foto',
@@ -55,22 +55,22 @@ export const DOCUMENT_TYPES: Record<string, DocumentTypeConfig> = {
   medical: {
     label_de: 'Medizinisches Dokument',
     label_en: 'Medical Document',
-    context: 'This is a medical document (prescription, test result, medical report, etc.). Suggest folder structures like "Gesundheit/[Type]/[Year]" or "Health/[Type]/[Year]". Look for dates, doctor names, and medical procedures.',
+    context: 'This is a medical document (prescription, test result, medical report, etc.). TITLE FORMAT: Use "[Document Type] - [Doctor/Clinic] - [Date] - [Patient]" format (e.g., "Laborbefund - Dr. Müller - 20.03.2024 - Max Mustermann"). KEYWORDS: Extract document type, doctor/clinic name, patient name, document date, medical procedure/test type. FOLDER: "Gesundheit/[Type]/[Year]" or "Health/[Type]/[Year]".',
   },
   receipt: {
     label_de: 'Beleg / Quittung',
     label_en: 'Receipt',
-    context: 'This is a receipt or proof of purchase. Suggest folder structures like "Belege/[Year]/[Category]" or "Receipts/[Year]/[Category]". Extract dates, amounts, and vendor names.',
+    context: 'This is a receipt or proof of purchase. TITLE FORMAT: Use "[Vendor] - [Amount] - [Date] - [Item/Category]" format (e.g., "MediaMarkt - 49,99 EUR - 15.03.2024 - Elektronik"). KEYWORDS: Extract vendor name, purchase date, total amount, payment method, purchased items/categories. FOLDER: "Belege/[Year]/[Category]" or "Receipts/[Year]/[Category]".',
   },
   certificate: {
     label_de: 'Zertifikat / Bescheinigung',
     label_en: 'Certificate',
-    context: 'This is a certificate or credential document. Suggest folder structures like "Zertifikate/[Type]" or "Certificates/[Type]". Look for issue dates, issuing organizations, and validity periods.',
+    context: 'This is a certificate or credential document. TITLE FORMAT: Use "[Certificate Type] - [Issuer] - [Recipient] - [Issue Date]" format (e.g., "Deutschzertifikat B2 - Goethe Institut - Max Mustermann - 15.06.2024"). KEYWORDS: Extract certificate type, issuing organization, recipient name, issue date, valid until date, certificate number. FOLDER: "Zertifikate/[Type]" or "Certificates/[Type]".',
   },
   correspondence: {
     label_de: 'Korrespondenz / Brief',
     label_en: 'Correspondence / Letter',
-    context: 'This is correspondence or a letter. Suggest folder structures like "Korrespondenz/[Year]/[Sender]" or "Correspondence/[Year]/[Sender]". Identify sender, recipient, date, and subject.',
+    context: 'This is correspondence or a letter. TITLE FORMAT: Use "[Sender] - [Subject] - [Date]" format (e.g., "Stadtwerke München - Jahresabrechnung Strom - 05.01.2024"). KEYWORDS: Extract sender name, recipient name, letter date, subject/topic, reference number. FOLDER: "Korrespondenz/[Year]/[Sender Category]" or "Correspondence/[Year]/[Sender Category]".',
   },
   graphic: {
     label_de: 'Grafik / Illustration',
