@@ -208,6 +208,26 @@
     "retry": "Erneut versuchen",
     "goToHome": "Zur Startseite"
   },
+  "shortcuts": {
+    "title": "Tastenkombinationen",
+    "description": "Nutzen Sie diese Shortcuts für schnelleres Arbeiten",
+    "upload": "Upload-Tab öffnen",
+    "search": "Suche fokussieren",
+    "newFolder": "Neuer Ordner",
+    "showHelp": "Diese Hilfe anzeigen",
+    "close": "Dialog schließen",
+    "tip": "Tipp: Drücken Sie ? um diese Übersicht jederzeit anzuzeigen"
+  },
+  "onboarding": {
+    "step1": "Hier können Sie Dateien hochladen. Mit 'Smart Upload' analysiert unsere KI Ihre Dokumente automatisch und schlägt den besten Ablageort vor.",
+    "step1Title": "Dateien hochladen",
+    "step2": "In der Seitenleiste verwalten Sie Ihre Ordnerstruktur. Klicken Sie auf einen Ordner, um dessen Inhalte anzuzeigen. Neue Ordner können Sie mit dem +-Symbol erstellen.",
+    "step2Title": "Ordner organisieren",
+    "step3": "Hier finden Sie alle Ihre Dokumente. Nutzen Sie die Suche und Filter, um schnell die richtige Datei zu finden. 'Neu'-Badges zeigen ungelesene Dateien an.",
+    "step3Title": "Dokumente finden",
+    "skip": "Überspringen",
+    "finish": "Fertig"
+  },
   "viewer": {
     "zoomIn": "Vergrößern",
     "zoomOut": "Verkleinern",

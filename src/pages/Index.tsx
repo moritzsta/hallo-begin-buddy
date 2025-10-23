@@ -8,7 +8,10 @@ import { DocumentList } from '@/components/documents/DocumentList';
 import { FolderTree } from '@/components/folders/FolderTree';
 import { ProfileMenu } from '@/components/ProfileMenu';
 import { LifestyleGradientBar } from '@/components/LifestyleGradientBar';
+import { OnboardingTour } from '@/components/OnboardingTour';
+import { KeyboardShortcutsDialog } from '@/components/KeyboardShortcutsDialog';
 import { useFolderUnreadCounts } from '@/hooks/useFolderUnreadCounts';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { Upload, FileText } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -19,10 +22,12 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState('documents');
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
 
-  // Check if user is admin
+  // Check if user is admin & if onboarding needed
   useEffect(() => {
-    const checkAdmin = async () => {
+    const checkAdminAndOnboarding = async () => {
       if (!user) return;
 
       const { data, error } = await supabase
@@ -33,10 +38,47 @@ const Index = () => {
         .maybeSingle();
 
       setIsAdmin(!error && data !== null);
+
+      // Check if onboarding completed
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('onboarding_completed')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (profile && !profile.onboarding_completed) {
+        // Show onboarding after short delay
+        setTimeout(() => setShowOnboarding(true), 1000);
+      }
     };
 
-    checkAdmin();
+    checkAdminAndOnboarding();
   }, [user]);
+
+  // Keyboard shortcuts
+  useKeyboardShortcuts([
+    {
+      key: 'u',
+      ctrl: true,
+      handler: () => setActiveTab('upload'),
+      description: 'Open upload tab',
+    },
+    {
+      key: 'f',
+      ctrl: true,
+      handler: () => {
+        const searchInput = document.querySelector<HTMLInputElement>('[data-search-input]');
+        searchInput?.focus();
+      },
+      description: 'Focus search',
+    },
+    {
+      key: '?',
+      ctrl: false,
+      handler: () => setShowShortcuts(true),
+      description: 'Show keyboard shortcuts',
+    },
+  ]);
 
   const handleLogout = async () => {
     await signOut();
@@ -45,10 +87,18 @@ const Index = () => {
   return (
     <>
       <LifestyleGradientBar />
+      <OnboardingTour 
+        run={showOnboarding} 
+        onFinish={() => setShowOnboarding(false)} 
+      />
+      <KeyboardShortcutsDialog 
+        open={showShortcuts} 
+        onOpenChange={setShowShortcuts} 
+      />
       <SidebarProvider>
         <div className="min-h-screen w-full flex bg-background">
         {/* Sidebar with Folder Tree */}
-        <Sidebar className="border-r">
+        <Sidebar className="border-r" data-tour="folder-sidebar">
           <SidebarContent>
             <div className="p-4 border-b">
               <h2 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
@@ -86,11 +136,19 @@ const Index = () => {
           <main className="flex-1 p-6 overflow-auto">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full max-w-md grid-cols-2">
-                <TabsTrigger value="documents" className="flex items-center gap-2">
+                <TabsTrigger 
+                  value="documents" 
+                  className="flex items-center gap-2"
+                  data-tour="documents-tab"
+                >
                   <FileText className="h-4 w-4" />
                   {t('documents.title')}
                 </TabsTrigger>
-                <TabsTrigger value="upload" className="flex items-center gap-2">
+                <TabsTrigger 
+                  value="upload" 
+                  className="flex items-center gap-2"
+                  data-tour="upload-tab"
+                >
                   <Upload className="h-4 w-4" />
                   {t('upload.title')}
                 </TabsTrigger>

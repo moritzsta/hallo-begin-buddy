@@ -199,6 +199,7 @@ export type Database = {
           id: string
           last_seen_at: string | null
           locale: string
+          onboarding_completed: boolean | null
           plan_tier: string
           theme: string
           updated_at: string
@@ -208,6 +209,7 @@ export type Database = {
           id: string
           last_seen_at?: string | null
           locale?: string
+          onboarding_completed?: boolean | null
           plan_tier?: string
           theme?: string
           updated_at?: string
@@ -217,6 +219,7 @@ export type Database = {
           id?: string
           last_seen_at?: string | null
           locale?: string
+          onboarding_completed?: boolean | null
           plan_tier?: string
           theme?: string
           updated_at?: string

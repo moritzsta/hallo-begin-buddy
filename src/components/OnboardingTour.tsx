@@ -41,17 +41,20 @@ export const OnboardingTour = ({ run, onFinish }: OnboardingTourProps) => {
     },
   ];
 
-  const handleJoyrideCallback = async (data: CallBackProps) => {
+  const handleJoyrideCallback = (data: CallBackProps) => {
     const { status } = data;
     const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
 
     if (finishedStatuses.includes(status)) {
-      // Mark tour as completed in database
+      // Mark tour as completed in database (deferred to avoid blocking)
       if (user) {
-        await supabase
-          .from('profiles')
-          .update({ onboarding_completed: true })
-          .eq('user_id', user.id);
+        setTimeout(() => {
+          supabase
+            .from('profiles')
+            .update({ onboarding_completed: true })
+            .eq('id', user.id)
+            .then(() => console.log('Onboarding completed'));
+        }, 0);
       }
       onFinish();
     }

@@ -1,12 +1,13 @@
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
-import { Upload, X, FileIcon, Loader2, Sparkles } from 'lucide-react';
+import { Upload, X, FileIcon, Loader2, Sparkles, HelpCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -753,34 +754,47 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
                       </div>
 
                       {/* Smart Upload Button */}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => triggerSmartUpload(uploadFile.id)}
-                        disabled={smartUploadLoading === uploadFile.id}
-                        className="w-full relative overflow-hidden group/btn hover:shadow-glow transition-all duration-300"
-                      >
-                        {/* Animated gradient background on hover */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-secondary/10 to-tertiary/10 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
-                        
-                        {smartUploadLoading === uploadFile.id ? (
-                          <>
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin relative z-10" />
-                            <span className="relative z-10">{t('upload.smartUploadProcessing', { defaultValue: 'Analysiere Dokument...' })}</span>
-                          </>
-                        ) : (
-                          <>
-                            <motion.div
-                              animate={{ rotate: [0, 10, -10, 0] }}
-                              transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
-                              className="relative z-10"
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => triggerSmartUpload(uploadFile.id)}
+                              disabled={smartUploadLoading === uploadFile.id}
+                              className="w-full relative overflow-hidden group/btn hover:shadow-glow transition-all duration-300"
                             >
-                              <Sparkles className="h-4 w-4 mr-2 text-primary" />
-                            </motion.div>
-                            <span className="relative z-10 font-semibold">{t('upload.smartUpload', { defaultValue: 'Smart Upload' })}</span>
-                          </>
-                        )}
-                      </Button>
+                              {/* Animated gradient background on hover */}
+                              <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-secondary/10 to-tertiary/10 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
+                              
+                              {smartUploadLoading === uploadFile.id ? (
+                                <>
+                                  <Loader2 className="h-4 w-4 mr-2 animate-spin relative z-10" />
+                                  <span className="relative z-10">{t('upload.smartUploadProcessing', { defaultValue: 'Analysiere Dokument...' })}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <motion.div
+                                    animate={{ rotate: [0, 10, -10, 0] }}
+                                    transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
+                                    className="relative z-10"
+                                  >
+                                    <Sparkles className="h-4 w-4 mr-2 text-primary" />
+                                  </motion.div>
+                                  <span className="relative z-10 font-semibold">{t('upload.smartUpload', { defaultValue: 'Smart Upload' })}</span>
+                                </>
+                              )}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="max-w-xs">
+                            <p className="text-sm">
+                              {t('upload.smartUploadTooltip', { 
+                                defaultValue: 'Unsere KI analysiert Ihr Dokument, erkennt wichtige Informationen und schlägt automatisch den besten Ablageort vor.' 
+                              })}
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </div>
                   )}
 

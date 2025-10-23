@@ -208,6 +208,26 @@
     "retry": "Retry",
     "goToHome": "Go to Home"
   },
+  "shortcuts": {
+    "title": "Keyboard shortcuts",
+    "description": "Use these shortcuts for faster work",
+    "upload": "Open upload tab",
+    "search": "Focus search",
+    "newFolder": "New folder",
+    "showHelp": "Show this help",
+    "close": "Close dialog",
+    "tip": "Tip: Press ? to show this overview anytime"
+  },
+  "onboarding": {
+    "step1": "Here you can upload files. With 'Smart Upload' our AI automatically analyzes your documents and suggests the best storage location.",
+    "step1Title": "Upload files",
+    "step2": "In the sidebar you manage your folder structure. Click on a folder to view its contents. You can create new folders with the + icon.",
+    "step2Title": "Organize folders",
+    "step3": "Here you find all your documents. Use search and filters to quickly find the right file. 'New' badges show unread files.",
+    "step3Title": "Find documents",
+    "skip": "Skip",
+    "finish": "Finish"
+  },
   "viewer": {
     "zoomIn": "Zoom In",
     "zoomOut": "Zoom Out",
