@@ -6,6 +6,7 @@ import { useTheme } from 'next-themes';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { useDebounce } from '@/hooks/useDebounce';
 import { staggerContainer, listItem, getAnimationProps, fadeIn } from '@/lib/animations';
 import {
   Table,
@@ -91,7 +92,6 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
   const [moveFileId, setMoveFileId] = useState<string | null>(null);
   const [editTagsFileId, setEditTagsFileId] = useState<string | null>(null);
   const [editTagsCurrentTags, setEditTagsCurrentTags] = useState<string[]>([]);
-  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [previewFile, setPreviewFile] = useState<FileRecord | null>(null);
   const [shareFileId, setShareFileId] = useState<string | null>(null);
@@ -121,13 +121,8 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
     enabled: !!user,
   });
 
-  // Debounce search query
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchQuery);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
+  // Debounce search query with 600ms delay
+  const debouncedSearch = useDebounce(searchQuery, 600);
 
   // Fetch documents
   const { data: allFiles, isLoading } = useQuery({
