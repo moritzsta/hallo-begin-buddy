@@ -314,29 +314,51 @@ ${languageInstruction}${folderStructureText}`;
     let analysisPrompt = '';
     
     if (isImage) {
-      // For images, pass a short-lived signed URL directly (avoid large base64 payloads)
-      const { data: signedData, error: signedError } = await supabase.storage
-        .from('documents')
-        .createSignedUrl(file.storage_path, 300);
+      // Check if image format is supported by AI Gateway
+      // GIF and some other formats may not be supported, use fallback
+      const unsupportedImageFormats = ['image/gif', 'image/svg+xml'];
+      
+      if (unsupportedImageFormats.includes(mimeType)) {
+        // Fallback to filename-based analysis for unsupported image formats
+        console.log(`Unsupported image format ${mimeType}, using filename-based analysis`);
+        analysisPrompt = `Analyze this document and extract metadata to help organize it intelligently.
 
-      if (signedError || !signedData) {
-        throw new Error('Failed to get signed URL for image');
-      }
+Document filename: ${file.title}
 
-      analysisPrompt = `Analyze this image/document and extract: document type (e.g., invoice, receipt, letter, contract, photo, diagram), a suggested descriptive title (max 60 chars), 3-5 relevant keywords, and suggest an appropriate folder structure path with flexible depth (1-6 levels, ideally 3-4). AVOID duplicate or similar folder names (e.g., "Katze" and "Katzen"). REUSE existing folders whenever they match the content. ${languageInstruction}${userContextInstruction}${folderStructureText}`;
+Extract:
+1. document_type: Type of document (e.g., photo, animation, graphic, diagram, etc.)
+2. suggested_title: A descriptive title (max 60 chars) based on the filename
+3. keywords: 3-5 relevant keywords from the filename
+4. suggested_path: A logical folder structure path with flexible depth (1-6 levels, ideally 3-4). CRITICAL: AVOID duplicate or similar folder names (e.g., "Katze" and "Katzen" are duplicates). REUSE existing folders when they match the document content.
 
-      contentPayload = [
-        {
-          type: 'text',
-          text: analysisPrompt,
-        },
-        {
-          type: 'image_url',
-          image_url: {
-            url: signedData.signedUrl,
+${languageInstruction}${userContextInstruction}${folderStructureText}`;
+
+        contentPayload = analysisPrompt;
+      } else {
+        // For supported images, pass a short-lived signed URL directly (avoid large base64 payloads)
+        const { data: signedData, error: signedError } = await supabase.storage
+          .from('documents')
+          .createSignedUrl(file.storage_path, 300);
+
+        if (signedError || !signedData) {
+          throw new Error('Failed to get signed URL for image');
+        }
+
+        analysisPrompt = `Analyze this image/document and extract: document type (e.g., invoice, receipt, letter, contract, photo, diagram), a suggested descriptive title (max 60 chars), 3-5 relevant keywords, and suggest an appropriate folder structure path with flexible depth (1-6 levels, ideally 3-4). AVOID duplicate or similar folder names (e.g., "Katze" and "Katzen"). REUSE existing folders whenever they match the content. ${languageInstruction}${userContextInstruction}${folderStructureText}`;
+
+        contentPayload = [
+          {
+            type: 'text',
+            text: analysisPrompt,
           },
-        },
-      ];
+          {
+            type: 'image_url',
+            image_url: {
+              url: signedData.signedUrl,
+            },
+          },
+        ];
+      }
     } else {
       // For PDFs and Office docs, use extracted text
       analysisPrompt = `Analyze this document and extract metadata to help organize it intelligently.

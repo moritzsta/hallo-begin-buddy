@@ -318,13 +318,12 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
 
     // Logic:
     // - If skipAiAnalysis is true (document analysis disabled): No confirmation needed
-    // - If skipAiAnalysis is false AND smart_upload_enabled is true AND show_ai_confirmation is true: Show confirmation popup
+    // - If skipAiAnalysis is false AND smart_upload_enabled is true: Show confirmation popup
     // - Otherwise: Direct execution
     
     const shouldShowConfirmation = 
       !uploadFile.skipAiAnalysis && 
-      userPreferences?.smart_upload_enabled === true &&
-      userPreferences?.show_ai_confirmation === true;
+      userPreferences?.smart_upload_enabled === true;
     
     if (shouldShowConfirmation) {
       // Show AI confirmation dialog first

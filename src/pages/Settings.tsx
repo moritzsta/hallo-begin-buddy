@@ -54,7 +54,6 @@ const Settings = () => {
   const [displayName, setDisplayName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [aiDocAnalysisEnabled, setAiDocAnalysisEnabled] = useState(false);
-  const [showAiConfirmation, setShowAiConfirmation] = useState(true);
 
   const subscription = useSubscription();
   
@@ -102,7 +101,6 @@ const Settings = () => {
   useEffect(() => {
     if (preferences) {
       setAiDocAnalysisEnabled(preferences.smart_upload_enabled);
-      setShowAiConfirmation(preferences.show_ai_confirmation);
     }
   }, [preferences]);
 
@@ -183,7 +181,6 @@ const Settings = () => {
           .from('user_preferences')
           .update({
             smart_upload_enabled: aiDocAnalysisEnabled,
-            show_ai_confirmation: showAiConfirmation,
           })
           .eq('user_id', user!.id);
         
@@ -195,7 +192,6 @@ const Settings = () => {
           .insert({
             user_id: user!.id,
             smart_upload_enabled: aiDocAnalysisEnabled,
-            show_ai_confirmation: showAiConfirmation,
           });
         
         if (error) throw error;
@@ -330,12 +326,8 @@ const Settings = () => {
                 <RadioGroup
                   value={aiDocAnalysisEnabled ? 'enabled' : 'disabled'}
                   onValueChange={(value) => {
-                    const enabled = value === 'enabled';
-                    setAiDocAnalysisEnabled(enabled);
-                    if (!enabled) {
-                      setShowAiConfirmation(false);
-                    }
-                  }}
+                  setAiDocAnalysisEnabled(value === 'enabled');
+                }}
                   className="space-y-4"
                 >
                   {/* Option 1: KI-Dokumentenanalyse aktivieren */}
@@ -367,26 +359,6 @@ const Settings = () => {
                     </div>
                   </div>
                 </RadioGroup>
-
-                {/* Bestätigungsdialog - nur aktiv wenn Dokumentenanalyse aktiviert */}
-                <div className={`flex items-start justify-between gap-4 rounded-lg border p-4 transition-opacity ${
-                  aiDocAnalysisEnabled ? 'opacity-100' : 'opacity-50'
-                }`}>
-                  <div className="space-y-1 flex-1">
-                    <Label className="text-base font-medium">
-                      {t('settings.showAiConfirmation')}
-                    </Label>
-                    <p className="text-sm text-muted-foreground">
-                      {t('settings.showAiConfirmationDesc')}
-                    </p>
-                  </div>
-                  <Checkbox
-                    checked={showAiConfirmation}
-                    onCheckedChange={(checked) => setShowAiConfirmation(checked === true)}
-                    disabled={!aiDocAnalysisEnabled}
-                    className="mt-1"
-                  />
-                </div>
 
                 <Separator />
 
