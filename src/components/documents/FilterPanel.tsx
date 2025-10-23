@@ -211,8 +211,8 @@ export const FilterPanel = ({
               </Badge>
             )}
           </div>
-          <div className="relative border rounded-md overflow-hidden bg-muted/20">
-            <div className="space-y-1.5 max-h-64 overflow-y-auto p-2 custom-scrollbar">
+          <div className="border-2 rounded-md bg-muted/20">
+            <div className="space-y-1.5 max-h-64 overflow-y-auto p-2">
               {getAllDocumentTypes().map((type) => (
                 <div 
                   key={type} 
@@ -247,8 +247,8 @@ export const FilterPanel = ({
                 </Badge>
               )}
             </div>
-            <div className="relative border rounded-md overflow-hidden bg-muted/20">
-              <div className="space-y-1.5 max-h-64 overflow-y-auto p-2 custom-scrollbar">
+            <div className="border-2 rounded-md bg-muted/20">
+              <div className="space-y-1.5 max-h-64 overflow-y-auto p-2">
                 {availableTags.sort().map((tag) => (
                   <div 
                     key={tag}
