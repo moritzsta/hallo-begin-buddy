@@ -72,18 +72,19 @@ export const FileDetailsModal = ({
   const [editTitle, setEditTitle] = useState('');
   const [editTags, setEditTags] = useState<string[]>([]);
 
-  if (!file) return null;
-
   // Initialize editing state when file changes
   const handleStartEdit = () => {
-    setEditTitle(file.title);
-    setEditTags(file.tags || []);
-    setIsEditing(true);
+    if (file) {
+      setEditTitle(file.title);
+      setEditTags(file.tags || []);
+      setIsEditing(true);
+    }
   };
 
   // Save mutation
   const saveMutation = useMutation({
     mutationFn: async () => {
+      if (!file) return;
       const { error } = await supabase
         .from('files')
         .update({
@@ -114,10 +115,11 @@ export const FileDetailsModal = ({
   // Mark as seen when opening
   const markAsSeenMutation = useMutation({
     mutationFn: async () => {
+      if (!file || !user) return;
       const { error } = await supabase
         .from('profiles')
         .update({ last_seen_at: file.created_at })
-        .eq('id', user!.id);
+        .eq('id', user.id);
 
       if (error) throw error;
     },
@@ -140,6 +142,8 @@ export const FileDetailsModal = ({
     if (bytes < 1024 * 1024 * 1024) return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
     return `${(bytes / 1024 / 1024 / 1024).toFixed(1)} GB`;
   };
+
+  if (!file) return null;
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
