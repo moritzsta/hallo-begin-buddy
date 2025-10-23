@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -24,6 +24,9 @@ import {
   X,
   Save,
   Edit,
+  Calendar,
+  HardDrive,
+  ChevronRight,
 } from 'lucide-react';
 import { DocumentPreview } from './DocumentPreview';
 import { TagInput } from './TagInput';
@@ -71,6 +74,36 @@ export const FileDetailsModal = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState('');
   const [editTags, setEditTags] = useState<string[]>([]);
+
+  // Fetch folders to build breadcrumb path
+  const { data: folders = [] } = useQuery({
+    queryKey: ['folders'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('folders')
+        .select('*');
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!file,
+  });
+
+  // Build folder path breadcrumb
+  const folderPath = useMemo(() => {
+    if (!file || !file.folder_id || !folders.length) return null;
+    
+    const path: Array<{ id: string; name: string }> = [];
+    let currentFolderId = file.folder_id;
+    
+    while (currentFolderId) {
+      const folder = folders.find(f => f.id === currentFolderId);
+      if (!folder) break;
+      path.unshift({ id: folder.id, name: folder.name });
+      currentFolderId = folder.parent_id;
+    }
+    
+    return path;
+  }, [file, folders]);
 
   // Initialize editing state when file changes
   const handleStartEdit = () => {
@@ -228,6 +261,65 @@ export const FileDetailsModal = ({
               {/* Right: Details & Actions */}
               <ScrollArea className="h-full">
                 <div className="space-y-6 pr-4">
+                  {/* File Information */}
+                  <div>
+                    <Label className="mb-3 block">{t('documents.fileInfo')}</Label>
+                    <div className="space-y-3 text-sm">
+                      {/* Folder Path */}
+                      {folderPath && folderPath.length > 0 && (
+                        <div className="flex items-start gap-2">
+                          <FolderIcon className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <span className="text-muted-foreground">{t('documents.folder')}:</span>
+                            <div className="flex items-center gap-1 flex-wrap mt-1">
+                              {folderPath.map((folder, idx) => (
+                                <div key={folder.id} className="flex items-center gap-1">
+                                  <span className="font-medium truncate">{folder.name}</span>
+                                  {idx < folderPath.length - 1 && (
+                                    <ChevronRight className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* File Size */}
+                      <div className="flex items-center gap-2">
+                        <HardDrive className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <span className="text-muted-foreground">{t('documents.size')}:</span>
+                          <span className="font-medium ml-2">{formatFileSize(file.size)}</span>
+                        </div>
+                      </div>
+
+                      {/* Upload Date */}
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <span className="text-muted-foreground">{t('documents.uploadDate')}:</span>
+                          <span className="font-medium ml-2">
+                            {format(new Date(file.created_at), 'dd.MM.yyyy HH:mm', { locale: de })}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Last Modified */}
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <span className="text-muted-foreground">{t('documents.lastModified')}:</span>
+                          <span className="font-medium ml-2">
+                            {format(new Date(file.updated_at), 'dd.MM.yyyy HH:mm', { locale: de })}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
                   {/* Tags */}
                   <div>
                     <Label className="flex items-center gap-2 mb-2">
