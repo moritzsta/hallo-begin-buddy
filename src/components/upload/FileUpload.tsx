@@ -574,7 +574,6 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
                 <SelectValue placeholder={t('upload.selectDocumentType', { defaultValue: 'Typ auswählen...' })} />
               </SelectTrigger>
               <SelectContent className="bg-popover z-50">
-                <SelectItem value="">{t('upload.noDocumentType', { defaultValue: 'Kein Typ ausgewählt' })}</SelectItem>
                 {Object.keys(DOCUMENT_TYPES).map((typeKey) => (
                   <SelectItem key={typeKey} value={typeKey}>
                     {getDocumentTypeLabel(typeKey, i18n.language)}
