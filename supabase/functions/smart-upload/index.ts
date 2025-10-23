@@ -318,9 +318,9 @@ ${languageInstruction}${folderStructureText}`;
       // GIF and some other formats may not be supported, use fallback
       const unsupportedImageFormats = ['image/gif', 'image/svg+xml'];
       
-      if (unsupportedImageFormats.includes(mimeType)) {
+      if (unsupportedImageFormats.includes(file.mime || '')) {
         // Fallback to filename-based analysis for unsupported image formats
-        console.log(`Unsupported image format ${mimeType}, using filename-based analysis`);
+        console.log(`Unsupported image format ${file.mime}, using filename-based analysis`);
         analysisPrompt = `Analyze this document and extract metadata to help organize it intelligently.
 
 Document filename: ${file.title}
@@ -436,6 +436,71 @@ ${languageInstruction}${userContextInstruction}${folderStructureText}`;
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
       console.error('AI Gateway error:', aiResponse.status, errorText);
+      
+      // Fallback: If image extraction fails (e.g., GIF/SVG or fetch issues),
+      // run metadata-only analysis using filename + optional user context
+      if (isImage && aiResponse.status === 400) {
+        const metadataPrompt = `Based on the document filename and user-provided metadata, suggest an optimal folder structure and organization:
+
+1. document_type: Type of document (photo, animation, graphic, diagram, etc.)
+2. suggested_title: A descriptive title (max 60 chars) based on the filename and metadata
+3. keywords: 3-5 relevant keywords from the filename and user context
+4. suggested_path: A logical folder structure path with flexible depth (1-6 levels, ideally 3-4). CRITICAL: AVOID duplicate or similar folder names (e.g., "Katze" and "Katzen" are duplicates). REUSE existing folders when they match the document content.
+
+${languageInstruction}${userContextInstruction}${folderStructureText}`;
+
+        const fallbackResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'google/gemini-2.5-flash',
+            messages: [
+              {
+                role: 'user',
+                content: metadataPrompt,
+              },
+            ],
+            tools: [
+              {
+                type: 'function',
+                function: {
+                  name: 'extract_metadata',
+                  description: 'Extract document metadata and suggest folder structure',
+                  parameters: {
+                    type: 'object',
+                    properties: {
+                      document_type: { type: 'string' },
+                      suggested_title: { type: 'string' },
+                      keywords: { type: 'array', items: { type: 'string' } },
+                      suggested_path: { type: 'string' },
+                    },
+                    required: ['document_type', 'suggested_title', 'keywords', 'suggested_path'],
+                    additionalProperties: false,
+                  },
+                },
+              },
+            ],
+            tool_choice: { type: 'function', function: { name: 'extract_metadata' } },
+          }),
+        });
+
+        if (fallbackResponse.ok) {
+          const fallbackData = await fallbackResponse.json();
+          const fallbackToolCall = fallbackData.choices?.[0]?.message?.tool_calls?.[0];
+          if (fallbackToolCall) {
+            const extracted = JSON.parse(fallbackToolCall.function.arguments);
+            await incrementUsageTracking(supabase, file.owner_id, 'smart_upload');
+            console.log(`Smart upload completed (metadata-only) for ${file.mime} file ${file_id}:`, extracted);
+            return new Response(
+              JSON.stringify({ success: true, extracted }),
+              { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+        }
+      }
       
       if (aiResponse.status === 429) {
         return new Response(
