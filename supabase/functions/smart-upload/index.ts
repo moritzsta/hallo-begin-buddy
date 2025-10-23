@@ -335,14 +335,19 @@ ${languageInstruction}${userContextInstruction}${folderStructureText}`;
 
         contentPayload = analysisPrompt;
       } else {
-        // For supported images, pass a short-lived signed URL directly (avoid large base64 payloads)
-        const { data: signedData, error: signedError } = await supabase.storage
+        // For supported images, download and send as base64 for reliable processing
+        const { data: fileData, error: downloadError } = await supabase.storage
           .from('documents')
-          .createSignedUrl(file.storage_path, 300);
+          .download(file.storage_path);
 
-        if (signedError || !signedData) {
-          throw new Error('Failed to get signed URL for image');
+        if (downloadError || !fileData) {
+          throw new Error('Failed to download image for analysis');
         }
+
+        const arrayBuffer = await fileData.arrayBuffer();
+        const base64Image = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+        const mimeType = file.mime || 'image/jpeg';
+        const dataUrl = `data:${mimeType};base64,${base64Image}`;
 
         analysisPrompt = `Analyze this image/document and extract: document type (e.g., invoice, receipt, letter, contract, photo, diagram), a suggested descriptive title (max 60 chars), 3-5 relevant keywords, and suggest an appropriate folder structure path with flexible depth (1-6 levels, ideally 3-4). AVOID duplicate or similar folder names (e.g., "Katze" and "Katzen"). REUSE existing folders whenever they match the content. ${languageInstruction}${userContextInstruction}${folderStructureText}`;
 
@@ -354,7 +359,7 @@ ${languageInstruction}${userContextInstruction}${folderStructureText}`;
           {
             type: 'image_url',
             image_url: {
-              url: signedData.signedUrl,
+              url: dataUrl,
             },
           },
         ];
