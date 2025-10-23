@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
@@ -326,46 +327,65 @@ const Settings = () => {
                 <CardDescription>{t('settings.smartUploadDesc')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="space-y-4">
+                <RadioGroup
+                  value={aiDocAnalysisEnabled ? 'enabled' : 'disabled'}
+                  onValueChange={(value) => {
+                    const enabled = value === 'enabled';
+                    setAiDocAnalysisEnabled(enabled);
+                    if (!enabled) {
+                      setShowAiConfirmation(false);
+                    }
+                  }}
+                  className="space-y-4"
+                >
                   {/* Option 1: KI-Dokumentenanalyse aktivieren */}
-                  <div className="flex items-start justify-between gap-4 rounded-lg border p-4">
+                  <div className="flex items-start gap-4 rounded-lg border p-4">
+                    <RadioGroupItem value="enabled" id="ai-enabled" className="mt-1" />
                     <div className="space-y-1 flex-1">
-                      <Label className="text-base font-medium">
-                        {t('settings.enableAiDocAnalysis')}
+                      <Label htmlFor="ai-enabled" className="text-base font-medium cursor-pointer">
+                        {t('settings.aiDocAnalysisEnabled')}
                       </Label>
                       <p className="text-sm text-muted-foreground">
-                        {t('settings.enableAiDocAnalysisDesc')}
-                      </p>
-                      <p className="text-xs text-muted-foreground italic mt-2">
-                        {t('settings.enableAiDocAnalysisNote')}
+                        {t('settings.aiDocAnalysisEnabledDesc')}
                       </p>
                     </div>
-                    <Checkbox
-                      checked={aiDocAnalysisEnabled}
-                      onCheckedChange={(checked) => setAiDocAnalysisEnabled(checked === true)}
-                      className="mt-1"
-                    />
                   </div>
 
-                  {/* Option 2: Bestätigungsdialog (nur sichtbar wenn Option 1 aktiv) */}
-                  <div className={`flex items-start justify-between gap-4 rounded-lg border p-4 transition-opacity ${
-                    aiDocAnalysisEnabled ? 'opacity-100' : 'opacity-50'
-                  }`}>
+                  {/* Option 2: KI-Dokumentenanalyse deaktivieren */}
+                  <div className="flex items-start gap-4 rounded-lg border p-4">
+                    <RadioGroupItem value="disabled" id="ai-disabled" className="mt-1" />
                     <div className="space-y-1 flex-1">
-                      <Label className="text-base font-medium">
-                        {t('settings.showAiConfirmation')}
+                      <Label htmlFor="ai-disabled" className="text-base font-medium cursor-pointer">
+                        {t('settings.aiDocAnalysisDisabled')}
                       </Label>
                       <p className="text-sm text-muted-foreground">
-                        {t('settings.showAiConfirmationDesc')}
+                        {t('settings.aiDocAnalysisDisabledDesc')}
+                      </p>
+                      <p className="text-xs text-muted-foreground italic mt-2">
+                        {t('settings.aiDocAnalysisNote')}
                       </p>
                     </div>
-                    <Checkbox
-                      checked={showAiConfirmation}
-                      onCheckedChange={(checked) => setShowAiConfirmation(checked === true)}
-                      disabled={!aiDocAnalysisEnabled}
-                      className="mt-1"
-                    />
                   </div>
+                </RadioGroup>
+
+                {/* Bestätigungsdialog - nur aktiv wenn Dokumentenanalyse aktiviert */}
+                <div className={`flex items-start justify-between gap-4 rounded-lg border p-4 transition-opacity ${
+                  aiDocAnalysisEnabled ? 'opacity-100' : 'opacity-50'
+                }`}>
+                  <div className="space-y-1 flex-1">
+                    <Label className="text-base font-medium">
+                      {t('settings.showAiConfirmation')}
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      {t('settings.showAiConfirmationDesc')}
+                    </p>
+                  </div>
+                  <Checkbox
+                    checked={showAiConfirmation}
+                    onCheckedChange={(checked) => setShowAiConfirmation(checked === true)}
+                    disabled={!aiDocAnalysisEnabled}
+                    className="mt-1"
+                  />
                 </div>
 
                 <Separator />
