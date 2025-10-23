@@ -121,8 +121,8 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
     enabled: !!user,
   });
 
-  // Debounce search query with 600ms delay
-  const debouncedSearch = useDebounce(searchQuery, 600);
+  // Debounce search query with 1000ms delay (suitable for slower typing)
+  const debouncedSearch = useDebounce(searchQuery, 1000);
 
   // Fetch documents
   const { data: allFiles, isLoading } = useQuery({
