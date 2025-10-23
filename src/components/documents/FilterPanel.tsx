@@ -200,21 +200,32 @@ export const FilterPanel = ({
 
         {/* Document Types Filter */}
         <div className="space-y-3">
-          <Label className="text-sm font-semibold flex items-center gap-2">
-            <FolderOpen className="h-4 w-4" />
-            {t('filters.documentType')}
-          </Label>
-          <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
+          <div className="flex items-center justify-between">
+            <Label className="text-sm font-semibold flex items-center gap-2">
+              <FolderOpen className="h-4 w-4" />
+              {t('filters.documentType')}
+            </Label>
+            {filters.documentTypes.length > 0 && (
+              <Badge variant="secondary" className="text-xs">
+                {filters.documentTypes.length}
+              </Badge>
+            )}
+          </div>
+          <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1 border rounded-md p-2 bg-muted/20">
             {getAllDocumentTypes().map((type) => (
-              <div key={type} className="flex items-center space-x-2">
+              <div 
+                key={type} 
+                className="flex items-center space-x-2 hover:bg-accent/50 rounded px-2 py-1.5 transition-colors"
+              >
                 <Checkbox
                   id={`doctype-${type}`}
                   checked={filters.documentTypes.includes(type)}
                   onCheckedChange={() => handleDocumentTypeToggle(type)}
+                  className="shrink-0"
                 />
                 <label
                   htmlFor={`doctype-${type}`}
-                  className="text-sm cursor-pointer select-none flex-1"
+                  className="text-sm cursor-pointer select-none flex-1 leading-tight"
                 >
                   {getDocumentTypeLabel(type, i18n.language)}
                 </label>
@@ -226,17 +237,33 @@ export const FilterPanel = ({
         {/* Tags Filter */}
         {availableTags.length > 0 && (
           <div className="space-y-3">
-            <Label className="text-sm font-semibold">{t('filters.tags')}</Label>
-            <div className="flex flex-wrap gap-2">
-              {availableTags.map((tag) => (
-                <Badge
-                  key={tag}
-                  variant={filters.tags.includes(tag) ? 'default' : 'outline'}
-                  className="cursor-pointer hover:bg-primary/90 transition-colors"
-                  onClick={() => handleTagToggle(tag)}
-                >
-                  {tag}
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-semibold">{t('filters.tags')}</Label>
+              {filters.tags.length > 0 && (
+                <Badge variant="secondary" className="text-xs">
+                  {filters.tags.length}
                 </Badge>
+              )}
+            </div>
+            <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1 border rounded-md p-2 bg-muted/20">
+              {availableTags.sort().map((tag) => (
+                <div 
+                  key={tag}
+                  className="flex items-center space-x-2 hover:bg-accent/50 rounded px-2 py-1.5 transition-colors"
+                >
+                  <Checkbox
+                    id={`tag-${tag}`}
+                    checked={filters.tags.includes(tag)}
+                    onCheckedChange={() => handleTagToggle(tag)}
+                    className="shrink-0"
+                  />
+                  <label
+                    htmlFor={`tag-${tag}`}
+                    className="text-sm cursor-pointer select-none flex-1 leading-tight"
+                  >
+                    {tag}
+                  </label>
+                </div>
               ))}
             </div>
           </div>
