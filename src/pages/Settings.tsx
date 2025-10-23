@@ -11,10 +11,11 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
-import { User, CreditCard, BarChart3, ArrowLeft, Save, RefreshCw, Settings2 } from 'lucide-react';
+import { User, CreditCard, BarChart3, ArrowLeft, Save, RefreshCw, Settings2, Sparkles } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { PLAN_CONFIGS } from '@/lib/plans';
 import { PlanCard } from '@/components/plans/PlanCard';
@@ -51,6 +52,8 @@ const Settings = () => {
   const [searchParams] = useSearchParams();
   const [displayName, setDisplayName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [smartUploadEnabled, setSmartUploadEnabled] = useState(false);
+  const [showAiConfirmation, setShowAiConfirmation] = useState(true);
 
   const subscription = useSubscription();
   
@@ -77,6 +80,30 @@ const Settings = () => {
 
   const planTier = subscription.plan_tier;
   const limits = PLAN_LIMITS[planTier as keyof typeof PLAN_LIMITS];
+
+  // Fetch user preferences
+  const { data: preferences } = useQuery({
+    queryKey: ['user_preferences', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('user_preferences')
+        .select('*')
+        .eq('user_id', user!.id)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  // Initialize preferences state from fetched data
+  useEffect(() => {
+    if (preferences) {
+      setSmartUploadEnabled(preferences.smart_upload_enabled);
+      setShowAiConfirmation(preferences.show_ai_confirmation);
+    }
+  }, [preferences]);
 
   // Fetch usage data
   const { data: usage } = useQuery({
@@ -145,6 +172,50 @@ const Settings = () => {
     }
   };
 
+  const handleSaveSmartUploadPreferences = async () => {
+    setIsSaving(true);
+    try {
+      // Check if preferences exist
+      if (preferences) {
+        // Update existing preferences
+        const { error } = await supabase
+          .from('user_preferences')
+          .update({
+            smart_upload_enabled: smartUploadEnabled,
+            show_ai_confirmation: showAiConfirmation,
+          })
+          .eq('user_id', user!.id);
+        
+        if (error) throw error;
+      } else {
+        // Create new preferences
+        const { error } = await supabase
+          .from('user_preferences')
+          .insert({
+            user_id: user!.id,
+            smart_upload_enabled: smartUploadEnabled,
+            show_ai_confirmation: showAiConfirmation,
+          });
+        
+        if (error) throw error;
+      }
+
+      toast({
+        title: t('settings.saveSuccess'),
+        description: t('settings.smartUploadPrefSaved'),
+      });
+    } catch (error) {
+      console.error('Preferences update error:', error);
+      toast({
+        title: t('settings.saveError'),
+        description: error instanceof Error ? error.message : t('common.unknownError'),
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
@@ -164,10 +235,14 @@ const Settings = () => {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue={initialTab} className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-3">
+          <TabsList className="grid w-full max-w-2xl grid-cols-4">
             <TabsTrigger value="profile" className="flex items-center gap-2">
               <User className="h-4 w-4" />
               {t('settings.profile')}
+            </TabsTrigger>
+            <TabsTrigger value="smartupload" className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4" />
+              {t('settings.smartUpload')}
             </TabsTrigger>
             <TabsTrigger value="plan" className="flex items-center gap-2">
               <CreditCard className="h-4 w-4" />
@@ -232,6 +307,75 @@ const Settings = () => {
 
                 <div className="flex justify-end">
                   <Button onClick={handleSaveProfile} disabled={isSaving}>
+                    <Save className="mr-2 h-4 w-4" />
+                    {isSaving ? t('common.loading') : t('common.save')}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Smart Upload Tab */}
+          <TabsContent value="smartupload" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  {t('settings.smartUploadSettings')}
+                </CardTitle>
+                <CardDescription>{t('settings.smartUploadDesc')}</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-start justify-between gap-4 rounded-lg border p-4">
+                    <div className="space-y-1 flex-1">
+                      <Label className="text-base font-medium">
+                        {t('settings.enableSmartUpload')}
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        {t('settings.enableSmartUploadDesc')}
+                      </p>
+                    </div>
+                    <Checkbox
+                      checked={smartUploadEnabled}
+                      onCheckedChange={(checked) => setSmartUploadEnabled(checked === true)}
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <div className="flex items-start justify-between gap-4 rounded-lg border p-4 bg-muted/30">
+                    <div className="space-y-1 flex-1">
+                      <Label className="text-base font-medium">
+                        {t('settings.showAiConfirmation')}
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        {t('settings.showAiConfirmationDesc')}
+                      </p>
+                    </div>
+                    <Checkbox
+                      checked={showAiConfirmation}
+                      onCheckedChange={(checked) => setShowAiConfirmation(checked === true)}
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="rounded-lg bg-primary/5 border border-primary/20 p-4">
+                  <h4 className="font-medium mb-2 flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-primary" />
+                    {t('settings.smartUploadInfoTitle')}
+                  </h4>
+                  <ul className="space-y-1 text-sm text-muted-foreground">
+                    <li>• {t('settings.smartUploadInfo1')}</li>
+                    <li>• {t('settings.smartUploadInfo2')}</li>
+                    <li>• {t('settings.smartUploadInfo3')}</li>
+                  </ul>
+                </div>
+
+                <div className="flex justify-end">
+                  <Button onClick={handleSaveSmartUploadPreferences} disabled={isSaving}>
                     <Save className="mr-2 h-4 w-4" />
                     {isSaving ? t('common.loading') : t('common.save')}
                   </Button>

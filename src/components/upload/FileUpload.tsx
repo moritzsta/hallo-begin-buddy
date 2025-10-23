@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { TagInput } from '@/components/documents/TagInput';
 import { useQuery } from '@tanstack/react-query';
 import { MetadataConfirmDialog } from './MetadataConfirmDialog';
+import { AiConfirmationDialog } from './AiConfirmationDialog';
 import { fadeInUp, staggerContainer, getAnimationProps } from '@/lib/animations';
 
 interface UploadFile {
@@ -47,6 +48,8 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
     open: boolean;
     uploadFileId: string | null;
   }>({ open: false, uploadFileId: null });
+  const [aiConfirmDialogOpen, setAiConfirmDialogOpen] = useState(false);
+  const [pendingSmartUploadId, setPendingSmartUploadId] = useState<string | null>(null);
   const [smartUploadLoading, setSmartUploadLoading] = useState<string | null>(null);
   
   const { toast } = useToast();
@@ -76,6 +79,22 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
       allFiles?.flatMap(file => file.tags || []) || []
     )
   ).sort();
+
+  // Fetch user preferences for Smart Upload
+  const { data: userPreferences } = useQuery({
+    queryKey: ['user_preferences', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('user_preferences')
+        .select('*')
+        .eq('user_id', user!.id)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
 
   const validateFile = (file: File): string | null => {
     if (file.size > limits.maxSize) {
@@ -288,6 +307,24 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
   };
 
   const triggerSmartUpload = async (uploadFileId: string) => {
+    const uploadFile = uploadFiles.find(f => f.id === uploadFileId);
+    if (!uploadFile?.fileId) return;
+
+    // Check if AI confirmation is needed
+    const showConfirmation = userPreferences?.show_ai_confirmation !== false;
+    
+    if (showConfirmation) {
+      // Show AI confirmation dialog first
+      setPendingSmartUploadId(uploadFileId);
+      setAiConfirmDialogOpen(true);
+      return;
+    }
+
+    // Proceed with smart upload
+    await executeSmartUpload(uploadFileId);
+  };
+
+  const executeSmartUpload = async (uploadFileId: string) => {
     const uploadFile = uploadFiles.find(f => f.id === uploadFileId);
     if (!uploadFile?.fileId) return;
 
@@ -743,6 +780,49 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
           availableTags={availableTags}
         />
       )}
+
+      {/* AI Confirmation Dialog */}
+      <AiConfirmationDialog
+        open={aiConfirmDialogOpen}
+        onConfirm={async (dontShowAgain) => {
+          setAiConfirmDialogOpen(false);
+          
+          // Update preference if user chose "don't show again"
+          if (dontShowAgain) {
+            try {
+              if (userPreferences) {
+                await supabase
+                  .from('user_preferences')
+                  .update({ show_ai_confirmation: false })
+                  .eq('user_id', user!.id);
+              } else {
+                await supabase
+                  .from('user_preferences')
+                  .insert({
+                    user_id: user!.id,
+                    smart_upload_enabled: false,
+                    show_ai_confirmation: false,
+                  });
+              }
+            } catch (error) {
+              console.error('Failed to update preferences:', error);
+            }
+          }
+
+          // Execute smart upload
+          if (pendingSmartUploadId) {
+            await executeSmartUpload(pendingSmartUploadId);
+            setPendingSmartUploadId(null);
+          }
+        }}
+        onCancel={() => {
+          setAiConfirmDialogOpen(false);
+          setPendingSmartUploadId(null);
+          if (pendingSmartUploadId) {
+            setSmartUploadLoading(null);
+          }
+        }}
+      />
     </div>
   );
 };
