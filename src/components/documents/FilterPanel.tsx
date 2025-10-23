@@ -211,7 +211,7 @@ export const FilterPanel = ({
               </Badge>
             )}
           </div>
-          <div className="border-2 rounded-md bg-muted/20">
+          <div className="border-2 rounded-md bg-muted/20 border-b-0 rounded-b-none">
             <div className="space-y-1.5 max-h-64 overflow-y-auto p-2">
               {getAllDocumentTypes().map((type) => (
                 <div 
@@ -247,7 +247,7 @@ export const FilterPanel = ({
                 </Badge>
               )}
             </div>
-            <div className="border-2 rounded-md bg-muted/20">
+            <div className="border-2 rounded-md bg-muted/20 rounded-t-none border-t-0 -mt-px">
               <div className="space-y-1.5 max-h-64 overflow-y-auto p-2">
                 {availableTags.sort().map((tag) => (
                   <div 
