@@ -63,10 +63,18 @@ export const MetadataConfirmDialog = ({
   // Path editing state
   const initialPath = (suggestedPath || metadata.suggested_path || '').split('/').filter(Boolean);
   const [pathElements, setPathElements] = useState<string[]>(initialPath);
+  const [editingPathIndex, setEditingPathIndex] = useState<number | null>(null);
+  const [editingPathValue, setEditingPathValue] = useState('');
+  const [insertingAtIndex, setInsertingAtIndex] = useState<number | null>(null);
   const [newPathElement, setNewPathElement] = useState('');
-  const [isAddingPath, setIsAddingPath] = useState(false);
 
   const handleConfirm = async () => {
+    // Validate path - remove empty segments
+    const validPath = pathElements.filter(el => el.trim() !== '');
+    if (validPath.length === 0) {
+      return; // Need at least one folder
+    }
+    
     setIsConfirming(true);
     try {
       const updatedMetadata = {
@@ -75,7 +83,7 @@ export const MetadataConfirmDialog = ({
         date: editedDate || undefined,
         party: editedParty || undefined,
         amount: editedAmount || undefined,
-        suggested_path: pathElements.join('/'),
+        suggested_path: validPath.join('/'),
       };
       await onConfirm(updatedMetadata, tags);
     } finally {
@@ -87,12 +95,34 @@ export const MetadataConfirmDialog = ({
     setPathElements(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleAddPathElement = () => {
+  const handleInsertPathElement = (index: number) => {
     if (newPathElement.trim() && pathElements.length < 6) {
-      setPathElements(prev => [...prev, newPathElement.trim()]);
+      const newElements = [...pathElements];
+      newElements.splice(index + 1, 0, newPathElement.trim());
+      setPathElements(newElements);
       setNewPathElement('');
-      setIsAddingPath(false);
+      setInsertingAtIndex(null);
     }
+  };
+
+  const handleStartEditPathElement = (index: number) => {
+    setEditingPathIndex(index);
+    setEditingPathValue(pathElements[index]);
+  };
+
+  const handleSaveEditPathElement = () => {
+    if (editingPathIndex !== null && editingPathValue.trim()) {
+      const newElements = [...pathElements];
+      newElements[editingPathIndex] = editingPathValue.trim();
+      setPathElements(newElements);
+      setEditingPathIndex(null);
+      setEditingPathValue('');
+    }
+  };
+
+  const handleCancelEditPathElement = () => {
+    setEditingPathIndex(null);
+    setEditingPathValue('');
   };
 
   const handleCancel = () => {
@@ -108,89 +138,123 @@ export const MetadataConfirmDialog = ({
           <span className="text-sm text-muted-foreground">/</span>
           {pathElements.map((part, index) => {
             const isNew = newFolders?.includes(part);
+            const isEditing = editingPathIndex === index;
+            
             return (
-              <div key={index} className="flex items-center gap-2">
+              <div key={index} className="flex items-center gap-1.5">
+                {/* Path Element Chip */}
                 <div className="flex items-center gap-1.5 bg-background rounded-md px-2 py-1 border">
                   {isNew && <FolderPlus className="h-3.5 w-3.5 text-primary" />}
-                  <span className={`text-sm font-medium ${isNew ? 'text-primary' : 'text-foreground'}`}>
-                    {part}
-                  </span>
+                  
+                  {isEditing ? (
+                    <Input
+                      value={editingPathValue}
+                      onChange={(e) => setEditingPathValue(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleSaveEditPathElement();
+                        }
+                        if (e.key === 'Escape') {
+                          handleCancelEditPathElement();
+                        }
+                      }}
+                      onBlur={handleSaveEditPathElement}
+                      className="h-6 w-32 text-sm px-2"
+                      autoFocus
+                    />
+                  ) : (
+                    <span 
+                      className={`text-sm font-medium cursor-pointer hover:underline ${isNew ? 'text-primary' : 'text-foreground'}`}
+                      onClick={() => handleStartEditPathElement(index)}
+                    >
+                      {part}
+                    </span>
+                  )}
+                  
                   {isNew && (
                     <Badge variant="outline" className="h-5 text-xs border-primary/50 text-primary ml-1">
                       {t('common.new')}
                     </Badge>
                   )}
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-5 w-5 ml-1 hover:bg-destructive/10 hover:text-destructive"
-                        onClick={() => handleRemovePathElement(index)}
-                      >
-                        <Minus className="h-3 w-3" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{t('upload.removePathElement', { defaultValue: 'Pfadelement entfernen' })}</p>
-                    </TooltipContent>
-                  </Tooltip>
+                  
+                  {!isEditing && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-5 w-5 ml-1 hover:bg-destructive/10 hover:text-destructive"
+                          onClick={() => handleRemovePathElement(index)}
+                        >
+                          <Minus className="h-3 w-3" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{t('upload.removePathElement', { defaultValue: 'Pfadelement entfernen' })}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
                 </div>
-                {index < pathElements.length - 1 && (
-                  <span className="text-sm text-muted-foreground">/</span>
+
+                {/* Insert Button after "/" separator */}
+                {pathElements.length < 6 && (
+                  <Popover 
+                    open={insertingAtIndex === index} 
+                    onOpenChange={(open) => setInsertingAtIndex(open ? index : null)}
+                  >
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 rounded-full hover:bg-primary/10"
+                          >
+                            <Plus className="h-3.5 w-3.5 text-primary" />
+                          </Button>
+                        </PopoverTrigger>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{t('upload.insertPathElementAfter', { defaultValue: 'Hier neuen Ordner einfügen' })}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <PopoverContent className="w-64" align="start">
+                      <div className="flex items-center gap-2">
+                        <Input
+                          value={newPathElement}
+                          onChange={(e) => setNewPathElement(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              handleInsertPathElement(index);
+                            }
+                            if (e.key === 'Escape') {
+                              setInsertingAtIndex(null);
+                              setNewPathElement('');
+                            }
+                          }}
+                          placeholder={t('upload.pathElementName', { defaultValue: 'Ordnername...' })}
+                          className="flex-1"
+                          autoFocus
+                        />
+                        <Button
+                          size="icon"
+                          onClick={() => handleInsertPathElement(index)}
+                          disabled={!newPathElement.trim()}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                 )}
+
+                {/* Separator */}
+                <span className="text-sm text-muted-foreground">/</span>
               </div>
             );
           })}
-          
-          {pathElements.length < 6 && (
-            <Popover open={isAddingPath} onOpenChange={setIsAddingPath}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 rounded-md border border-dashed hover:border-solid hover:bg-primary/10"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  </PopoverTrigger>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{t('upload.addPathElementTooltip', { defaultValue: 'Neues Pfadelement hinzufügen (max. 6 Ebenen)' })}</p>
-                </TooltipContent>
-              </Tooltip>
-              <PopoverContent className="w-64" align="start">
-                <div className="flex items-center gap-2">
-                  <Input
-                    value={newPathElement}
-                    onChange={(e) => setNewPathElement(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        handleAddPathElement();
-                      }
-                      if (e.key === 'Escape') {
-                        setIsAddingPath(false);
-                        setNewPathElement('');
-                      }
-                    }}
-                    placeholder={t('upload.pathElementName', { defaultValue: 'Ordnername...' })}
-                    className="flex-1"
-                    autoFocus
-                  />
-                  <Button
-                    size="icon"
-                    onClick={handleAddPathElement}
-                    disabled={!newPathElement.trim()}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-              </PopoverContent>
-            </Popover>
-          )}
         </div>
       </TooltipProvider>
     );

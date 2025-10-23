@@ -54,6 +54,7 @@
     "addPathElement": "Neues Pfadelement hinzufügen...",
     "addPathElementTooltip": "Neues Pfadelement hinzufügen (max. 6 Ebenen)",
     "removePathElement": "Pfadelement entfernen",
+    "insertPathElementAfter": "Hier neuen Ordner einfügen",
     "pathElementName": "Ordnername...",
     "userContext": "Optionale Hinweise für KI",
     "userContextPlaceholder": "z.B. Katze, Operation, Pfote",

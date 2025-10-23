@@ -54,6 +54,7 @@
     "addPathElement": "Add new path element...",
     "addPathElementTooltip": "Add new path element (max. 6 levels)",
     "removePathElement": "Remove path element",
+    "insertPathElementAfter": "Insert new folder here",
     "pathElementName": "Folder name...",
     "userContext": "Optional hints for AI",
     "userContextPlaceholder": "e.g. Cat, Surgery, Paw",
