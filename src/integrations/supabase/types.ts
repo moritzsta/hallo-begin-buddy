@@ -55,6 +55,7 @@ export type Database = {
       files: {
         Row: {
           created_at: string
+          document_type: string | null
           folder_id: string
           hash_sha256: string
           id: string
@@ -70,6 +71,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          document_type?: string | null
           folder_id: string
           hash_sha256: string
           id?: string
@@ -85,6 +87,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          document_type?: string | null
           folder_id?: string
           hash_sha256?: string
           id?: string

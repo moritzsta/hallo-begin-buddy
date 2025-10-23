@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { X, Filter } from 'lucide-react';
+import { X, Filter, FolderOpen } from 'lucide-react';
+import { getAllDocumentTypes, getDocumentTypeLabel } from '@/lib/documentTypes';
 
 export interface FileFilters {
   mimeTypes: string[];
@@ -14,6 +15,7 @@ export interface FileFilters {
   sizeMin: number;
   sizeMax: number;
   tags: string[];
+  documentTypes: string[];
 }
 
 interface FilterPanelProps {
@@ -38,7 +40,7 @@ export const FilterPanel = ({
   availableTags,
   onClearFilters,
 }: FilterPanelProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const handleMimeTypeToggle = (mimeType: string) => {
     const newMimeTypes = filters.mimeTypes.includes(mimeType)
@@ -54,9 +56,17 @@ export const FilterPanel = ({
     onFiltersChange({ ...filters, tags: newTags });
   };
 
+  const handleDocumentTypeToggle = (type: string) => {
+    const newTypes = filters.documentTypes.includes(type)
+      ? filters.documentTypes.filter(t => t !== type)
+      : [...filters.documentTypes, type];
+    onFiltersChange({ ...filters, documentTypes: newTypes });
+  };
+
   const hasActiveFilters =
     filters.mimeTypes.length > 0 ||
     filters.tags.length > 0 ||
+    filters.documentTypes.length > 0 ||
     filters.dateFrom ||
     filters.dateTo ||
     filters.sizeMin > 0 ||
@@ -185,6 +195,31 @@ export const FilterPanel = ({
                 className="mt-1"
               />
             </div>
+          </div>
+        </div>
+
+        {/* Document Types Filter */}
+        <div className="space-y-3">
+          <Label className="text-sm font-semibold flex items-center gap-2">
+            <FolderOpen className="h-4 w-4" />
+            {t('filters.documentType')}
+          </Label>
+          <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
+            {getAllDocumentTypes().map((type) => (
+              <div key={type} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`doctype-${type}`}
+                  checked={filters.documentTypes.includes(type)}
+                  onCheckedChange={() => handleDocumentTypeToggle(type)}
+                />
+                <label
+                  htmlFor={`doctype-${type}`}
+                  className="text-sm cursor-pointer select-none flex-1"
+                >
+                  {getDocumentTypeLabel(type, i18n.language)}
+                </label>
+              </div>
+            ))}
           </div>
         </div>
 

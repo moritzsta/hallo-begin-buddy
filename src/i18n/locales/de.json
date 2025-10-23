@@ -329,6 +329,7 @@
     "minSize": "Minimalgröße",
     "maxSize": "Maximalgröße",
     "tags": "Tags",
+    "documentType": "Dokumententyp",
     "unlimited": "Unbegrenzt"
   },
   "public": {

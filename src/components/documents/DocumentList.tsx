@@ -104,6 +104,7 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
     sizeMin: 0,
     sizeMax: Infinity,
     tags: [],
+    documentTypes: [],
   });
 
   // Fetch profile to get last_seen_at
@@ -212,6 +213,12 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
         if (!hasMatchingTag) return false;
       }
 
+      // Document type filter
+      if (filters.documentTypes.length > 0) {
+        if (!file.meta?.document_type) return false;
+        if (!filters.documentTypes.includes(file.meta.document_type as string)) return false;
+      }
+
       return true;
     });
   }, [allFiles, filters]);
@@ -236,6 +243,7 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
       sizeMin: 0,
       sizeMax: Infinity,
       tags: [],
+      documentTypes: [],
     });
   };
 
