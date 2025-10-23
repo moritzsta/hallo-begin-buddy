@@ -273,7 +273,13 @@ ${languageInstruction}${folderStructureText}`;
         }
         
         const fileBuffer = await fileResponse.arrayBuffer();
-        const base64Content = btoa(String.fromCharCode(...new Uint8Array(fileBuffer)));
+        // Safe base64 conversion without spread operator to avoid call stack overflow
+        const bytes = new Uint8Array(fileBuffer);
+        let binary = '';
+        for (let i = 0; i < bytes.length; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        const base64Content = btoa(binary);
         
         // Use Gemini to extract text from PDF via OCR
         const ocrResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
