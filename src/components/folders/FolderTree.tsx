@@ -104,26 +104,31 @@ export function FolderTree({ selectedFolderId, onSelectFolder }: FolderTreeProps
           whileHover={{ x: 4 }}
           transition={{ duration: 0.2 }}
         >
-          {hasChildren ? (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-4 w-4 p-0"
-              onClick={() => toggleExpanded(folder.id)}
+          {hasChildren && (
+            <div
+              className="h-4 w-4 flex items-center justify-center cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleExpanded(folder.id);
+              }}
             >
               {isExpanded ? (
                 <ChevronDown className="h-3 w-3" />
               ) : (
                 <ChevronRight className="h-3 w-3" />
               )}
-            </Button>
-          ) : (
-            <div className="w-4" />
+            </div>
           )}
+          {!hasChildren && <div className="w-4" />}
           
           <div
             className="flex-1 flex items-center gap-2 cursor-pointer"
-            onClick={() => handleSelectFolder(folder.id)}
+            onClick={() => {
+              if (hasChildren) {
+                toggleExpanded(folder.id);
+              }
+              handleSelectFolder(folder.id);
+            }}
           >
             {isExpanded && hasChildren ? (
               <FolderOpen className="h-4 w-4 text-muted-foreground" />

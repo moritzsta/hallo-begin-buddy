@@ -51,6 +51,7 @@ import { EditTagsDialog } from './EditTagsDialog';
 import { DocumentDetailsTable } from './DocumentDetailsTable';
 import { DocumentViewer } from '../viewer/DocumentViewer';
 import { ShareLinkDialog } from './ShareLinkDialog';
+import { FileDetailsModal } from './FileDetailsModal';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -65,6 +66,7 @@ interface FileRecord {
   created_at: string;
   updated_at: string;
   meta: any;
+  folder_id: string;
 }
 
 type SortField = 'created_at' | 'title' | 'size';
@@ -94,7 +96,7 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
   const [editTagsFileId, setEditTagsFileId] = useState<string | null>(null);
   const [editTagsCurrentTags, setEditTagsCurrentTags] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
-  const [previewFile, setPreviewFile] = useState<FileRecord | null>(null);
+  const [detailsFile, setDetailsFile] = useState<FileRecord | null>(null);
   const [shareFileId, setShareFileId] = useState<string | null>(null);
   const [shareFileName, setShareFileName] = useState<string>('');
   const [filters, setFilters] = useState<FileFilters>({
@@ -403,10 +405,23 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
   };
 
   const handlePreview = (file: FileRecord) => {
-    setPreviewFile(file);
+    setDetailsFile(file);
     // Mark file as seen if it's new
     if (isNewFile(file)) {
       markFileAsSeenMutation.mutate(file.created_at);
+    }
+  };
+
+  const handleShareFromDetails = () => {
+    if (detailsFile) {
+      setShareFileId(detailsFile.id);
+      setShareFileName(detailsFile.title);
+    }
+  };
+
+  const handleDownloadFromDetails = async () => {
+    if (detailsFile) {
+      await downloadFile(detailsFile);
     }
   };
 
@@ -595,24 +610,25 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
                         </Button>
                       </div>
                     ) : (
-                      <motion.div
-                        whileHover={{ scale: 1.02 }}
-                        className="flex items-center gap-3"
-                      >
-                        <DocumentPreview 
-                          fileId={file.id}
-                          fileName={file.title}
-                          mimeType={file.mime}
-                          size="sm"
-                          clickable={true}
-                        />
-                        <span className="font-medium">{file.title}</span>
-                        {isNewFile(file) && (
-                          <Badge variant={isLifestyle ? "lifestyle" : "default"} className="text-xs">
-                            {t('documents.new')}
-                          </Badge>
-                        )}
-                      </motion.div>
+                       <motion.div
+                         whileHover={{ scale: 1.02 }}
+                         className="flex items-center gap-3 cursor-pointer"
+                         onClick={() => handlePreview(file)}
+                       >
+                         <DocumentPreview 
+                           fileId={file.id}
+                           fileName={file.title}
+                           mimeType={file.mime}
+                           size="sm"
+                           clickable={false}
+                         />
+                         <span className="font-medium">{file.title}</span>
+                         {isNewFile(file) && (
+                           <Badge variant={isLifestyle ? "lifestyle" : "default"} className="text-xs">
+                             {t('documents.new')}
+                           </Badge>
+                         )}
+                       </motion.div>
                     )}
                   </TableCell>
                   <TableCell>
@@ -745,15 +761,17 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
         currentTags={editTagsCurrentTags}
       />
 
-      {/* Preview Dialog for Details View */}
-      {previewFile && (
-        <DocumentViewer
-          fileId={previewFile.id}
-          fileName={previewFile.title}
-          mimeType={previewFile.mime}
-          onClose={() => setPreviewFile(null)}
-        />
-      )}
+      {/* File Details Modal */}
+      <FileDetailsModal
+        open={!!detailsFile}
+        onOpenChange={(open) => !open && setDetailsFile(null)}
+        file={detailsFile}
+        availableTags={availableTags}
+        onDelete={setDeleteId}
+        onMove={setMoveFileId}
+        onShare={handleShareFromDetails}
+        onDownload={handleDownloadFromDetails}
+      />
 
       {/* Share Link Dialog */}
       <ShareLinkDialog
