@@ -24,7 +24,7 @@ export function DocumentPreview({ fileId, fileName, mimeType, size = 'md', click
   const sizeClasses = {
     sm: isLifestyle ? 'w-14 h-14' : 'w-12 h-12',
     md: isLifestyle ? 'w-20 h-20' : 'w-16 h-16',
-    lg: isLifestyle ? 'w-40 h-40' : 'w-32 h-32',
+    lg: 'w-full h-full', // Full size for modal preview
   };
 
   const iconSizeClasses = {
@@ -116,7 +116,7 @@ export function DocumentPreview({ fileId, fileName, mimeType, size = 'md', click
             <img 
               src={previewUrl} 
               alt={fileName} 
-              className="w-full h-full object-cover"
+              className={size === 'lg' ? 'w-full h-full object-contain' : 'w-full h-full object-cover'}
             />
           )}
           {!isLoading && !error && !previewUrl && getFileTypeIcon()}

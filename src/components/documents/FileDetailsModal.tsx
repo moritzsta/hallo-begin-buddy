@@ -212,9 +212,9 @@ export const FileDetailsModal = ({
           <div className="flex-1 overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6 h-full">
               {/* Left: Preview */}
-              <div className="flex flex-col">
+              <div className="flex flex-col min-h-[400px]">
                 <Label className="mb-2">{t('documents.preview')}</Label>
-                <div className="flex-1 border rounded-lg overflow-hidden bg-muted/20">
+                <div className="flex-1 border rounded-lg overflow-hidden bg-muted/20 flex items-center justify-center">
                   <DocumentPreview
                     fileId={file.id}
                     fileName={file.title}
