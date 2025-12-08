@@ -1,12 +1,26 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Loader2, FileIcon, Trash2, MoreVertical, FolderInput } from 'lucide-react';
+import { Sparkles, Loader2, Trash2, MoreVertical, FolderInput, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,6 +46,7 @@ import { MoveFileDialog } from '@/components/documents/MoveFileDialog';
 import { fadeInUp, staggerContainer, getAnimationProps } from '@/lib/animations';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
+import { DOCUMENT_TYPES, getDocumentTypeLabel } from '@/lib/documentTypes';
 
 interface UnsortedFile {
   id: string;
@@ -40,7 +55,13 @@ interface UnsortedFile {
   size: number;
   storage_path: string;
   created_at: string;
+  document_type: string | null;
   meta: any;
+}
+
+interface FileMetadata {
+  description: string;
+  documentType: string;
 }
 
 interface UnsortedFileListProps {
@@ -59,6 +80,8 @@ export function UnsortedFileList({ onSmartUpload, smartUploadLoading }: Unsorted
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [moveFileId, setMoveFileId] = useState<string | null>(null);
   const [batchProcessing, setBatchProcessing] = useState(false);
+  const [expandedFiles, setExpandedFiles] = useState<Set<string>>(new Set());
+  const [fileMetadata, setFileMetadata] = useState<Record<string, FileMetadata>>({});
 
   // Fetch files in unsorted folder
   const { data: files = [], isLoading } = useQuery({
@@ -160,6 +183,66 @@ export function UnsortedFileList({ onSmartUpload, smartUploadLoading }: Unsorted
     return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
   };
 
+  const toggleExpanded = (fileId: string) => {
+    setExpandedFiles(prev => {
+      const next = new Set(prev);
+      if (next.has(fileId)) {
+        next.delete(fileId);
+      } else {
+        next.add(fileId);
+      }
+      return next;
+    });
+  };
+
+  const updateFileMetadata = (fileId: string, field: keyof FileMetadata, value: string) => {
+    setFileMetadata(prev => ({
+      ...prev,
+      [fileId]: {
+        ...prev[fileId],
+        [field]: value,
+      },
+    }));
+  };
+
+  // Get metadata for file (from state or from file's existing data)
+  const getFileMetadata = (file: UnsortedFile): FileMetadata => {
+    const existing = fileMetadata[file.id];
+    return {
+      description: existing?.description ?? (file.meta?.description || ''),
+      documentType: existing?.documentType ?? (file.document_type || ''),
+    };
+  };
+
+  // Update file mutation for saving metadata
+  const updateFileMutation = useMutation({
+    mutationFn: async ({ fileId, description, documentType }: { fileId: string; description: string; documentType: string }) => {
+      const { error } = await supabase
+        .from('files')
+        .update({
+          document_type: documentType || null,
+          meta: { description: description || null },
+        })
+        .eq('id', fileId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['unsorted-files'] });
+      toast({
+        title: t('common.saved', { defaultValue: 'Gespeichert' }),
+        description: t('upload.metadataSaved', { defaultValue: 'Metadaten wurden gespeichert' }),
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: t('common.error'),
+        description: error instanceof Error ? error.message : t('common.unknownError'),
+        variant: 'destructive',
+      });
+    },
+  });
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -229,93 +312,185 @@ export function UnsortedFileList({ onSmartUpload, smartUploadLoading }: Unsorted
       {/* File list */}
       <motion.div {...getAnimationProps(staggerContainer)} className="space-y-2">
         <AnimatePresence mode="popLayout">
-          {files.map(file => (
-            <motion.div key={file.id} {...getAnimationProps(fadeInUp)} layout>
-              <Card className={`p-4 transition-all duration-200 ${
-                selectedFiles.has(file.id) ? 'ring-2 ring-primary bg-primary/5' : 'hover:bg-muted/50'
-              }`}>
-                <div className="flex items-start gap-4">
-                  {/* Checkbox */}
-                  <Checkbox
-                    checked={selectedFiles.has(file.id)}
-                    onCheckedChange={() => toggleSelectFile(file.id)}
-                    className="mt-1"
-                  />
+          {files.map(file => {
+            const metadata = getFileMetadata(file);
+            const isExpanded = expandedFiles.has(file.id);
+            
+            return (
+              <motion.div key={file.id} {...getAnimationProps(fadeInUp)} layout>
+                <Card className={`transition-all duration-200 ${
+                  selectedFiles.has(file.id) ? 'ring-2 ring-primary bg-primary/5' : 'hover:bg-muted/50'
+                }`}>
+                  <Collapsible open={isExpanded} onOpenChange={() => toggleExpanded(file.id)}>
+                    <div className="p-4">
+                      <div className="flex items-start gap-4">
+                        {/* Checkbox */}
+                        <Checkbox
+                          checked={selectedFiles.has(file.id)}
+                          onCheckedChange={() => toggleSelectFile(file.id)}
+                          className="mt-1"
+                        />
 
-                  {/* Preview */}
-                  <div className="w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-muted">
-                    <DocumentPreview
-                      fileId={file.id}
-                      fileName={file.title}
-                      mimeType={file.mime}
-                      size="sm"
-                    />
-                  </div>
+                        {/* Preview */}
+                        <div className="w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-muted">
+                          <DocumentPreview
+                            fileId={file.id}
+                            fileName={file.title}
+                            mimeType={file.mime}
+                            size="sm"
+                          />
+                        </div>
 
-                  {/* File info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <h4 className="font-medium truncate">{file.title}</h4>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="secondary" className="text-xs">
-                            {file.mime.split('/')[1]?.toUpperCase() || 'FILE'}
-                          </Badge>
-                          <span className="text-xs text-muted-foreground">
-                            {formatFileSize(file.size)}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {format(new Date(file.created_at), 'dd.MM.yyyy HH:mm', {
-                              locale: i18n.language === 'de' ? de : undefined,
-                            })}
-                          </span>
+                        {/* File info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <h4 className="font-medium truncate">{file.title}</h4>
+                              <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                <Badge variant="secondary" className="text-xs">
+                                  {file.mime.split('/')[1]?.toUpperCase() || 'FILE'}
+                                </Badge>
+                                {metadata.documentType && (
+                                  <Badge variant="outline" className="text-xs">
+                                    {getDocumentTypeLabel(metadata.documentType, i18n.language)}
+                                  </Badge>
+                                )}
+                                <span className="text-xs text-muted-foreground">
+                                  {formatFileSize(file.size)}
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  {format(new Date(file.created_at), 'dd.MM.yyyy HH:mm', {
+                                    locale: i18n.language === 'de' ? de : undefined,
+                                  })}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="flex items-center gap-2">
+                              <CollapsibleTrigger asChild>
+                                <Button variant="ghost" size="sm" className="gap-1">
+                                  {isExpanded ? (
+                                    <ChevronUp className="h-4 w-4" />
+                                  ) : (
+                                    <ChevronDown className="h-4 w-4" />
+                                  )}
+                                  {t('upload.details', { defaultValue: 'Details' })}
+                                </Button>
+                              </CollapsibleTrigger>
+                              
+                              <Button
+                                variant="default"
+                                size="sm"
+                                onClick={() => onSmartUpload(file.id)}
+                                disabled={smartUploadLoading === file.id || batchProcessing}
+                                className="gap-1"
+                              >
+                                {smartUploadLoading === file.id ? (
+                                  <Loader2 className="h-3 w-3 animate-spin" />
+                                ) : (
+                                  <Sparkles className="h-3 w-3" />
+                                )}
+                                {t('upload.smartUpload')}
+                              </Button>
+
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                                    <MoreVertical className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="bg-popover">
+                                  <DropdownMenuItem onClick={() => setMoveFileId(file.id)}>
+                                    <FolderInput className="mr-2 h-4 w-4" />
+                                    {t('documents.move')}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => setDeleteId(file.id)}
+                                    className="text-destructive"
+                                  >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    {t('documents.delete')}
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                          </div>
                         </div>
                       </div>
-
-                      {/* Actions */}
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="default"
-                          size="sm"
-                          onClick={() => onSmartUpload(file.id)}
-                          disabled={smartUploadLoading === file.id || batchProcessing}
-                          className="gap-1"
-                        >
-                          {smartUploadLoading === file.id ? (
-                            <Loader2 className="h-3 w-3 animate-spin" />
-                          ) : (
-                            <Sparkles className="h-3 w-3" />
-                          )}
-                          {t('upload.smartUpload')}
-                        </Button>
-
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => setMoveFileId(file.id)}>
-                              <FolderInput className="mr-2 h-4 w-4" />
-                              {t('documents.move')}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => setDeleteId(file.id)}
-                              className="text-destructive"
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              {t('documents.delete')}
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
                     </div>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-          ))}
+
+                    {/* Expandable metadata section */}
+                    <CollapsibleContent>
+                      <div className="px-4 pb-4 pt-2 border-t border-border/50 bg-muted/30">
+                        <div className="grid gap-4 sm:grid-cols-2">
+                          {/* Document Type */}
+                          <div className="space-y-2">
+                            <Label htmlFor={`doctype-${file.id}`}>
+                              {t('upload.documentType', { defaultValue: 'Dokumententyp' })}
+                            </Label>
+                            <Select
+                              value={metadata.documentType}
+                              onValueChange={(value) => updateFileMetadata(file.id, 'documentType', value)}
+                            >
+                              <SelectTrigger id={`doctype-${file.id}`} className="bg-background">
+                                <SelectValue placeholder={t('upload.selectDocumentType', { defaultValue: 'Typ auswählen...' })} />
+                              </SelectTrigger>
+                              <SelectContent className="bg-popover">
+                                {Object.keys(DOCUMENT_TYPES).map((type) => (
+                                  <SelectItem key={type} value={type}>
+                                    {getDocumentTypeLabel(type, i18n.language)}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          {/* Description */}
+                          <div className="space-y-2 sm:col-span-2">
+                            <Label htmlFor={`desc-${file.id}`}>
+                              {t('upload.description', { defaultValue: 'Beschreibung' })}
+                            </Label>
+                            <Textarea
+                              id={`desc-${file.id}`}
+                              value={metadata.description}
+                              onChange={(e) => updateFileMetadata(file.id, 'description', e.target.value)}
+                              placeholder={t('upload.descriptionPlaceholder', { 
+                                defaultValue: 'Optionale Beschreibung oder Notizen...' 
+                              })}
+                              rows={2}
+                              className="resize-none bg-background"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Save button */}
+                        <div className="flex justify-end mt-4">
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => {
+                              updateFileMutation.mutate({
+                                fileId: file.id,
+                                description: metadata.description,
+                                documentType: metadata.documentType,
+                              });
+                            }}
+                            disabled={updateFileMutation.isPending}
+                          >
+                            {updateFileMutation.isPending ? (
+                              <Loader2 className="h-3 w-3 animate-spin mr-2" />
+                            ) : null}
+                            {t('common.save', { defaultValue: 'Speichern' })}
+                          </Button>
+                        </div>
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                </Card>
+              </motion.div>
+            );
+          })}
         </AnimatePresence>
       </motion.div>
 
