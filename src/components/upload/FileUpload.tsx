@@ -32,6 +32,7 @@ interface UploadFile {
   userContext?: string; // Optional user-provided context for AI
   skipAiAnalysis?: boolean; // Skip AI analysis, use only metadata and title
   initialFolderId?: string; // Track original folder for decrement on move
+  documentType?: string; // Document type selected during upload
 }
 
 const PLAN_LIMITS = {
@@ -186,7 +187,7 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
           hash_sha256: hashHex,
           folder_id: targetFolderId,
           tags: uploadFile.tags || [],
-          document_type: selectedDocumentType || null,
+          document_type: uploadFile.documentType || null,
           meta: {
             original_name: file.name,
             uploaded_at: new Date().toISOString(),
@@ -275,6 +276,7 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
         status: validationError ? ('error' as const) : ('pending' as const),
         error: validationError || undefined,
         skipAiAnalysis,
+        documentType: selectedDocumentType || undefined,
       };
     });
 
@@ -284,7 +286,7 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
     newFiles
       .filter(f => f.status === 'pending')
       .forEach(f => uploadFile(f));
-  }, [user, profile, userPreferences]);
+  }, [user, profile, userPreferences, selectedDocumentType]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
