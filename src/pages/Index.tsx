@@ -107,8 +107,11 @@ const Index = () => {
     await signOut();
   };
 
+  // State for skipDocumentAnalysis
+  const [pendingSkipAnalysis, setPendingSkipAnalysis] = useState(false);
+
   // Smart Upload handler for unsorted files
-  const handleSmartUpload = useCallback(async (fileId: string) => {
+  const handleSmartUpload = useCallback(async (fileId: string, skipDocumentAnalysis?: boolean) => {
     // Get file info
     const { data: fileData } = await supabase
       .from('files')
@@ -129,19 +132,20 @@ const Index = () => {
     
     if (shouldShowConfirmation) {
       setPendingSmartUploadId(fileId);
+      setPendingSkipAnalysis(skipDocumentAnalysis || false);
       setAiConfirmDialogOpen(true);
       return;
     }
 
-    await executeSmartUpload(fileId, fileData.title);
+    await executeSmartUpload(fileId, fileData.title, skipDocumentAnalysis);
   }, [user]);
 
-  const executeSmartUpload = async (fileId: string, fileName: string) => {
+  const executeSmartUpload = async (fileId: string, fileName: string, skipDocumentAnalysis?: boolean) => {
     setSmartUploadLoading(fileId);
 
     try {
       const { data, error } = await supabase.functions.invoke('smart-upload', {
-        body: { file_id: fileId },
+        body: { file_id: fileId, skip_document_analysis: skipDocumentAnalysis || false },
       });
 
       if (error) throw error;
@@ -488,9 +492,10 @@ const Index = () => {
               .single();
             
             if (fileData) {
-              await executeSmartUpload(pendingSmartUploadId, fileData.title);
+              await executeSmartUpload(pendingSmartUploadId, fileData.title, pendingSkipAnalysis);
             }
             setPendingSmartUploadId(null);
+            setPendingSkipAnalysis(false);
           }
         }}
         onCancel={() => {
