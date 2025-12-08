@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, DragEvent } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Loader2, Trash2, MoreVertical, FolderInput, ChevronDown, ChevronUp, FileType2, AlignLeft, Tags, ZapOff } from 'lucide-react';
+import { Sparkles, Loader2, Trash2, MoreVertical, FolderInput, ChevronDown, ChevronUp, FileType2, AlignLeft, Tags, ZapOff, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -92,6 +92,7 @@ export function UnsortedFileList({ onSmartUpload, smartUploadLoading }: Unsorted
   const [batchProcessing, setBatchProcessing] = useState(false);
   const [expandedFiles, setExpandedFiles] = useState<Set<string>>(new Set());
   const [fileMetadata, setFileMetadata] = useState<Record<string, FileMetadata>>({});
+  const [draggingFileId, setDraggingFileId] = useState<string | null>(null);
 
   // Fetch files in unsorted folder
   const { data: files = [], isLoading } = useQuery({
@@ -276,6 +277,22 @@ export function UnsortedFileList({ onSmartUpload, smartUploadLoading }: Unsorted
     },
   });
 
+  // Drag handlers
+  const handleDragStart = (e: DragEvent<HTMLDivElement>, file: UnsortedFile) => {
+    setDraggingFileId(file.id);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('application/json', JSON.stringify({
+      type: 'file',
+      id: file.id,
+      title: file.title,
+      currentFolderId: unsortedFolderId,
+    }));
+  };
+
+  const handleDragEnd = () => {
+    setDraggingFileId(null);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -350,10 +367,22 @@ export function UnsortedFileList({ onSmartUpload, smartUploadLoading }: Unsorted
             const isExpanded = expandedFiles.has(file.id);
             
             return (
-              <motion.div key={file.id} {...getAnimationProps(fadeInUp)} layout>
-                <Card className={`transition-all duration-200 ${
+              <motion.div 
+                key={file.id} 
+                {...getAnimationProps(fadeInUp)} 
+                layout
+                draggable
+                onDragStart={(e) => handleDragStart(e as unknown as DragEvent<HTMLDivElement>, file)}
+                onDragEnd={handleDragEnd}
+                className={cn(
+                  "cursor-grab active:cursor-grabbing",
+                  draggingFileId === file.id && "opacity-50 scale-[0.98]"
+                )}
+              >
+                <Card className={cn(
+                  "transition-all duration-200",
                   selectedFiles.has(file.id) ? 'ring-2 ring-primary bg-primary/5' : 'hover:bg-muted/50'
-                }`}>
+                )}>
                   <Collapsible open={isExpanded} onOpenChange={() => toggleExpanded(file.id)}>
                     <div className="p-4">
                       <div className="flex items-start gap-4">

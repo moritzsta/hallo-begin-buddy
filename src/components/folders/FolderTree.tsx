@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, DragEvent } from 'react';
 import { ChevronRight, ChevronDown, Folder, FolderOpen, MoreVertical, Plus, Inbox } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useFolders, type Folder as FolderType } from '@/hooks/useFolders';
 import { useFolderUnreadCounts } from '@/hooks/useFolderUnreadCounts';
 import { useUnsortedFolder } from '@/hooks/useUnsortedFolder';
+import { useMoveFile } from '@/hooks/useMoveFile';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { listItem, getAnimationProps } from '@/lib/animations';
@@ -18,6 +19,8 @@ import { CreateFolderDialog } from './CreateFolderDialog';
 import { RenameFolderDialog } from './RenameFolderDialog';
 import { DeleteFolderDialog } from './DeleteFolderDialog';
 import { FolderBadgeCount } from './FolderBadgeCount';
+import { cn } from '@/lib/utils';
+
 const SHOW_UNREAD_BADGES = false;
 
 interface FolderTreeProps {
@@ -30,6 +33,8 @@ export function FolderTree({ selectedFolderId, onSelectFolder }: FolderTreeProps
   const { folders } = useFolders();
   const { unreadCounts, resetFolderVisit } = useFolderUnreadCounts();
   const { unsortedFolder, unsortedCount } = useUnsortedFolder();
+  const moveFileMutation = useMoveFile();
+  
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [createParentId, setCreateParentId] = useState<string | undefined>(undefined);
@@ -37,9 +42,11 @@ export function FolderTree({ selectedFolderId, onSelectFolder }: FolderTreeProps
   const [renameFolder, setRenameFolder] = useState<FolderType | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteFolder, setDeleteFolder] = useState<FolderType | null>(null);
+  
+  // Drag & Drop state
+  const [dragOverFolderId, setDragOverFolderId] = useState<string | null>(null);
 
   const handleSelectFolder = async (folderId: string | null) => {
-    // Only reset unread counts if the feature is enabled
     if (folderId && SHOW_UNREAD_BADGES) {
       await resetFolderVisit(folderId);
     }
@@ -59,7 +66,6 @@ export function FolderTree({ selectedFolderId, onSelectFolder }: FolderTreeProps
   };
 
   const getRootFolders = () => {
-    // Exclude the system "Unsortiert" folder from regular folder tree
     return folders.filter(f => !f.parent_id && f.meta?.type !== 'unsorted');
   };
 
@@ -71,15 +77,13 @@ export function FolderTree({ selectedFolderId, onSelectFolder }: FolderTreeProps
     return folder.meta?.system === true || folder.meta?.type === 'unsorted';
   };
 
-  // Compute direct (non-duplicated) unread count for a folder.
-  // Our backend stores cumulative counts per folder (including descendants).
-  // To avoid double-counting at parents, subtract the children's cumulative counts.
   const getDirectUnreadCount = (folderId: string) => {
     const own = unreadCounts.get(folderId) || 0;
     const children = getChildFolders(folderId);
     const childrenSum = children.reduce((sum, child) => sum + (unreadCounts.get(child.id) || 0), 0);
     return Math.max(0, own - childrenSum);
   };
+
   const handleCreateFolder = (parentId?: string) => {
     setCreateParentId(parentId);
     setCreateDialogOpen(true);
@@ -95,22 +99,75 @@ export function FolderTree({ selectedFolderId, onSelectFolder }: FolderTreeProps
     setDeleteDialogOpen(true);
   };
 
+  // Drag & Drop handlers
+  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDragEnter = (e: DragEvent<HTMLDivElement>, folderId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOverFolderId(folderId);
+  };
+
+  const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    // Only clear if we're leaving the folder element entirely
+    const relatedTarget = e.relatedTarget as HTMLElement;
+    if (!relatedTarget || !e.currentTarget.contains(relatedTarget)) {
+      setDragOverFolderId(null);
+    }
+  };
+
+  const handleDrop = (e: DragEvent<HTMLDivElement>, folderId: string, folderName: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOverFolderId(null);
+
+    try {
+      const data = e.dataTransfer.getData('application/json');
+      if (!data) return;
+
+      const payload = JSON.parse(data);
+      if (payload.type !== 'file') return;
+
+      // Don't move to same folder
+      if (payload.currentFolderId === folderId) return;
+
+      moveFileMutation.mutate({
+        fileId: payload.id,
+        folderId,
+        folderName,
+      });
+    } catch (error) {
+      console.error('Drop error:', error);
+    }
+  };
+
   const renderFolder = (folder: FolderType, depth: number = 0) => {
     const isExpanded = expandedFolders.has(folder.id);
     const isSelected = selectedFolderId === folder.id;
     const children = getChildFolders(folder.id);
     const hasChildren = children.length > 0;
     const unreadCount = getDirectUnreadCount(folder.id);
+    const isDragOver = dragOverFolderId === folder.id;
 
     return (
       <motion.div key={folder.id} className="select-none" {...getAnimationProps(listItem)}>
         <motion.div
-          className={`flex items-center gap-1 py-1 px-2 rounded-md hover:bg-accent group transition-colors ${
-            isSelected ? 'bg-accent' : ''
-          }`}
+          className={cn(
+            "flex items-center gap-1 py-1 px-2 rounded-md hover:bg-accent group transition-all",
+            isSelected && 'bg-accent',
+            isDragOver && 'ring-2 ring-primary bg-primary/10'
+          )}
           style={{ paddingLeft: `${depth * 16 + 8}px` }}
           whileHover={{ x: 4 }}
           transition={{ duration: 0.2 }}
+          onDragOver={handleDragOver}
+          onDragEnter={(e) => handleDragEnter(e, folder.id)}
+          onDragLeave={handleDragLeave}
+          onDrop={(e) => handleDrop(e, folder.id, folder.name)}
         >
           {hasChildren && (
             <div
@@ -139,9 +196,9 @@ export function FolderTree({ selectedFolderId, onSelectFolder }: FolderTreeProps
             }}
           >
             {isExpanded && hasChildren ? (
-              <FolderOpen className="h-4 w-4 text-muted-foreground" />
+              <FolderOpen className={cn("h-4 w-4 text-muted-foreground", isDragOver && "text-primary")} />
             ) : (
-              <Folder className="h-4 w-4 text-muted-foreground" />
+              <Folder className={cn("h-4 w-4 text-muted-foreground", isDragOver && "text-primary")} />
             )}
             <span className="text-sm truncate">{folder.name}</span>
           </div>
@@ -207,9 +264,10 @@ export function FolderTree({ selectedFolderId, onSelectFolder }: FolderTreeProps
       {/* Unsortiert folder - always at top */}
       {unsortedFolder && (
         <div
-          className={`py-1.5 px-2 rounded-md cursor-pointer hover:bg-accent transition-colors mb-2 border-b pb-2 ${
-            selectedFolderId === unsortedFolder.id ? 'bg-accent' : ''
-          }`}
+          className={cn(
+            "py-1.5 px-2 rounded-md cursor-pointer hover:bg-accent transition-all mb-2 border-b pb-2",
+            selectedFolderId === unsortedFolder.id && 'bg-accent'
+          )}
           onClick={() => handleSelectFolder(unsortedFolder.id)}
         >
           <div className="flex items-center justify-between">
@@ -227,9 +285,10 @@ export function FolderTree({ selectedFolderId, onSelectFolder }: FolderTreeProps
       )}
 
       <div
-        className={`py-1 px-2 rounded-md cursor-pointer hover:bg-accent ${
-          selectedFolderId === null ? 'bg-accent' : ''
-        }`}
+        className={cn(
+          "py-1 px-2 rounded-md cursor-pointer hover:bg-accent",
+          selectedFolderId === null && 'bg-accent'
+        )}
         onClick={() => handleSelectFolder(null)}
       >
         <div className="flex items-center gap-2">
