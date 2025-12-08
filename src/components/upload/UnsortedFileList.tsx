@@ -43,6 +43,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUnsortedFolder } from '@/hooks/useUnsortedFolder';
 import { DocumentPreview } from '@/components/documents/DocumentPreview';
 import { MoveFileDialog } from '@/components/documents/MoveFileDialog';
+import { TagInput } from '@/components/documents/TagInput';
 import { fadeInUp, staggerContainer, getAnimationProps } from '@/lib/animations';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
@@ -56,12 +57,14 @@ interface UnsortedFile {
   storage_path: string;
   created_at: string;
   document_type: string | null;
+  tags: string[] | null;
   meta: any;
 }
 
 interface FileMetadata {
   description: string;
   documentType: string;
+  tags: string[];
 }
 
 interface UnsortedFileListProps {
@@ -211,16 +214,28 @@ export function UnsortedFileList({ onSmartUpload, smartUploadLoading }: Unsorted
     return {
       description: existing?.description ?? (file.meta?.description || ''),
       documentType: existing?.documentType ?? (file.document_type || ''),
+      tags: existing?.tags ?? (file.tags || []),
     };
+  };
+
+  const updateFileTags = (fileId: string, tags: string[]) => {
+    setFileMetadata(prev => ({
+      ...prev,
+      [fileId]: {
+        ...prev[fileId],
+        tags,
+      },
+    }));
   };
 
   // Update file mutation for saving metadata
   const updateFileMutation = useMutation({
-    mutationFn: async ({ fileId, description, documentType }: { fileId: string; description: string; documentType: string }) => {
+    mutationFn: async ({ fileId, description, documentType, tags }: { fileId: string; description: string; documentType: string; tags: string[] }) => {
       const { error } = await supabase
         .from('files')
         .update({
           document_type: documentType || null,
+          tags: tags.length > 0 ? tags : null,
           meta: { description: description || null },
         })
         .eq('id', fileId);
@@ -462,6 +477,19 @@ export function UnsortedFileList({ onSmartUpload, smartUploadLoading }: Unsorted
                               className="resize-none bg-background"
                             />
                           </div>
+
+                          {/* Tags */}
+                          <div className="space-y-2 sm:col-span-2">
+                            <Label>
+                              {t('documents.tags', { defaultValue: 'Tags' })}
+                            </Label>
+                            <TagInput
+                              tags={metadata.tags}
+                              onTagsChange={(tags) => updateFileTags(file.id, tags)}
+                              placeholder={t('tags.inputPlaceholder', { defaultValue: 'Tag hinzufügen...' })}
+                              maxTags={10}
+                            />
+                          </div>
                         </div>
 
                         {/* Save button */}
@@ -474,6 +502,7 @@ export function UnsortedFileList({ onSmartUpload, smartUploadLoading }: Unsorted
                                 fileId: file.id,
                                 description: metadata.description,
                                 documentType: metadata.documentType,
+                                tags: metadata.tags,
                               });
                             }}
                             disabled={updateFileMutation.isPending}
