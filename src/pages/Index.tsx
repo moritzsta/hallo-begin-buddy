@@ -39,6 +39,8 @@ const Index = () => {
   
   // Smart Upload state for unsorted files
   const [smartUploadLoading, setSmartUploadLoading] = useState<string | null>(null);
+  const [batchAutoLoading, setBatchAutoLoading] = useState(false);
+  const [batchProgress, setBatchProgress] = useState<{ current: number; total: number } | null>(null);
   const [confirmDialogState, setConfirmDialogState] = useState<{
     open: boolean;
     fileId: string | null;
@@ -285,6 +287,144 @@ const Index = () => {
     }
   };
 
+  // Auto-batch smart upload (no confirmation dialogs)
+  const executeBatchSmartUploadAuto = useCallback(async (fileIds: string[]) => {
+    if (!user || fileIds.length === 0) return;
+
+    setBatchAutoLoading(true);
+    setBatchProgress({ current: 0, total: fileIds.length });
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (let i = 0; i < fileIds.length; i++) {
+      const fileId = fileIds[i];
+      setBatchProgress({ current: i + 1, total: fileIds.length });
+
+      try {
+        // Call Smart Upload Edge Function
+        const { data, error } = await supabase.functions.invoke('smart-upload', {
+          body: { file_id: fileId, skip_document_analysis: false },
+        });
+
+        if (error || !data?.extracted) {
+          console.error('Smart upload error for file', fileId, error);
+          errorCount++;
+          continue;
+        }
+
+        const metadata = data.extracted;
+        const pathParts = (metadata.suggested_path || '').split('/').filter(Boolean);
+
+        // Create folder structure if needed
+        let targetFolderId: string | null = null;
+        if (pathParts.length > 0) {
+          const { data: allFolders } = await supabase
+            .from('folders')
+            .select('*')
+            .eq('owner_id', user.id);
+
+          let currentParentId: string | null = null;
+
+          for (const folderName of pathParts) {
+            const existingFolder = allFolders?.find(
+              f => f.name === folderName && f.parent_id === currentParentId
+            );
+
+            if (existingFolder) {
+              currentParentId = existingFolder.id;
+            } else {
+              const { data: newFolder, error: folderError } = await supabase
+                .from('folders')
+                .insert({
+                  owner_id: user.id,
+                  name: folderName,
+                  parent_id: currentParentId,
+                })
+                .select()
+                .single();
+
+              if (folderError) {
+                console.error('Folder creation error:', folderError);
+                break;
+              }
+              currentParentId = newFolder.id;
+            }
+          }
+
+          targetFolderId = currentParentId;
+        }
+
+        // Update file directly without confirmation dialog
+        const { error: updateError } = await supabase
+          .from('files')
+          .update({
+            title: metadata.suggested_title || 'Untitled',
+            tags: metadata.keywords || [],
+            folder_id: targetFolderId || undefined,
+            meta: {
+              doc_type: metadata.document_type,
+              smart_upload: true,
+              auto_batch: true,
+              ai_suggested_path: metadata.suggested_path,
+            },
+          })
+          .eq('id', fileId);
+
+        if (updateError) {
+          console.error('File update error:', updateError);
+          errorCount++;
+          continue;
+        }
+
+        // Update unread counts
+        if (targetFolderId && unsortedFolderId) {
+          await supabase.rpc('increment_folder_unread_count', {
+            p_user_id: user.id,
+            p_folder_id: unsortedFolderId,
+            p_increment: -1,
+          });
+          await supabase.rpc('increment_folder_unread_count', {
+            p_user_id: user.id,
+            p_folder_id: targetFolderId,
+            p_increment: 1,
+          });
+        }
+
+        successCount++;
+      } catch (e) {
+        console.error('Batch smart upload error for file', fileId, e);
+        errorCount++;
+      }
+
+      // Small delay between files
+      await new Promise(r => setTimeout(r, 300));
+    }
+
+    // Show result toast
+    if (errorCount > 0) {
+      toast({
+        title: t('upload.batchComplete', { count: successCount }),
+        description: t('upload.batchCompleteWithErrors', { success: successCount, errors: errorCount }),
+        variant: errorCount === fileIds.length ? 'destructive' : 'default',
+      });
+    } else {
+      toast({
+        title: t('upload.batchComplete', { count: successCount }),
+        description: t('upload.batchSuccess'),
+      });
+    }
+
+    // Refresh data
+    queryClient.invalidateQueries({ queryKey: ['unsorted-files'] });
+    queryClient.invalidateQueries({ queryKey: ['unsorted-count'] });
+    queryClient.invalidateQueries({ queryKey: ['folders'] });
+    queryClient.invalidateQueries({ queryKey: ['files'] });
+    invalidateUnreadCounts();
+
+    setBatchAutoLoading(false);
+    setBatchProgress(null);
+  }, [user, unsortedFolderId, toast, t, queryClient, invalidateUnreadCounts]);
+
   // Fetch available tags for the metadata dialog
   const [availableTags, setAvailableTags] = useState<string[]>([]);
   useEffect(() => {
@@ -416,9 +556,12 @@ const Index = () => {
                       {t('upload.noUnsortedFilesDesc')}
                     </p>
                   </div>
-                  <UnsortedFileList 
+                <UnsortedFileList 
                     onSmartUpload={handleSmartUpload}
+                    onBatchSmartUploadAuto={executeBatchSmartUploadAuto}
                     smartUploadLoading={smartUploadLoading}
+                    batchAutoLoading={batchAutoLoading}
+                    batchProgress={batchProgress}
                   />
                 </div>
               </TabsContent>

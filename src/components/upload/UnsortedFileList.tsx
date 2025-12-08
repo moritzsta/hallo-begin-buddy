@@ -76,10 +76,19 @@ interface FileMetadata {
 
 interface UnsortedFileListProps {
   onSmartUpload: (fileId: string, skipDocumentAnalysis?: boolean) => void;
+  onBatchSmartUploadAuto: (fileIds: string[]) => Promise<void>;
   smartUploadLoading: string | null;
+  batchAutoLoading: boolean;
+  batchProgress: { current: number; total: number } | null;
 }
 
-export function UnsortedFileList({ onSmartUpload, smartUploadLoading }: UnsortedFileListProps) {
+export function UnsortedFileList({ 
+  onSmartUpload, 
+  onBatchSmartUploadAuto, 
+  smartUploadLoading, 
+  batchAutoLoading,
+  batchProgress 
+}: UnsortedFileListProps) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -176,16 +185,26 @@ export function UnsortedFileList({ onSmartUpload, smartUploadLoading }: Unsorted
 
     if (filesToProcess.length === 0) return;
 
-    setBatchProcessing(true);
-    
-    for (const file of filesToProcess) {
-      await onSmartUpload(file.id);
-      // Small delay between files to not overwhelm the API
-      await new Promise(resolve => setTimeout(resolve, 500));
+    // Check if ALL files are selected (either no selection = all, or all selected)
+    const allSelected = selectedFiles.size === 0 || selectedFiles.size === files.length;
+
+    if (allSelected && filesToProcess.length > 1) {
+      // ALL selected → Auto-mode WITHOUT confirmation dialogs
+      await onBatchSmartUploadAuto(filesToProcess.map(f => f.id));
+      setSelectedFiles(new Set());
+    } else {
+      // Partial selection or single file → Dialog mode
+      setBatchProcessing(true);
+      
+      for (const file of filesToProcess) {
+        await onSmartUpload(file.id);
+        // Small delay between files to not overwhelm the API
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      
+      setBatchProcessing(false);
+      setSelectedFiles(new Set());
     }
-    
-    setBatchProcessing(false);
-    setSelectedFiles(new Set());
   };
 
   const formatFileSize = (bytes: number): string => {
@@ -336,13 +355,20 @@ export function UnsortedFileList({ onSmartUpload, smartUploadLoading }: Unsorted
 
         <Button
           onClick={handleBatchSmartUpload}
-          disabled={batchProcessing || !!smartUploadLoading}
+          disabled={batchProcessing || batchAutoLoading || !!smartUploadLoading}
           className="gap-2"
         >
-          {batchProcessing ? (
+          {batchProcessing || batchAutoLoading ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              {t('upload.processing', { defaultValue: 'Verarbeite...' })}
+              {batchProgress 
+                ? t('upload.batchProcessing', { 
+                    current: batchProgress.current, 
+                    total: batchProgress.total,
+                    defaultValue: 'Verarbeite {{current}} von {{total}}...'
+                  })
+                : t('upload.processing', { defaultValue: 'Verarbeite...' })
+              }
             </>
           ) : (
             <>
