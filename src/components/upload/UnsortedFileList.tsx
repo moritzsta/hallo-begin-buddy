@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Loader2, Trash2, MoreVertical, FolderInput, ChevronDown, ChevronUp } from 'lucide-react';
+import { Sparkles, Loader2, Trash2, MoreVertical, FolderInput, ChevronDown, ChevronUp, FileType2, AlignLeft, Tags, ZapOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -37,6 +37,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -45,6 +50,7 @@ import { DocumentPreview } from '@/components/documents/DocumentPreview';
 import { MoveFileDialog } from '@/components/documents/MoveFileDialog';
 import { TagInput } from '@/components/documents/TagInput';
 import { fadeInUp, staggerContainer, getAnimationProps } from '@/lib/animations';
+import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { DOCUMENT_TYPES, getDocumentTypeLabel } from '@/lib/documentTypes';
@@ -390,6 +396,83 @@ export function UnsortedFileList({ onSmartUpload, smartUploadLoading }: Unsorted
                                     locale: i18n.language === 'de' ? de : undefined,
                                   })}
                                 </span>
+                              </div>
+                              
+                              {/* Status Badges */}
+                              <div className="flex items-center gap-1.5 mt-2">
+                                {/* Dokumententyp Badge */}
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div className={cn(
+                                      "flex items-center justify-center w-6 h-6 rounded-full transition-colors",
+                                      metadata.documentType 
+                                        ? "bg-green-500/20 text-green-600 dark:text-green-400" 
+                                        : "bg-muted text-muted-foreground/40"
+                                    )}>
+                                      <FileType2 className="h-3.5 w-3.5" />
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    {metadata.documentType 
+                                      ? t('upload.badges.documentType')
+                                      : t('upload.badges.documentTypeEmpty')
+                                    }
+                                  </TooltipContent>
+                                </Tooltip>
+
+                                {/* Beschreibung Badge */}
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div className={cn(
+                                      "flex items-center justify-center w-6 h-6 rounded-full transition-colors",
+                                      metadata.description 
+                                        ? "bg-blue-500/20 text-blue-600 dark:text-blue-400" 
+                                        : "bg-muted text-muted-foreground/40"
+                                    )}>
+                                      <AlignLeft className="h-3.5 w-3.5" />
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    {metadata.description 
+                                      ? t('upload.badges.description')
+                                      : t('upload.badges.descriptionEmpty')
+                                    }
+                                  </TooltipContent>
+                                </Tooltip>
+
+                                {/* Tags Badge */}
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div className={cn(
+                                      "flex items-center justify-center w-6 h-6 rounded-full transition-colors",
+                                      metadata.tags.length > 0 
+                                        ? "bg-purple-500/20 text-purple-600 dark:text-purple-400" 
+                                        : "bg-muted text-muted-foreground/40"
+                                    )}>
+                                      <Tags className="h-3.5 w-3.5" />
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    {metadata.tags.length > 0 
+                                      ? t('upload.badges.tags')
+                                      : t('upload.badges.tagsEmpty')
+                                    }
+                                  </TooltipContent>
+                                </Tooltip>
+
+                                {/* Skip AI Badge (nur sichtbar wenn aktiviert) */}
+                                {metadata.skipAiAnalysis && (
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 transition-colors">
+                                        <ZapOff className="h-3.5 w-3.5" />
+                                      </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      {t('upload.badges.skipAiAnalysis')}
+                                    </TooltipContent>
+                                  </Tooltip>
+                                )}
                               </div>
                             </div>
 
