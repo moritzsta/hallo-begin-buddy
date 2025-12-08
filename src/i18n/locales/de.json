@@ -87,7 +87,16 @@
     "documentType": "Dokumententyp",
     "description": "Beschreibung",
     "descriptionPlaceholder": "Optionale Beschreibung oder Notizen...",
-    "metadataSaved": "Metadaten wurden gespeichert"
+    "metadataSaved": "Metadaten wurden gespeichert",
+    "badges": {
+      "documentType": "Dokumententyp ausgewählt",
+      "documentTypeEmpty": "Kein Dokumententyp",
+      "description": "Beschreibung vorhanden",
+      "descriptionEmpty": "Keine Beschreibung",
+      "tags": "Tags vorhanden",
+      "tagsEmpty": "Keine Tags",
+      "skipAiAnalysis": "Ohne Dokumentenanalyse"
+    }
   },
   "documents": {
     "title": "Meine Dokumente",
