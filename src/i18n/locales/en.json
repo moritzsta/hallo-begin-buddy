@@ -82,7 +82,12 @@
     "documentTypeHelp": "Helps the AI suggest better folder structures and metadata.",
     "documentTypeTooltip": "Select the document type so the AI can suggest better folder structures and metadata.",
     "selectDocumentType": "Select type...",
-    "noDocumentType": "No type selected"
+    "noDocumentType": "No type selected",
+    "details": "Details",
+    "documentType": "Document Type",
+    "description": "Description",
+    "descriptionPlaceholder": "Optional description or notes...",
+    "metadataSaved": "Metadata saved"
   },
   "documents": {
     "title": "My Documents",

@@ -82,7 +82,12 @@
     "documentTypeHelp": "Hilft der KI, bessere Ordnerstrukturen und Metadaten vorzuschlagen.",
     "documentTypeTooltip": "Wählen Sie den Dokumenttyp, damit die KI bessere Ordnerstrukturen und Metadaten vorschlagen kann.",
     "selectDocumentType": "Typ auswählen...",
-    "noDocumentType": "Kein Typ ausgewählt"
+    "noDocumentType": "Kein Typ ausgewählt",
+    "details": "Details",
+    "documentType": "Dokumententyp",
+    "description": "Beschreibung",
+    "descriptionPlaceholder": "Optionale Beschreibung oder Notizen...",
+    "metadataSaved": "Metadaten wurden gespeichert"
   },
   "documents": {
     "title": "Meine Dokumente",
