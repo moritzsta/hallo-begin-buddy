@@ -74,15 +74,27 @@ export function DocumentPreview({ fileId, fileName, mimeType, size = 'md', click
         });
 
         if (previewError) {
+          // Silently handle errors - file might have been deleted or is inaccessible
           console.warn('Preview generation failed:', previewError);
+          setError(true);
+          return;
+        }
+
+        // Check for error in response data (edge function returns 500 with error object)
+        if (data?.error) {
+          console.warn('Preview error response:', data.error);
           setError(true);
           return;
         }
 
         if (data?.preview_url) {
           setPreviewUrl(data.preview_url);
+        } else {
+          // No preview URL returned - show fallback icon
+          setError(true);
         }
       } catch (err) {
+        // Silently handle - component will show fallback icon
         console.warn('Preview error:', err);
         setError(true);
       } finally {
