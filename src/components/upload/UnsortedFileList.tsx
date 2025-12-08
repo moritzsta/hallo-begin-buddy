@@ -403,16 +403,19 @@ export function UnsortedFileList({ onSmartUpload, smartUploadLoading }: Unsorted
                                 {/* Dokumententyp Badge */}
                                 <Tooltip>
                                   <TooltipTrigger asChild>
-                                    <div className={cn(
-                                      "flex items-center justify-center w-6 h-6 rounded-full transition-colors",
-                                      metadata.documentType 
-                                        ? "bg-green-500/20 text-green-600 dark:text-green-400" 
-                                        : "bg-muted text-muted-foreground/40"
-                                    )}>
+                                    <button
+                                      type="button"
+                                      className={cn(
+                                        "flex items-center justify-center w-6 h-6 rounded-full transition-colors cursor-default",
+                                        metadata.documentType 
+                                          ? "bg-green-500/20 text-green-600 dark:text-green-400" 
+                                          : "bg-muted text-muted-foreground/40"
+                                      )}
+                                    >
                                       <FileType2 className="h-3.5 w-3.5" />
-                                    </div>
+                                    </button>
                                   </TooltipTrigger>
-                                  <TooltipContent>
+                                  <TooltipContent side="bottom">
                                     {metadata.documentType 
                                       ? t('upload.badges.documentType')
                                       : t('upload.badges.documentTypeEmpty')
@@ -423,16 +426,19 @@ export function UnsortedFileList({ onSmartUpload, smartUploadLoading }: Unsorted
                                 {/* Beschreibung Badge */}
                                 <Tooltip>
                                   <TooltipTrigger asChild>
-                                    <div className={cn(
-                                      "flex items-center justify-center w-6 h-6 rounded-full transition-colors",
-                                      metadata.description 
-                                        ? "bg-blue-500/20 text-blue-600 dark:text-blue-400" 
-                                        : "bg-muted text-muted-foreground/40"
-                                    )}>
+                                    <button
+                                      type="button"
+                                      className={cn(
+                                        "flex items-center justify-center w-6 h-6 rounded-full transition-colors cursor-default",
+                                        metadata.description 
+                                          ? "bg-blue-500/20 text-blue-600 dark:text-blue-400" 
+                                          : "bg-muted text-muted-foreground/40"
+                                      )}
+                                    >
                                       <AlignLeft className="h-3.5 w-3.5" />
-                                    </div>
+                                    </button>
                                   </TooltipTrigger>
-                                  <TooltipContent>
+                                  <TooltipContent side="bottom">
                                     {metadata.description 
                                       ? t('upload.badges.description')
                                       : t('upload.badges.descriptionEmpty')
@@ -443,16 +449,19 @@ export function UnsortedFileList({ onSmartUpload, smartUploadLoading }: Unsorted
                                 {/* Tags Badge */}
                                 <Tooltip>
                                   <TooltipTrigger asChild>
-                                    <div className={cn(
-                                      "flex items-center justify-center w-6 h-6 rounded-full transition-colors",
-                                      metadata.tags.length > 0 
-                                        ? "bg-purple-500/20 text-purple-600 dark:text-purple-400" 
-                                        : "bg-muted text-muted-foreground/40"
-                                    )}>
+                                    <button
+                                      type="button"
+                                      className={cn(
+                                        "flex items-center justify-center w-6 h-6 rounded-full transition-colors cursor-default",
+                                        metadata.tags.length > 0 
+                                          ? "bg-purple-500/20 text-purple-600 dark:text-purple-400" 
+                                          : "bg-muted text-muted-foreground/40"
+                                      )}
+                                    >
                                       <Tags className="h-3.5 w-3.5" />
-                                    </div>
+                                    </button>
                                   </TooltipTrigger>
-                                  <TooltipContent>
+                                  <TooltipContent side="bottom">
                                     {metadata.tags.length > 0 
                                       ? t('upload.badges.tags')
                                       : t('upload.badges.tagsEmpty')
@@ -464,11 +473,14 @@ export function UnsortedFileList({ onSmartUpload, smartUploadLoading }: Unsorted
                                 {metadata.skipAiAnalysis && (
                                   <Tooltip>
                                     <TooltipTrigger asChild>
-                                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 transition-colors">
+                                      <button
+                                        type="button"
+                                        className="flex items-center justify-center w-6 h-6 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 transition-colors cursor-default"
+                                      >
                                         <ZapOff className="h-3.5 w-3.5" />
-                                      </div>
+                                      </button>
                                     </TooltipTrigger>
-                                    <TooltipContent>
+                                    <TooltipContent side="bottom">
                                       {t('upload.badges.skipAiAnalysis')}
                                     </TooltipContent>
                                   </Tooltip>
