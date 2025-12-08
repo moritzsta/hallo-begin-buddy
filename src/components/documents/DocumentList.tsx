@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useRef, DragEvent } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useUnsortedFolder } from '@/hooks/useUnsortedFolder';
 import { staggerContainer, listItem, getAnimationProps, fadeIn } from '@/lib/animations';
+import { cn } from '@/lib/utils';
 import {
   Table,
   TableBody,
@@ -52,7 +53,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Card } from '@/components/ui/card';
-import { MoreVertical, Download, Trash2, Edit, FileIcon, Loader2, Search, Folder as FolderIcon, SlidersHorizontal, CheckCheck, Tags, LayoutGrid, List, Eye, Link, FilePenLine } from 'lucide-react';
+import { MoreVertical, Download, Trash2, Edit, FileIcon, Loader2, Search, Folder as FolderIcon, SlidersHorizontal, CheckCheck, Tags, LayoutGrid, List, Eye, Link, FilePenLine, GripVertical } from 'lucide-react';
 import { MoveFileDialog } from './MoveFileDialog';
 import { DocumentPreview } from './DocumentPreview';
 import { FilterPanel, FileFilters } from './FilterPanel';
@@ -118,6 +119,9 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
     tags: [],
     documentTypes: [],
   });
+  
+  // Drag state
+  const [draggingFileId, setDraggingFileId] = useState<string | null>(null);
 
   // Fetch profile to get last_seen_at
   const { data: profile } = useQuery({
@@ -452,6 +456,21 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
     return `${(bytes / 1024 / 1024 / 1024).toFixed(1)} GB`;
   };
 
+  // Drag handlers
+  const handleDragStart = (e: DragEvent<HTMLTableRowElement | HTMLDivElement>, file: FileRecord) => {
+    setDraggingFileId(file.id);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('application/json', JSON.stringify({
+      type: 'file',
+      id: file.id,
+      title: file.title,
+      currentFolderId: file.folder_id,
+    }));
+  };
+
+  const handleDragEnd = () => {
+    setDraggingFileId(null);
+  };
 
   return (
     <div className="space-y-4">
@@ -604,7 +623,13 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
                     custom={index}
                     exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}
                     layout
-                    className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                    draggable
+                    onDragStart={(e) => handleDragStart(e as unknown as DragEvent<HTMLTableRowElement>, file)}
+                    onDragEnd={handleDragEnd}
+                    className={cn(
+                      "border-b transition-all hover:bg-muted/50 data-[state=selected]:bg-muted cursor-grab active:cursor-grabbing",
+                      draggingFileId === file.id && "opacity-50 scale-[0.98]"
+                    )}
                   >
                   <TableCell>
                     {editingId === file.id ? (
