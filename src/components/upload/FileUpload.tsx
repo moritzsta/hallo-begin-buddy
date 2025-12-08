@@ -186,6 +186,7 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
           hash_sha256: hashHex,
           folder_id: targetFolderId,
           tags: uploadFile.tags || [],
+          document_type: selectedDocumentType || null,
           meta: {
             original_name: file.name,
             uploaded_at: new Date().toISOString(),
