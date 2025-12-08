@@ -361,7 +361,7 @@ const Index = () => {
 
           <main className="flex-1 p-6 overflow-auto">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full max-w-lg grid-cols-3">
+              <TabsList className="flex flex-row w-full max-w-lg justify-center">
                 <TabsTrigger 
                   value="documents" 
                   className="flex items-center gap-2"
