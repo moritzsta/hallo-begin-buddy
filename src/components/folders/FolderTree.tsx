@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { ChevronRight, ChevronDown, Folder, FolderOpen, MoreVertical, Plus } from 'lucide-react';
+import { ChevronRight, ChevronDown, Folder, FolderOpen, MoreVertical, Plus, Inbox } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useFolders, type Folder as FolderType } from '@/hooks/useFolders';
 import { useFolderUnreadCounts } from '@/hooks/useFolderUnreadCounts';
+import { useUnsortedFolder } from '@/hooks/useUnsortedFolder';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { listItem, getAnimationProps } from '@/lib/animations';
 import {
   DropdownMenu,
@@ -27,6 +29,7 @@ export function FolderTree({ selectedFolderId, onSelectFolder }: FolderTreeProps
   const { t } = useTranslation();
   const { folders } = useFolders();
   const { unreadCounts, resetFolderVisit } = useFolderUnreadCounts();
+  const { unsortedFolder, unsortedCount } = useUnsortedFolder();
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [createParentId, setCreateParentId] = useState<string | undefined>(undefined);
@@ -56,11 +59,16 @@ export function FolderTree({ selectedFolderId, onSelectFolder }: FolderTreeProps
   };
 
   const getRootFolders = () => {
-    return folders.filter(f => !f.parent_id);
+    // Exclude the system "Unsortiert" folder from regular folder tree
+    return folders.filter(f => !f.parent_id && f.meta?.type !== 'unsorted');
   };
 
   const getChildFolders = (parentId: string) => {
     return folders.filter(f => f.parent_id === parentId);
+  };
+
+  const isSystemFolder = (folder: FolderType) => {
+    return folder.meta?.system === true || folder.meta?.type === 'unsorted';
   };
 
   // Compute direct (non-duplicated) unread count for a folder.
@@ -195,6 +203,28 @@ export function FolderTree({ selectedFolderId, onSelectFolder }: FolderTreeProps
           <Plus className="h-4 w-4" />
         </Button>
       </div>
+
+      {/* Unsortiert folder - always at top */}
+      {unsortedFolder && (
+        <div
+          className={`py-1.5 px-2 rounded-md cursor-pointer hover:bg-accent transition-colors mb-2 border-b pb-2 ${
+            selectedFolderId === unsortedFolder.id ? 'bg-accent' : ''
+          }`}
+          onClick={() => handleSelectFolder(unsortedFolder.id)}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Inbox className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium">{t('upload.unsorted')}</span>
+            </div>
+            {unsortedCount > 0 && (
+              <Badge variant="secondary" className="h-5 min-w-5 px-1.5 text-xs">
+                {unsortedCount}
+              </Badge>
+            )}
+          </div>
+        </div>
+      )}
 
       <div
         className={`py-1 px-2 rounded-md cursor-pointer hover:bg-accent ${
