@@ -65,10 +65,11 @@ interface FileMetadata {
   description: string;
   documentType: string;
   tags: string[];
+  skipAiAnalysis: boolean;
 }
 
 interface UnsortedFileListProps {
-  onSmartUpload: (fileId: string) => void;
+  onSmartUpload: (fileId: string, skipDocumentAnalysis?: boolean) => void;
   smartUploadLoading: string | null;
 }
 
@@ -215,7 +216,18 @@ export function UnsortedFileList({ onSmartUpload, smartUploadLoading }: Unsorted
       description: existing?.description ?? (file.meta?.description || ''),
       documentType: existing?.documentType ?? (file.document_type || ''),
       tags: existing?.tags ?? (file.tags || []),
+      skipAiAnalysis: existing?.skipAiAnalysis ?? false,
     };
+  };
+
+  const updateSkipAiAnalysis = (fileId: string, value: boolean) => {
+    setFileMetadata(prev => ({
+      ...prev,
+      [fileId]: {
+        ...prev[fileId],
+        skipAiAnalysis: value,
+      },
+    }));
   };
 
   const updateFileTags = (fileId: string, tags: string[]) => {
@@ -397,7 +409,7 @@ export function UnsortedFileList({ onSmartUpload, smartUploadLoading }: Unsorted
                               <Button
                                 variant="default"
                                 size="sm"
-                                onClick={() => onSmartUpload(file.id)}
+                                onClick={() => onSmartUpload(file.id, metadata.skipAiAnalysis)}
                                 disabled={smartUploadLoading === file.id || batchProcessing}
                                 className="gap-1"
                               >
@@ -489,6 +501,20 @@ export function UnsortedFileList({ onSmartUpload, smartUploadLoading }: Unsorted
                               placeholder={t('tags.inputPlaceholder', { defaultValue: 'Tag hinzufügen...' })}
                               maxTags={10}
                             />
+                          </div>
+
+                          {/* Skip AI Analysis Checkbox */}
+                          <div className="flex items-center space-x-2 sm:col-span-2">
+                            <Checkbox
+                              id={`skip-ai-${file.id}`}
+                              checked={metadata.skipAiAnalysis}
+                              onCheckedChange={(checked) => updateSkipAiAnalysis(file.id, !!checked)}
+                            />
+                            <Label htmlFor={`skip-ai-${file.id}`} className="text-sm font-normal cursor-pointer">
+                              {t('upload.skipAiAnalysis', { 
+                                defaultValue: 'Ohne Dokumentenanalyse (nutzt nur Metadaten und Titel)' 
+                              })}
+                            </Label>
                           </div>
                         </div>
 

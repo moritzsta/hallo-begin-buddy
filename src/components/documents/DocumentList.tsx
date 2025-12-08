@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useUnsortedFolder } from '@/hooks/useUnsortedFolder';
 import { staggerContainer, listItem, getAnimationProps, fadeIn } from '@/lib/animations';
 import {
   Table,
@@ -93,6 +94,7 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
   const queryClient = useQueryClient();
   const isLifestyle = theme === 'lifestyle';
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const { unsortedFolderId } = useUnsortedFolder();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [sortField, setSortField] = useState<SortField>('created_at');
@@ -138,7 +140,7 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
 
   // Fetch documents
   const { data: allFiles, isLoading, isFetching } = useQuery({
-    queryKey: ['files', user?.id, folderId, sortField, sortOrder, debouncedSearch],
+    queryKey: ['files', user?.id, folderId, unsortedFolderId, sortField, sortOrder, debouncedSearch],
     queryFn: async () => {
       let query = supabase
         .from('files')
@@ -147,7 +149,11 @@ export const DocumentList = ({ folderId }: DocumentListProps) => {
 
       // Filter by folder
       if (folderId) {
+        // Specific folder selected
         query = query.eq('folder_id', folderId);
+      } else if (unsortedFolderId) {
+        // "All Files" view - exclude unsorted folder
+        query = query.neq('folder_id', unsortedFolderId);
       }
 
       // Apply search
