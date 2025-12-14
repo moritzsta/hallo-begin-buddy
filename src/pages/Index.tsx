@@ -501,10 +501,10 @@ const Index = () => {
 
           <main className="flex-1 p-6 overflow-auto">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="inline-flex w-auto gap-1">
+              <TabsList className="grid grid-cols-3 w-full max-w-md">
                 <TabsTrigger 
                   value="documents" 
-                  className="flex items-center gap-2 flex-shrink-0"
+                  className="flex items-center justify-center gap-2"
                   data-tour="documents-tab"
                 >
                   <FileText className="h-4 w-4" />
@@ -512,7 +512,7 @@ const Index = () => {
                 </TabsTrigger>
                 <TabsTrigger 
                   value="unsorted" 
-                  className="flex items-center gap-2 relative flex-shrink-0"
+                  className="flex items-center justify-center gap-2"
                   data-tour="unsorted-tab"
                 >
                   <Inbox className="h-4 w-4" />
@@ -525,7 +525,7 @@ const Index = () => {
                 </TabsTrigger>
                 <TabsTrigger 
                   value="upload" 
-                  className="flex items-center gap-2 flex-shrink-0"
+                  className="flex items-center justify-center gap-2"
                   data-tour="upload-tab"
                 >
                   <Upload className="h-4 w-4" />
