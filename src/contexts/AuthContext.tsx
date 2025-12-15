@@ -139,16 +139,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
-    if (error) {
+    
+    // IMMER den lokalen State zurücksetzen, auch bei Server-Fehler
+    setUser(null);
+    setSession(null);
+    setProfile(null);
+    
+    // Nur bei echten Fehlern (nicht "session not found") Toast anzeigen
+    if (error && !error.message?.toLowerCase().includes('session')) {
       toast({
         title: i18n.t('auth.errorSignout'),
         description: error.message,
         variant: 'destructive',
       });
-    } else {
-      setUser(null);
-      setSession(null);
-      setProfile(null);
     }
   };
 
