@@ -138,12 +138,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    
-    // IMMER den lokalen State zurücksetzen, auch bei Server-Fehler
+    // Zuerst lokalen State zurücksetzen
     setUser(null);
     setSession(null);
     setProfile(null);
+    
+    // Dann Server-seitigen Logout versuchen
+    const { error } = await supabase.auth.signOut();
+    
+    // localStorage explizit leeren für sauberen State
+    localStorage.removeItem('sb-bzyohsokcfjlmbguijow-auth-token');
     
     // Nur bei echten Fehlern (nicht "session not found") Toast anzeigen
     if (error && !error.message?.toLowerCase().includes('session')) {
