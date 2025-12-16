@@ -217,6 +217,19 @@
 
 ---
 
+### [18-Live-Search-Pattern.md](./18-Live-Search-Pattern.md) ⭐ NEU
+**Was:** Live-Suche mit Debounce & Fokus-Persistenz  
+**Wann:** Dokumentenlisten, Produktsuche, Datenbankabfragen  
+**Enthält:**
+- **useDebounce Hook:** Generischer TypeScript-Hook (konfigurierbar)
+- **Fokus-Persistenz:** Cursor bleibt im Suchfeld während Laden
+- **React Query Integration:** `debouncedSearch` im queryKey
+- **Server-Suche:** Supabase `.or()` mit `ilike` + `cs` Operatoren
+- **Client-Filter:** `useMemo` für feingranulare Filterung
+- **i18n:** Übersetzbare Platzhalter + Empty States
+
+---
+
 ## 🎯 Anwendungshinweise für Lovable KI
 
 ### Bei neuem Projekt:
@@ -264,13 +277,14 @@
 - [ ] **14-Transactional-Email:** E-Mail-Templates
 - [ ] **12-Account-Deletion:** DSGVO-Löschung
 - [ ] **17-Drag-And-Drop:** Item-Organisation
+- [ ] **18-Live-Search:** Debounced Suche mit Fokus-Persistenz
 
 **Reihenfolge:**
 1. Auth + Security (Fundament)
 2. UI/UX + i18n + Cookie-Consent (Basis)
 3. Datenstruktur + Sharing (MVP-Features)
 4. Subscription + Limits + KI + Email (Erweitert)
-5. PWA + Tour + DnD (Polish)
+5. PWA + Tour + DnD + Live-Search (Polish)
 
 ---
 
@@ -288,6 +302,6 @@
 
 ---
 
-**Version:** 2.0  
-**Stand:** 2025-01-16  
+**Version:** 2.1  
+**Stand:** 2025-12-16  
 **Basis:** Dokumentenablage, PromptManager, Handwerker-Marketplace
